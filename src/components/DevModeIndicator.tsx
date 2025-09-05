@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Code, Database } from 'lucide-react';
 
 const DevModeIndicator: React.FC = () => {
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
   
   if (!isDevelopment) {
     return null;

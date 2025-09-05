@@ -10,12 +10,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { WalletType } from '@/lib/wallet-adapters/types';
 import { useNavigate } from 'react-router-dom';
 import WalletInstallGuide from './WalletInstallGuide';
+import SimpleWalletConnector from './SimpleWalletConnector';
 
 const WalletConnector: React.FC = () => {
   const { wallet, user, userStats, availableWallets, currentWalletType, connectWallet, disconnectWallet, isLoading } = useWallet();
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
   const navigate = useNavigate();
+
+  // Fallback to simple wallet connector if there are issues
+  const hasError = availableWallets.length === 0 && !isLoading;
+  if (hasError) {
+    return <SimpleWalletConnector />;
+  }
 
   const handleConnect = async (walletType?: WalletType) => {
     try {

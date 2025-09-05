@@ -7,7 +7,7 @@ import { Wallet, User, TrendingUp, DollarSign } from 'lucide-react';
 
 const MockDataDemo: React.FC = () => {
   const { wallet, user, userStats, availableWallets, currentWalletType } = useWallet();
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
 
   if (!isDevelopment) {
     return null;

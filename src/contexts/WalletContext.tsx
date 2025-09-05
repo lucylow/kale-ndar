@@ -44,7 +44,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       try {
         // Use mock data in development mode
-        const isDevelopment = import.meta.env.DEV;
+        const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
         const manager = isDevelopment ? mockWalletManager : walletManager;
         
         // Get available wallets
@@ -89,7 +89,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsLoading(true);
       
       // Use mock data in development mode
-      const isDevelopment = import.meta.env.DEV;
+      const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
       
       if (isDevelopment) {
         // Use new mock data
@@ -128,51 +128,51 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           });
         }
       } else {
-        // Try to load user profile from API
-        try {
-          const userProfile = await apiService.getUserProfile(address);
-          setUser(userProfile);
-        } catch (error) {
-          // Fallback to mock data
-          const mockUser = getMockUserByAddress(address);
-          if (mockUser) {
-            setUser(mockUser);
-          } else {
-            // Create a new user profile
-            setUser({
-              id: 0,
-              address,
-              username: null,
-              email: null,
-              created_at: new Date().toISOString(),
-              last_login: new Date().toISOString(),
-              total_bets: 0,
-              total_winnings: 0,
-            });
-          }
+      // Try to load user profile from API
+      try {
+        const userProfile = await apiService.getUserProfile(address);
+        setUser(userProfile);
+      } catch (error) {
+        // Fallback to mock data
+        const mockUser = getMockUserByAddress(address);
+        if (mockUser) {
+          setUser(mockUser);
+        } else {
+          // Create a new user profile
+          setUser({
+            id: 0,
+            address,
+            username: null,
+            email: null,
+            created_at: new Date().toISOString(),
+            last_login: new Date().toISOString(),
+            total_bets: 0,
+            total_winnings: 0,
+          });
         }
-        
-        // Try to load user stats from API
-        try {
-          const stats = await apiService.getUserStats(address);
-          setUserStats(stats);
-        } catch (error) {
-          // Fallback to mock data
-          const mockStats = getMockUserStats(address);
-          if (mockStats) {
-            setUserStats(mockStats);
-          } else {
-            // Create default stats
-            setUserStats({
-              total_bets: 0,
-              total_bet_amount: 0,
-              claimed_bets: 0,
-              pending_claims: 0,
-              wins: 0,
-              losses: 0,
-              win_rate: 0,
-              recent_activity: [],
-            });
+      }
+      
+      // Try to load user stats from API
+      try {
+        const stats = await apiService.getUserStats(address);
+        setUserStats(stats);
+      } catch (error) {
+        // Fallback to mock data
+        const mockStats = getMockUserStats(address);
+        if (mockStats) {
+          setUserStats(mockStats);
+        } else {
+          // Create default stats
+          setUserStats({
+            total_bets: 0,
+            total_bet_amount: 0,
+            claimed_bets: 0,
+            pending_claims: 0,
+            wins: 0,
+            losses: 0,
+            win_rate: 0,
+            recent_activity: [],
+          });
           }
         }
       }
@@ -191,7 +191,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsLoading(true);
       
       // Use mock data in development mode
-      const isDevelopment = import.meta.env.DEV;
+      const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
       const manager = isDevelopment ? mockWalletManager : walletManager;
       
       // If no wallet type specified, try to connect to the first available wallet

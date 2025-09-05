@@ -8,6 +8,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import DevModeIndicator from "@/components/DevModeIndicator";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import WalletTest from "./pages/WalletTest";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./components/AuthGuard";
 
@@ -24,6 +25,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/wallet-test" element={<WalletTest />} />
               <Route 
                 path="/dashboard" 
                 element={

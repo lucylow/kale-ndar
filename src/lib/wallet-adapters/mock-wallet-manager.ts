@@ -35,6 +35,19 @@ export class MockWalletManager extends WalletManager {
     }
   }
 
+  async disconnectWallet(): Promise<void> {
+    this.currentConnection = null;
+    this.currentWallet = null;
+  }
+
+  getCurrentWallet(): string | null {
+    return this.currentWallet;
+  }
+
+  getCurrentConnection(): any {
+    return this.currentConnection;
+  }
+
   async autoConnect() {
     const availableWallets = this.getAvailableWallets();
     
