@@ -157,6 +157,31 @@ All colors MUST be HSL. Semantic tokens for consistent theming.
     outline-offset: 2px;
   }
 
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    :root {
+      --border: 0 0% 0%;
+      --ring: 0 0% 0%;
+    }
+    
+    .light {
+      --border: 0 0% 100%;
+      --ring: 0 0% 100%;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   /* Selection styles */
   ::selection {
     background: hsl(var(--primary) / 0.2);

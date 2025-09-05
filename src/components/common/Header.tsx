@@ -53,44 +53,6 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link 
-              to="/dashboard" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              Dashboard
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link 
-              to="/kale" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              KALE
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link 
-              to="/reflector" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              Reflector
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link 
-              to="/defi" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              DeFi
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link 
-              to="/markets" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              Markets
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-          </div>
           
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center gap-4">

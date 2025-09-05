@@ -211,11 +211,11 @@ const DeFiPage = () => {
                 <CardContent className="space-y-4">
                   <div className="text-center">
                     <p className="text-3xl font-bold text-green-600">{strategy.apy}%</p>
-                    <p className="text-sm text-gray-600">Expected APY</p>
+                    <p className="text-sm text-muted-foreground">Expected APY</p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Supported Assets</p>
+                    <p className="text-sm font-medium text-foreground mb-2">Supported Assets</p>
                     <div className="flex flex-wrap gap-2">
                       {strategy.assets.map((asset, idx) => (
                         <Badge key={idx} variant="outline" className="text-xs">

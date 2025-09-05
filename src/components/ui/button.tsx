@@ -21,6 +21,10 @@ const buttonVariants = cva(
         hero: "bg-gradient-primary text-primary-foreground hover:shadow-teal hover:-translate-y-1 font-semibold",
         premium: "bg-gradient-accent text-primary-foreground hover:shadow-primary hover:scale-105 font-semibold",
         glow: "bg-accent-teal text-background hover:bg-accent-teal/90 shadow-teal hover:shadow-xl animate-pulse-glow",
+        success: "bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-green-500/25 hover:scale-105",
+        warning: "bg-yellow-600 text-white hover:bg-yellow-700 shadow-lg hover:shadow-yellow-500/25 hover:scale-105",
+        danger: "bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-red-500/25 hover:scale-105",
+        gradient: "bg-gradient-to-r from-primary to-accent-teal text-white hover:from-primary/90 hover:to-accent-teal/90 shadow-lg hover:shadow-xl hover:scale-105",
       },
       size: {
         default: "h-10 px-4 py-2",

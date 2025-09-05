@@ -59,8 +59,8 @@ const ReflectorPage = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Feeds</p>
-                <p className="text-2xl font-bold text-gray-900">{oracleStats.totalFeeds}</p>
+                <p className="text-sm text-muted-foreground">Total Feeds</p>
+                <p className="text-2xl font-bold text-foreground">{oracleStats.totalFeeds}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Eye className="w-6 h-6 text-blue-600" />
@@ -73,8 +73,8 @@ const ReflectorPage = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Active Subscriptions</p>
-                <p className="text-2xl font-bold text-gray-900">{oracleStats.activeSubscriptions}</p>
+                <p className="text-sm text-muted-foreground">Active Subscriptions</p>
+                <p className="text-2xl font-bold text-foreground">{oracleStats.activeSubscriptions}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <Zap className="w-6 h-6 text-green-600" />
@@ -87,8 +87,8 @@ const ReflectorPage = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Spent</p>
-                <p className="text-2xl font-bold text-gray-900">{oracleStats.totalSpent} XRF</p>
+                <p className="text-sm text-muted-foreground">Total Spent</p>
+                <p className="text-2xl font-bold text-foreground">{oracleStats.totalSpent} XRF</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-purple-600" />
@@ -101,8 +101,8 @@ const ReflectorPage = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">XRF Balance</p>
-                <p className="text-2xl font-bold text-gray-900">{oracleStats.xrfBalance}</p>
+                <p className="text-sm text-muted-foreground">XRF Balance</p>
+                <p className="text-2xl font-bold text-foreground">{oracleStats.xrfBalance}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <Activity className="w-6 h-6 text-orange-600" />
@@ -131,18 +131,18 @@ const ReflectorPage = () => {
             <CardContent>
               <div className="space-y-4">
                 {priceFeeds.map((feed, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
                         {feed.symbol.split('/')[0][0]}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{feed.symbol}</p>
-                        <p className="text-sm text-gray-500">Volume: {feed.volume}</p>
+                        <p className="font-medium text-foreground">{feed.symbol}</p>
+                        <p className="text-sm text-muted-foreground">Volume: {feed.volume}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-gray-900">${feed.price.toLocaleString()}</p>
+                      <p className="font-bold text-foreground">${feed.price.toLocaleString()}</p>
                       <Badge variant={feed.change.startsWith('+') ? 'default' : 'destructive'} className="text-xs">
                         {feed.change}
                       </Badge>
@@ -177,7 +177,7 @@ const ReflectorPage = () => {
                       id="feed"
                       value={selectedFeed}
                       onChange={(e) => setSelectedFeed(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent bg-background text-foreground"
                     >
                       <option value="">Choose a feed...</option>
                       {priceFeeds.map((feed, index) => (
@@ -197,10 +197,10 @@ const ReflectorPage = () => {
                     />
                   </div>
                   
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-muted rounded-lg p-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Available XRF</span>
-                      <span className="font-medium">{oracleStats.xrfBalance}</span>
+                      <span className="text-muted-foreground">Available XRF</span>
+                      <span className="font-medium text-foreground">{oracleStats.xrfBalance}</span>
                     </div>
                   </div>
                   
@@ -225,13 +225,13 @@ const ReflectorPage = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {subscriptions.map((sub, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                       <div>
-                        <p className="font-medium text-gray-900">{sub.feed}</p>
-                        <p className="text-sm text-gray-500">{sub.frequency}</p>
+                        <p className="font-medium text-foreground">{sub.feed}</p>
+                        <p className="text-sm text-muted-foreground">{sub.frequency}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">{sub.cost} XRF</p>
+                        <p className="text-sm font-medium text-foreground">{sub.cost} XRF</p>
                         <Badge variant="default" className="text-xs">
                           {sub.status}
                         </Badge>

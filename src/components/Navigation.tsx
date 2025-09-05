@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X, Sun, Moon, Monitor, Bell, BarChart3 } from "lucide-react";
+import { Leaf, Menu, X, Sun, Moon, Monitor, Bell, BarChart3, Target, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import WalletConnector from "@/components/WalletConnector";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -44,14 +44,14 @@ const Navigation = () => {
         ? 'bg-background/95 backdrop-blur-xl border-b border-white/10 shadow-lg' 
         : 'bg-background/80 backdrop-blur-xl border-b border-white/5'
     }`}>
-      <nav className="container mx-auto px-6 py-4">
+      <nav className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="p-2 rounded-xl bg-gradient-primary transition-all duration-300 group-hover:scale-110 group-hover:shadow-primary">
-              <Leaf className="h-6 w-6 text-background" />
+          <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer" onClick={() => navigate('/')}>
+            <div className="p-1.5 sm:p-2 rounded-xl bg-gradient-primary transition-all duration-300 group-hover:scale-110 group-hover:shadow-primary">
+              <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-background" />
             </div>
-            <span className="text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors">
+            <span className="text-xl sm:text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors">
               KALE-ndar
             </span>
           </div>
@@ -161,14 +161,14 @@ const Navigation = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="md:hidden flex items-center gap-1 sm:gap-2">
             <ConnectionStatus variant="icon" className="mr-1" />
             
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="hover:bg-accent/50 transition-colors"
+              className="hover:bg-accent/50 transition-colors h-8 w-8"
               aria-label="Toggle theme"
             >
               {getThemeIcon()}
@@ -179,7 +179,7 @@ const Navigation = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-accent/50 transition-colors"
+                className="hover:bg-accent/50 transition-colors h-8 w-8"
                 aria-label="Notifications"
               >
                 <Bell className="h-4 w-4" />
@@ -190,21 +190,21 @@ const Navigation = () => {
               variant="ghost"
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="hover:bg-accent/50 transition-colors"
+              className="hover:bg-accent/50 transition-colors h-8 w-8"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        <div className={`md:hidden transition-all duration-300 ease-in-out ${
+        <div className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
           isMenuOpen 
             ? 'max-h-96 opacity-100 mt-4' 
-            : 'max-h-0 opacity-0 overflow-hidden'
+            : 'max-h-0 opacity-0'
         }`}>
-          <div className="flex flex-col gap-4 pb-4 border-t border-white/10 pt-4">
+          <div className="flex flex-col gap-2 pb-4 border-t border-white/10 pt-4 bg-background/50 backdrop-blur-sm rounded-lg">
             {wallet.isConnected ? (
               <>
                 <button 
@@ -212,22 +212,25 @@ const Navigation = () => {
                     navigate('/dashboard');
                     setIsMenuOpen(false);
                   }}
-                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20 text-left"
+                  className="text-muted-foreground hover:text-accent-teal transition-all duration-200 py-3 px-4 rounded-lg hover:bg-accent/20 text-left hover:translate-x-1 flex items-center gap-3"
                 >
+                  <BarChart3 className="h-4 w-4" />
                   Dashboard
                 </button>
                 <a 
                   href="#markets" 
-                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  className="text-muted-foreground hover:text-accent-teal transition-all duration-200 py-3 px-4 rounded-lg hover:bg-accent/20 hover:translate-x-1 flex items-center gap-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Target className="h-4 w-4" />
                   Markets
                 </a>
                 <a 
                   href="#features" 
-                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  className="text-muted-foreground hover:text-accent-teal transition-all duration-200 py-3 px-4 rounded-lg hover:bg-accent/20 hover:translate-x-1 flex items-center gap-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Sparkles className="h-4 w-4" />
                   Features
                 </a>
               </>
