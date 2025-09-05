@@ -6,8 +6,8 @@ import { AlbedoAdapter } from './albedo';
 
 export class WalletManager {
   private adapters: Map<WalletType, WalletAdapter> = new Map();
-  private currentWallet: WalletType | null = null;
-  private currentConnection: any = null;
+  protected currentWallet: WalletType | null = null;
+  protected currentConnection: any = null;
 
   constructor() {
     this.initializeAdapters();
