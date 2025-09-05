@@ -1,425 +1,256 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
-import { useToast } from "@/hooks/use-toast";
-import { useWallet } from "@/contexts/WalletContext";
-import { apiService, ApiError } from "@/services/api";
-import { Market, MarketCondition } from "@/types/market";
-import MockDataDemo from "@/components/MockDataDemo";
+import { Link } from 'react-router-dom';
 import { 
   TrendingUp, 
   TrendingDown, 
-  Clock, 
-  Users, 
-  DollarSign, 
-  Target, 
-  Calendar, 
-  ArrowRight,
-  Plus,
+  Sprout, 
+  Shield, 
+  ArrowUpRight,
   BarChart3,
-  Wallet,
-  Activity,
-  Trophy,
-  Star,
+  Calendar,
+  Coins,
+  Users,
   Zap,
-  TrendingUp as TrendingUpIcon,
-  Award,
-  Eye,
-  RefreshCw
-} from "lucide-react";
-import MarketList from "@/components/MarketList";
-import { YieldOptimizer } from "@/components/YieldOptimizer";
+  Activity,
+  Clock
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useWallet } from '@/contexts/WalletContext';
 
-const Dashboard: React.FC = () => {
-  const { wallet, user, userStats, isLoading } = useWallet();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const [recentMarkets, setRecentMarkets] = useState<Market[]>([]);
-  const [loadingMarkets, setLoadingMarkets] = useState(true);
+const Dashboard = () => {
+  const { wallet, user } = useWallet();
+  const [portfolioData, setPortfolioData] = useState([]);
+  const [kaleStats, setKaleStats] = useState({
+    balance: 1234.56,
+    staked: 890.12,
+    pending: 45.78,
+    dailyYield: 2.34
+  });
 
-  // Redirect if not connected
+  const [reflectorStats, setReflectorStats] = useState({
+    xrfBalance: 567.89,
+    subscriptions: 3,
+    totalSpent: 123.45,
+    activePriceFeeds: 8
+  });
+
+  // Mock data for the chart
   useEffect(() => {
-    if (!isLoading && !wallet.isConnected) {
-      navigate('/');
-    }
-  }, [wallet.isConnected, isLoading, navigate]);
-
-  useEffect(() => {
-    if (wallet.isConnected) {
-      loadRecentMarkets();
-    }
-  }, [wallet.isConnected]);
-
-  const loadRecentMarkets = async () => {
-    try {
-      setLoadingMarkets(true);
-      const response = await apiService.getMarkets({ limit: 6 });
-      setRecentMarkets(response.markets);
-    } catch (error) {
-      console.error('Error loading recent markets:', error);
-      // Fallback to mock data
-      setRecentMarkets(getMockMarkets());
-    } finally {
-      setLoadingMarkets(false);
-    }
-  };
-
-  const getMockMarkets = (): Market[] => {
-    return [
-      {
-        id: 'market_1',
-        description: 'Will Bitcoin reach $100,000 by end of 2024?',
-        creator: '0x1234...5678',
-        oracleAsset: { type: 'other', code: 'BTC' },
-        targetPrice: 100000,
-        condition: MarketCondition.ABOVE,
-        resolveTime: new Date('2024-12-31T23:59:59Z'),
-        totalFor: 1500000,
-        totalAgainst: 800000,
-        resolved: false,
-        createdAt: new Date('2024-01-15T10:00:00Z'),
-        currentPrice: 85000,
-        oracleConfidence: 0.95,
-      },
-      {
-        id: 'market_2',
-        description: 'Will Ethereum 2.0 launch before Q2 2024?',
-        creator: '0x8765...4321',
-        oracleAsset: { type: 'other', code: 'ETH' },
-        targetPrice: 5000,
-        condition: MarketCondition.BELOW,
-        resolveTime: new Date('2024-06-30T23:59:59Z'),
-        totalFor: 2200000,
-        totalAgainst: 1200000,
-        resolved: false,
-        createdAt: new Date('2024-01-10T14:30:00Z'),
-        currentPrice: 3200,
-        oracleConfidence: 0.88,
-      },
-      {
-        id: 'market_3',
-        description: 'Will KALE token reach $1.00 by March 2024?',
-        creator: '0xabcd...efgh',
-        oracleAsset: { type: 'stellar', code: 'KALE', contractId: 'contract_123' },
-        targetPrice: 100,
-        condition: MarketCondition.ABOVE,
-        resolveTime: new Date('2024-03-31T23:59:59Z'),
-        totalFor: 500000,
-        totalAgainst: 300000,
-        resolved: false,
-        createdAt: new Date('2024-01-05T09:15:00Z'),
-        currentPrice: 75,
-        oracleConfidence: 0.92,
-      },
+    const mockData = [
+      { name: 'Jan', value: 4000, kale: 2400, xrf: 1600 },
+      { name: 'Feb', value: 3000, kale: 1398, xrf: 1602 },
+      { name: 'Mar', value: 5000, kale: 3800, xrf: 1200 },
+      { name: 'Apr', value: 4500, kale: 3908, xrf: 592 },
+      { name: 'May', value: 6000, kale: 4800, xrf: 1200 },
+      { name: 'Jun', value: 7000, kale: 5800, xrf: 1200 }
     ];
-  };
+    setPortfolioData(mockData);
+  }, []);
 
-  const formatAddress = (address: string): string => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+  const quickActions = [
+    { title: 'Start Farming', description: 'Begin KALE farming', link: '/kale', icon: Sprout, color: 'bg-green-500' },
+    { title: 'View Prices', description: 'Check Reflector feeds', link: '/reflector', icon: TrendingUp, color: 'bg-blue-500' },
+    { title: 'Manage Portfolio', description: 'View your assets', link: '/portfolio', icon: BarChart3, color: 'bg-purple-500' },
+    { title: 'DeFi Protocols', description: 'Explore integrations', link: '/defi', icon: Shield, color: 'bg-orange-500' }
+  ];
 
-  const formatAmount = (amount: number): string => {
-    if (amount >= 1000000) return `${(amount / 1000000).toFixed(1)}M`;
-    if (amount >= 1000) return `${(amount / 1000).toFixed(1)}K`;
-    return amount.toString();
-  };
-
-  const formatTimeUntilResolve = (resolveTime: Date): string => {
-    const now = new Date();
-    const diff = resolveTime.getTime() - now.getTime();
-    
-    if (diff <= 0) return 'Resolved';
-    
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
-    if (days > 0) return `${days}d ${hours}h`;
-    if (hours > 0) return `${hours}h`;
-    return 'Soon';
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-6 py-8">
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-8 w-48" />
-              <Skeleton className="h-10 w-32" />
-            </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="bg-gradient-card border-white/10">
-                  <CardContent className="p-6">
-                    <Skeleton className="h-6 w-24 mb-2" />
-                    <Skeleton className="h-8 w-16" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+  return (
+    <div className="space-y-8">
+      {/* Welcome Header */}
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Welcome back!</h1>
+            <p className="text-gray-600 mt-1">Here's your Stellar DeFi overview</p>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>{new Date().toLocaleDateString()}</span>
           </div>
         </div>
       </div>
-    );
-  }
 
-  if (!wallet.isConnected) {
-    return null; // Will redirect
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-primary rounded-xl">
-                <BarChart3 className="h-6 w-6 text-background" />
-              </div>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-display font-bold">
-                  Welcome back, {user?.username || 'Trader'}!
-                </h1>
-                <p className="text-muted-foreground">
-                  Ready to make your next prediction?
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" className="gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
-            <Button variant="hero" className="gap-2 hover:scale-105 transition-transform">
-              <Plus className="h-4 w-4" />
-              Create Market
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Bets</p>
-                  <p className="text-2xl font-bold text-primary group-hover:scale-105 transition-transform">
-                    {userStats?.total_bets || 0}
-                  </p>
-                  <div className="mt-2">
-                    <Progress value={Math.min((userStats?.total_bets || 0) / 10 * 100, 100)} className="h-1" />
-                  </div>
-                </div>
-                <div className="p-3 bg-primary/20 rounded-lg group-hover:scale-110 transition-transform">
-                  <BarChart3 className="h-6 w-6 text-primary" />
+                <p className="text-sm text-gray-600">Total Portfolio</p>
+                <p className="text-2xl font-bold text-gray-900">$12,345</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-green-500">+5.2%</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Winnings</p>
-                  <p className="text-2xl font-bold text-accent-gold group-hover:scale-105 transition-transform">
-                    {formatAmount(userStats?.total_winnings || 0)} KALE
-                  </p>
-                  <div className="mt-2">
-                    <Badge variant="secondary" className="text-xs">
-                      <TrendingUpIcon className="h-3 w-3 mr-1" />
-                      +12.5% this week
-                    </Badge>
-                  </div>
-                </div>
-                <div className="p-3 bg-accent-gold/20 rounded-lg group-hover:scale-110 transition-transform">
-                  <Trophy className="h-6 w-6 text-accent-gold" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Win Rate</p>
-                  <p className="text-2xl font-bold text-accent-teal group-hover:scale-105 transition-transform">
-                    {(userStats?.win_rate || 0).toFixed(1)}%
-                  </p>
-                  <div className="mt-2">
-                    <Progress value={userStats?.win_rate || 0} className="h-1" />
-                  </div>
-                </div>
-                <div className="p-3 bg-accent-teal/20 rounded-lg group-hover:scale-110 transition-transform">
-                  <TrendingUp className="h-6 w-6 text-accent-teal" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Bets</p>
-                  <p className="text-2xl font-bold text-foreground group-hover:scale-105 transition-transform">
-                    {userStats?.pending_claims || 0}
-                  </p>
-                  <div className="mt-2">
-                    <Badge variant="outline" className="text-xs">
-                      <Zap className="h-3 w-3 mr-1" />
-                      Live
-                    </Badge>
-                  </div>
-                </div>
-                <div className="p-3 bg-secondary/20 rounded-lg group-hover:scale-110 transition-transform">
-                  <Activity className="h-6 w-6 text-foreground" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Wallet Info */}
-        <Card className="bg-gradient-card border-white/10 shadow-card mb-8 hover:shadow-card-hover transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="p-2 bg-primary/20 rounded-lg">
-                <Wallet className="h-5 w-5 text-primary" />
-              </div>
-              Wallet Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Connected Address</p>
-                <p className="font-mono text-sm bg-secondary/20 px-3 py-2 rounded-lg border border-white/10">
-                  {formatAddress(wallet.publicKey!)}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Badge variant="secondary" className="gap-1">
-                  <Star className="h-3 w-3" />
-                  Verified
-                </Badge>
-                <Badge variant="outline" className="gap-1">
-                  <Award className="h-3 w-3" />
-                  Trusted
-                </Badge>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Recent Markets */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-accent-teal/20 rounded-lg">
-                <Eye className="h-5 w-5 text-accent-teal" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">KALE Balance</p>
+                <p className="text-2xl font-bold text-gray-900">{kaleStats.balance}</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <span className="text-sm text-gray-500">+{kaleStats.dailyYield} today</span>
+                </div>
               </div>
-              <h2 className="text-2xl font-display font-bold">Recent Markets</h2>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Sprout className="w-6 h-6 text-green-600" />
+              </div>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/')}
-              className="gap-2 hover:scale-105 transition-transform"
-            >
-              View All Markets
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          {loadingMarkets ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="bg-gradient-card border-white/10">
-                  <CardHeader>
-                    <Skeleton className="h-6 w-3/4 mb-2" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="h-20 w-full mb-4" />
-                    <div className="flex gap-2">
-                      <Skeleton className="h-8 w-16" />
-                      <Skeleton className="h-8 w-16" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">XRF Tokens</p>
+                <p className="text-2xl font-bold text-gray-900">{reflectorStats.xrfBalance}</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <span className="text-sm text-gray-500">{reflectorStats.subscriptions} subscriptions</span>
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
+              </div>
             </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {recentMarkets.map((market) => (
-                <Card key={market.id} className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {market.oracleAsset.code}
-                      </Badge>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        {formatTimeUntilResolve(market.resolveTime)}
-                      </div>
-                    </div>
-                    <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
-                      {market.description}
-                    </CardTitle>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="h-3 w-3" />
-                      by {formatAddress(market.creator)}
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="text-center p-3 bg-primary/10 rounded-lg">
-                        <div className="text-xl font-bold text-primary">
-                          {formatAmount(market.totalFor)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">FOR</div>
-                      </div>
-                      <div className="text-center p-3 bg-accent-teal/10 rounded-lg">
-                        <div className="text-xl font-bold text-accent-teal">
-                          {formatAmount(market.totalAgainst)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">AGAINST</div>
-                      </div>
-                    </div>
+          </CardContent>
+        </Card>
 
-                    <div className="space-y-2">
-                      <Button
-                        variant="hero"
-                        size="sm"
-                        className="w-full group hover:scale-105 transition-transform"
-                        onClick={() => navigate('/')}
-                      >
-                        <TrendingUp className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-                        View Market
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Active Positions</p>
+                <p className="text-2xl font-bold text-gray-900">8</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-green-500">All profitable</span>
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Coins className="w-6 h-6 text-orange-600" />
+              </div>
             </div>
-          )}
-        </div>
-
-        {/* Mock Data Demo (Development Only) */}
-        <MockDataDemo />
-
-        {/* Yield Optimizer */}
-        <YieldOptimizer />
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Portfolio Chart */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Portfolio Performance</CardTitle>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm">7D</Button>
+              <Button size="sm">30D</Button>
+              <Button variant="outline" size="sm">90D</Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={portfolioData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#3B82F6" 
+                  strokeWidth={2}
+                  dot={{ fill: '#3B82F6' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="kale" 
+                  stroke="#10B981" 
+                  strokeWidth={2}
+                  dot={{ fill: '#10B981' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="xrf" 
+                  stroke="#8B5CF6" 
+                  strokeWidth={2}
+                  dot={{ fill: '#8B5CF6' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-gray-900">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map((action, index) => (
+            <Link
+              key={index}
+              to={action.link}
+              className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow group"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-10 h-10 ${action.color} rounded-lg flex items-center justify-center`}>
+                  <action.icon className="w-5 h-5 text-white" />
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+              </div>
+              <h3 className="font-medium text-gray-900">{action.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{action.description}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+          <CardDescription>Your latest transactions and activities</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[
+              { type: 'farming', description: 'Harvested 12.5 KALE', time: '2 hours ago', amount: '+12.5 KALE' },
+              { type: 'oracle', description: 'Created price subscription', time: '5 hours ago', amount: '-50 XRF' },
+              { type: 'stake', description: 'Staked KALE tokens', time: '1 day ago', amount: '100 KALE' },
+              { type: 'trade', description: 'Swapped XLM for USDC', time: '2 days ago', amount: '500 XLM' }
+            ].map((activity, index) => (
+              <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    {activity.type === 'farming' && <Sprout className="w-4 h-4 text-green-600" />}
+                    {activity.type === 'oracle' && <TrendingUp className="w-4 h-4 text-blue-600" />}
+                    {activity.type === 'stake' && <Shield className="w-4 h-4 text-purple-600" />}
+                    {activity.type === 'trade' && <Coins className="w-4 h-4 text-orange-600" />}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{activity.description}</p>
+                    <p className="text-xs text-gray-500">{activity.time}</p>
+                  </div>
+                </div>
+                <span className={`text-sm font-medium ${activity.amount.startsWith('+') ? 'text-green-600' : activity.amount.startsWith('-') ? 'text-red-600' : 'text-gray-600'}`}>
+                  {activity.amount}
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
