@@ -59,7 +59,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           const walletType = manager.getCurrentWallet();
           
           if (connection && walletType) {
-            setCurrentWalletType(walletType);
+            setCurrentWalletType(walletType as WalletType);
           setWallet({
             isConnected: true,
               publicKey: connection.publicKey,
