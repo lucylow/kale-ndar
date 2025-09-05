@@ -1,16 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X, Sun, Moon, Monitor, Bell } from "lucide-react";
+import { Leaf, Menu, X, Sun, Moon, Monitor, Bell, BarChart3 } from "lucide-react";
 import { useState, useEffect } from "react";
 import WalletConnector from "@/components/WalletConnector";
 import { useTheme } from "@/contexts/ThemeContext";
 import NotificationBadge from "@/components/ui/notification-badge";
 import ConnectionStatus from "@/components/ui/connection-status";
+import { useWallet } from "@/contexts/WalletContext";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [notificationCount, setNotificationCount] = useState(3); // Mock notification count
+  const { wallet } = useWallet();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,34 +58,62 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a 
-              href="#markets" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              Markets
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a 
-              href="#features" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              Features
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a 
-              href="#how-it-works" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              How It Works
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a 
-              href="#community" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
-            >
-              Community
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
-            </a>
+            {wallet.isConnected ? (
+              <>
+                <button 
+                  onClick={() => navigate('/dashboard')}
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  Dashboard
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <a 
+                  href="#markets" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  Markets
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a 
+                  href="#features" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  Features
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+              </>
+            ) : (
+              <>
+                <a 
+                  href="#markets" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  Markets
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a 
+                  href="#features" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  Features
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a 
+                  href="#how-it-works" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  How It Works
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a 
+                  href="#community" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  Community
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+              </>
+            )}
           </div>
 
           {/* Desktop Buttons */}
@@ -111,9 +143,21 @@ const Navigation = () => {
             </NotificationBadge>
             
             <WalletConnector />
-            <Button variant="hero" size="sm" className="hover:scale-105 transition-transform">
-              Start Predicting
-            </Button>
+            {wallet.isConnected ? (
+              <Button 
+                variant="hero" 
+                size="sm" 
+                className="hover:scale-105 transition-transform gap-2"
+                onClick={() => navigate('/dashboard')}
+              >
+                <BarChart3 className="h-4 w-4" />
+                Dashboard
+              </Button>
+            ) : (
+              <Button variant="hero" size="sm" className="hover:scale-105 transition-transform">
+                Start Predicting
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -161,39 +205,84 @@ const Navigation = () => {
             : 'max-h-0 opacity-0 overflow-hidden'
         }`}>
           <div className="flex flex-col gap-4 pb-4 border-t border-white/10 pt-4">
-            <a 
-              href="#markets" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Markets
-            </a>
-            <a 
-              href="#features" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Features
-            </a>
-            <a 
-              href="#how-it-works" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              How It Works
-            </a>
-            <a 
-              href="#community" 
-              className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Community
-            </a>
+            {wallet.isConnected ? (
+              <>
+                <button 
+                  onClick={() => {
+                    navigate('/dashboard');
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20 text-left"
+                >
+                  Dashboard
+                </button>
+                <a 
+                  href="#markets" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Markets
+                </a>
+                <a 
+                  href="#features" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Features
+                </a>
+              </>
+            ) : (
+              <>
+                <a 
+                  href="#markets" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Markets
+                </a>
+                <a 
+                  href="#features" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Features
+                </a>
+                <a 
+                  href="#how-it-works" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  How It Works
+                </a>
+                <a 
+                  href="#community" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Community
+                </a>
+              </>
+            )}
             <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
               <WalletConnector />
-              <Button variant="hero" size="sm" className="w-full">
-                Start Predicting
-              </Button>
+              {wallet.isConnected ? (
+                <Button 
+                  variant="hero" 
+                  size="sm" 
+                  className="w-full gap-2"
+                  onClick={() => {
+                    navigate('/dashboard');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  Dashboard
+                </Button>
+              ) : (
+                <Button variant="hero" size="sm" className="w-full">
+                  Start Predicting
+                </Button>
+              )}
             </div>
           </div>
         </div>

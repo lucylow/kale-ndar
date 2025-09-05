@@ -3,20 +3,16 @@ import { Wallet, User } from '@/types/market';
 import { config } from '@/lib/config';
 import { apiService } from '@/services/api';
 import { getMockUserByAddress, getMockUserStats } from '@/data/mockData';
-import freighterApi from '@stellar/freighter-api';
-
-// Extend Window interface for Freighter
-declare global {
-  interface Window {
-    freighterApi: any;
-  }
-}
+import { walletManager, WalletManager } from '@/lib/wallet-adapters/wallet-manager';
+import { WalletType } from '@/lib/wallet-adapters/types';
 
 interface WalletContextType {
   wallet: Wallet;
   user: User | null;
   userStats: any;
-  connectWallet: () => Promise<void>;
+  availableWallets: any[];
+  currentWalletType: WalletType | null;
+  connectWallet: (walletType?: WalletType) => Promise<void>;
   disconnectWallet: () => void;
   updateUserProfile: (data: { username?: string; email?: string }) => Promise<void>;
   refreshUserData: () => Promise<void>;
@@ -35,69 +31,50 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [user, setUser] = useState<User | null>(null);
   const [userStats, setUserStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [availableWallets, setAvailableWallets] = useState<any[]>([]);
+  const [currentWalletType, setCurrentWalletType] = useState<WalletType | null>(null);
 
-  // Check if wallet was previously connected and load user data
+  // Initialize available wallets and check for existing connections
   useEffect(() => {
-    const checkConnection = async () => {
+    const initializeWallets = async () => {
       setIsLoading(true);
-      console.log('Starting wallet connection check...');
+      console.log('Initializing wallet manager...');
       
       try {
-        // Wait for Freighter to be available
-        let retries = 0;
-        const maxRetries = 5;
+        // Get available wallets
+        const wallets = walletManager.getAllWallets();
+        setAvailableWallets(wallets);
         
-        while (retries < maxRetries) {
-          if (window.freighterApi || (window as any).freighter) {
-            break;
-          }
-          await new Promise(resolve => setTimeout(resolve, 200));
-          retries++;
-        }
-        
-        const api = window.freighterApi || (window as any).freighter;
-        
-        // Check if Freighter is available
-        if (!api) {
-          console.log('Freighter not available after waiting');
-          return;
-        }
-        
-        const connected = await api.isConnected();
-        console.log('Freighter connected:', connected);
+        // Try to auto-connect to any available wallet
+        const connected = await walletManager.autoConnect();
         
         if (connected) {
-          const addressResponse = await api.getAddress();
-          const publicKey = typeof addressResponse === 'string' ? addressResponse : addressResponse.address;
-          console.log('Got wallet address:', publicKey);
+          const connection = walletManager.getCurrentConnection();
+          const walletType = walletManager.getCurrentWallet();
           
-          setWallet({
-            isConnected: true,
-            publicKey,
-            signTransaction: async (transactionXdr: string) => {
-              const result = await api.signTransaction(transactionXdr, {
-                networkPassphrase: config.soroban.networkPassphrase,
-              });
-              return typeof result === 'string' ? result : result.signedTxXdr;
-            }
-          });
-          
-          // Load user data
-          await loadUserData(publicKey);
-        } else {
-          console.log('Wallet not connected');
+          if (connection && walletType) {
+            setCurrentWalletType(walletType);
+            setWallet({
+              isConnected: true,
+              publicKey: connection.publicKey,
+              signTransaction: connection.signTransaction
+            });
+            
+            // Load user data
+            await loadUserData(connection.publicKey);
+          }
         }
       } catch (error) {
-        console.error('Error checking wallet connection:', error);
+        console.error('Error initializing wallets:', error);
       } finally {
         setIsLoading(false);
-        console.log('Wallet check completed, isLoading set to false');
+        console.log('Wallet initialization completed');
       }
     };
 
-    // Wait for the page to load before checking connection
+    // Wait for the page to load before initializing
     if (typeof window !== 'undefined') {
-      setTimeout(checkConnection, 100); // Small delay to ensure Freighter is loaded
+      setTimeout(initializeWallets, 100);
     }
   }, []);
 
@@ -160,70 +137,36 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const connectWallet = async () => {
-    console.log('connectWallet called');
+  const connectWallet = async (walletType?: WalletType) => {
+    console.log('connectWallet called with wallet type:', walletType);
     
     try {
       setIsLoading(true);
       
-      // Wait for Freighter to be available with retry logic
-      let retries = 0;
-      const maxRetries = 10;
-      
-      while (retries < maxRetries) {
-        if (window.freighterApi || (window as any).freighter) {
-          break;
+      // If no wallet type specified, try to connect to the first available wallet
+      if (!walletType) {
+        const availableWallets = walletManager.getAvailableWallets();
+        if (availableWallets.length === 0) {
+          throw new Error('No Stellar wallets are available. Please install a Stellar wallet like Freighter, Lobstr, Rabet, or Albedo.');
         }
-        
-        console.log(`Waiting for Freighter... attempt ${retries + 1}`);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        retries++;
+        walletType = availableWallets[0].adapter.name.toLowerCase() as WalletType;
       }
       
-      // Use the global freighter object if freighterApi isn't available
-      const api = window.freighterApi || (window as any).freighter;
+      console.log(`Connecting to ${walletType} wallet...`);
       
-      if (!api) {
-        throw new Error('Freighter wallet is not installed. Please install Freighter from freighter.app and refresh the page.');
-      }
+      const connection = await walletManager.connectWallet(walletType);
       
-      console.log('Freighter detected, checking if available...');
-      
-      // Check if Freighter is available and request permission
-      try {
-        const isAllowed = await api.isAllowed();
-        console.log('Freighter isAllowed:', isAllowed);
-        
-        if (!isAllowed) {
-          console.log('Requesting permission...');
-          await api.setAllowed();
-        }
-      } catch (permError) {
-        console.log('Permission check failed, trying direct connection...');
-      }
-      
-      console.log('Getting address...');
-      const addressResponse = await api.getAddress();
-      console.log('Address response:', addressResponse);
-      
-      const publicKey = typeof addressResponse === 'string' ? addressResponse : addressResponse.address;
-      console.log('Public key:', publicKey);
-      
+      setCurrentWalletType(walletType);
       setWallet({
         isConnected: true,
-        publicKey,
-        signTransaction: async (transactionXdr: string) => {
-          const result = await api.signTransaction(transactionXdr, {
-            networkPassphrase: config.soroban.networkPassphrase,
-          });
-          return typeof result === 'string' ? result : result.signedTxXdr;
-        }
+        publicKey: connection.publicKey,
+        signTransaction: connection.signTransaction
       });
       
       console.log('Wallet connected successfully');
       
       // Load user data after connecting
-      await loadUserData(publicKey);
+      await loadUserData(connection.publicKey);
       
     } catch (error) {
       console.error('Error connecting wallet:', error);
@@ -233,7 +176,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const disconnectWallet = () => {
+  const disconnectWallet = async () => {
+    await walletManager.disconnectWallet();
+    setCurrentWalletType(null);
     setWallet({
       isConnected: false,
       publicKey: null,
@@ -280,6 +225,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       wallet, 
       user, 
       userStats,
+      availableWallets,
+      currentWalletType,
       connectWallet, 
       disconnectWallet, 
       updateUserProfile,

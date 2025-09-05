@@ -240,12 +240,23 @@ class ApiService {
     message: string;
     market: Market;
   }> {
+    // Transform frontend params to backend format
+    const backendParams = {
+      description: params.description,
+      asset_symbol: params.oracleAsset.code,
+      target_price: params.targetPrice,
+      condition: params.condition,
+      resolve_time: params.resolveTime.toISOString(),
+      kale_token_address: config.soroban.kaleTokenId,
+      reflector_contract_address: config.soroban.reflectorContractId,
+    };
+
     return this.request('/api/markets', {
       method: 'POST',
       headers: {
         'X-User-Address': userAddress,
       },
-      body: JSON.stringify(params),
+      body: JSON.stringify(backendParams),
     });
   }
 
@@ -257,12 +268,19 @@ class ApiService {
     message: string;
     bet: Bet;
   }> {
+    // Transform frontend params to backend format
+    const backendParams = {
+      market_id: marketId,
+      amount: params.amount,
+      side: params.side,
+    };
+
     return this.request(`/api/markets/${marketId}/bet`, {
       method: 'POST',
       headers: {
         'X-User-Address': userAddress,
       },
-      body: JSON.stringify(params),
+      body: JSON.stringify(backendParams),
     });
   }
 

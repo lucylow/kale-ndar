@@ -2,21 +2,29 @@ import React, { useState } from 'react';
 import { useWallet } from '@/contexts/WalletContext';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, LogOut, User, TrendingUp, DollarSign } from 'lucide-react';
+import { Wallet, LogOut, User, TrendingUp, DollarSign, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { WalletType } from '@/lib/wallet-adapters/types';
+import { useNavigate } from 'react-router-dom';
+import WalletInstallGuide from './WalletInstallGuide';
 
 const WalletConnector: React.FC = () => {
-  const { wallet, user, userStats, connectWallet, disconnectWallet, isLoading } = useWallet();
+  const { wallet, user, userStats, availableWallets, currentWalletType, connectWallet, disconnectWallet, isLoading } = useWallet();
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
+  const navigate = useNavigate();
 
-  const handleConnect = async () => {
+  const handleConnect = async (walletType?: WalletType) => {
     try {
       setIsConnecting(true);
-      await connectWallet();
+      await connectWallet(walletType);
+      const walletName = walletType ? availableWallets.find(w => w.adapter.name.toLowerCase() === walletType)?.name || 'wallet' : 'wallet';
       toast({
         title: "Wallet Connected",
-        description: "Your Freighter wallet has been connected successfully.",
+        description: `Your ${walletName} has been connected successfully.`,
       });
+      navigate('/dashboard');
     } catch (error) {
       toast({
         title: "Connection Failed",
@@ -97,16 +105,74 @@ const WalletConnector: React.FC = () => {
     );
   }
 
+  // If only one wallet is available, show simple connect button
+  if (availableWallets.length === 1) {
+    return (
+      <Button 
+        onClick={() => handleConnect(availableWallets[0].adapter.name.toLowerCase() as WalletType)} 
+        disabled={isConnecting || isLoading}
+        className="gap-2"
+        variant="hero"
+      >
+        <Wallet className="h-4 w-4" />
+        {isConnecting ? 'Connecting...' : `Connect ${availableWallets[0].name}`}
+      </Button>
+    );
+  }
+
+  // If multiple wallets are available, show dropdown
+  if (availableWallets.length > 1) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            disabled={isConnecting || isLoading}
+            className="gap-2"
+            variant="hero"
+          >
+            <Wallet className="h-4 w-4" />
+            {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          {availableWallets.map((wallet) => (
+            <DropdownMenuItem
+              key={wallet.name}
+              onClick={() => handleConnect(wallet.adapter.name.toLowerCase() as WalletType)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <span className="text-lg">{wallet.icon}</span>
+              <div className="flex flex-col">
+                <span className="font-medium">{wallet.name}</span>
+                <span className="text-xs text-muted-foreground">{wallet.description}</span>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  // If no wallets are available, show install guide
   return (
-    <Button 
-      onClick={handleConnect} 
-      disabled={isConnecting || isLoading}
-      className="gap-2"
-      variant="hero"
-    >
-      <Wallet className="h-4 w-4" />
-      {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-    </Button>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button 
+          className="gap-2"
+          variant="hero"
+        >
+          <Wallet className="h-4 w-4" />
+          Install Wallet
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Install a Stellar Wallet</DialogTitle>
+        </DialogHeader>
+        <WalletInstallGuide />
+      </DialogContent>
+    </Dialog>
   );
 };
 

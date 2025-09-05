@@ -69,7 +69,7 @@ class ConnectionService {
     try {
       const health = await apiService.getHealth();
       
-      if (health.status === 'ok') {
+      if (health.status === 'healthy') {
         this.status.isConnected = true;
         this.status.error = null;
         this.status.retryCount = 0;

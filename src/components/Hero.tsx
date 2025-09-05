@@ -4,11 +4,13 @@ import heroDashboard from "@/assets/hero-dashboard.jpg";
 import { useWallet } from "@/contexts/WalletContext";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
-  const { wallet, connectWallet, isLoading } = useWallet();
+  const { wallet, availableWallets, connectWallet, isLoading } = useWallet();
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
+  const navigate = useNavigate();
 
   const handleGetStarted = async () => {
     console.log('Button clicked!', { 
@@ -24,24 +26,26 @@ const Hero = () => {
         await connectWallet();
         toast({
           title: "Wallet Connected!",
-          description: "You're now ready to start predicting on KALE-ndar markets.",
+          description: "Redirecting to your dashboard...",
         });
-        // Scroll to markets section
-        document.getElementById('markets')?.scrollIntoView({ behavior: 'smooth' });
+        // Navigate to dashboard
+        navigate('/dashboard');
       } catch (error) {
         console.error('Wallet connection failed:', error);
         toast({
           title: "Connection Failed",
-          description: error instanceof Error ? error.message : "Failed to connect wallet. Please make sure Freighter is installed and unlocked.",
+          description: availableWallets.length === 0 
+            ? "No Stellar wallets are available. Please install a Stellar wallet like Freighter, Lobstr, Rabet, or Albedo."
+            : error instanceof Error ? error.message : "Failed to connect wallet. Please make sure your wallet is installed and unlocked.",
           variant: "destructive",
         });
       } finally {
         setIsConnecting(false);
       }
     } else {
-      console.log('Already connected, scrolling to markets...');
-      // If already connected, scroll to markets
-      document.getElementById('markets')?.scrollIntoView({ behavior: 'smooth' });
+      console.log('Already connected, navigating to dashboard...');
+      // If already connected, navigate to dashboard
+      navigate('/dashboard');
     }
   };
 

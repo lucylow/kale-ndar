@@ -22,8 +22,8 @@ export const config = {
     enableWalletConnection: true,
     enableMarketCreation: true,
     enableStaking: true,
-    enableMockData: true, // Always use mock data since backend isn't deployed
-    enableBackendHealthCheck: false, // Disable backend health checks
+    enableMockData: false, // Use real backend API
+    enableBackendHealthCheck: true, // Enable backend health checks
   },
   
   // API endpoints
