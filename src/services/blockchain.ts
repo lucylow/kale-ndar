@@ -1,5 +1,7 @@
 import { MarketCreationParams, Market, TransactionResult } from '@/types/market';
 import { config } from '@/lib/config';
+import { kaleIntegrationService } from './kale-integration';
+import { reflectorOracleService } from './reflector-oracle';
 
 class BlockchainService {
   private readonly rpcUrl: string;
@@ -229,29 +231,17 @@ class BlockchainService {
     }
   }
 
-  // Additional methods for KALE integration
+  // KALE Integration methods - delegate to KALE service
   async getKaleBalance(userAddress: string): Promise<number> {
-    return Math.floor(Math.random() * 10000) + 1000;
+    return await kaleIntegrationService.getKaleBalance(userAddress);
   }
 
   async getStakeInfo(userAddress: string): Promise<any> {
-    return {
-      staker: userAddress,
-      amount: 1000,
-      stakeTime: Date.now() - 86400000,
-      lastRewardTime: Date.now() - 3600000,
-      accumulatedRewards: 25.5,
-      apy: 12.5,
-    };
+    return await kaleIntegrationService.getStakeInfo(userAddress);
   }
 
   async getStakingStats(): Promise<any> {
-    return {
-      totalStaked: 500000,
-      totalStakers: 150,
-      averageAPY: 15.2,
-      totalRewardsDistributed: 75000,
-    };
+    return await kaleIntegrationService.getStakingStats();
   }
 
   async plantKale(
@@ -259,12 +249,7 @@ class BlockchainService {
     amount: number,
     signTransaction: (tx: string) => Promise<string>
   ): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return {
-      success: true,
-      stakeId: 'stake_' + Date.now(),
-      transactionHash: 'plant_' + Date.now(),
-    };
+    return await kaleIntegrationService.plant(userAddress, amount, signTransaction);
   }
 
   async workKale(
@@ -274,12 +259,7 @@ class BlockchainService {
     entropy: string,
     signTransaction: (tx: string) => Promise<string>
   ): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return {
-      success: true,
-      reward: Math.random() * 10,
-      transactionHash: 'work_' + Date.now(),
-    };
+    return await kaleIntegrationService.work(userAddress, stakeId, nonce, entropy, signTransaction);
   }
 
   async harvestKale(
@@ -287,12 +267,20 @@ class BlockchainService {
     stakeId: string,
     signTransaction: (tx: string) => Promise<string>
   ): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return {
-      success: true,
-      harvestedAmount: Math.random() * 100 + 50,
-      transactionHash: 'harvest_' + Date.now(),
-    };
+    return await kaleIntegrationService.harvest(userAddress, stakeId, signTransaction);
+  }
+
+  // Reflector Oracle methods - delegate to Reflector service
+  async getAssetPrice(asset: string, source: string = 'external') {
+    return await reflectorOracleService.getAssetPrice(asset, source);
+  }
+
+  async getKalePrice() {
+    return await reflectorOracleService.getKalePrice();
+  }
+
+  async resolveMarketWithOracle(marketId: string, asset: string, targetPrice: number, condition: string, source: string = 'external') {
+    return await reflectorOracleService.resolveMarket(marketId, asset, targetPrice, condition, source);
   }
 }
 

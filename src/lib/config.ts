@@ -5,8 +5,21 @@ export const config = {
     rpcUrl: (typeof process !== 'undefined' && process.env?.VITE_SOROBAN_RPC_URL) || 'https://soroban-testnet.stellar.org',
     networkPassphrase: (typeof process !== 'undefined' && process.env?.VITE_NETWORK_PASSPHRASE) || 'Test SDF Network ; September 2015',
     factoryContractId: (typeof process !== 'undefined' && process.env?.VITE_FACTORY_CONTRACT_ID) || '',
-    kaleTokenId: (typeof process !== 'undefined' && process.env?.VITE_KALE_TOKEN_ID) || '',
-    reflectorContractId: (typeof process !== 'undefined' && process.env?.VITE_REFLECTOR_CONTRACT_ID) || '',
+    
+    // KALE Protocol Contract Addresses
+    kaleContractId: (typeof process !== 'undefined' && process.env?.VITE_KALE_CONTRACT_ID) || 'CDBG4XY2T5RRPH7HKGZIWMR2MFPLC6RJ453ITXQGNQXG6LNVL4375MRJ', // Testnet
+    kaleTokenId: (typeof process !== 'undefined' && process.env?.VITE_KALE_TOKEN_ID) || 'CDL74RF5BLYR2YBLCCI7F5FB6TPSCLKEJUBSD2RSVWZ4YHF3VMFAIGWA', // Mainnet
+    
+    // Reflector Oracle Contract Addresses
+    reflectorContractId: (typeof process !== 'undefined' && process.env?.VITE_REFLECTOR_CONTRACT_ID) || 'CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN', // External CEX/DEX
+    reflectorStellarId: 'CALI2BYU2JE6WVRUFYTS6MSBNEHGJ35P4AVCZYF3B6QOE3QKOB2PLE6M', // Stellar Assets
+    reflectorForexId: 'CBKGPWGKSKZF52CFHMTRR23TBWTPMRDIYZ4O2P5VS65BMHYH4DXMCJZC', // Forex Rates
+    
+    // Reflector Subscription Contract
+    reflectorSubscriptionId: (typeof process !== 'undefined' && process.env?.VITE_REFLECTOR_SUBSCRIPTION_ID) || '',
+    
+    // Reflector DAO Contract
+    reflectorDaoId: (typeof process !== 'undefined' && process.env?.VITE_REFLECTOR_DAO_ID) || '',
   },
   
   // Application configuration
