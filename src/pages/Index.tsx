@@ -6,8 +6,7 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import MarketList from "@/components/MarketList";
 import { YieldOptimizer } from "@/components/YieldOptimizer";
-import { WalletProvider, useWallet } from "@/contexts/WalletContext";
-import { Toaster } from "@/components/ui/toaster";
+import { useWallet } from "@/contexts/WalletContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -39,12 +38,7 @@ const IndexContent = () => {
 };
 
 const Index = () => {
-  return (
-    <WalletProvider>
-      <IndexContent />
-      <Toaster />
-    </WalletProvider>
-  );
+  return <IndexContent />;
 };
 
 export default Index;

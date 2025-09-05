@@ -43,9 +43,14 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       console.log('Initializing wallet manager...');
       
       try {
-        // Use mock data in development mode
-        const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
-        const manager = isDevelopment ? mockWalletManager : walletManager;
+        // Check if real wallets are available first
+        const realWallets = walletManager.getAvailableWallets();
+        const hasRealWallets = realWallets.length > 0;
+        
+        // Use real wallets if available, otherwise fall back to mock
+        const manager = hasRealWallets ? walletManager : mockWalletManager;
+        
+        console.log(`Using ${hasRealWallets ? 'real' : 'mock'} wallet manager. Available wallets:`, realWallets.length);
         
         // Get available wallets
         const wallets = manager.getAllWallets();
@@ -88,10 +93,11 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setIsLoading(true);
       
-      // Use mock data in development mode
-      const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
+      // Check if using real wallets or mock data
+      const realWallets = walletManager.getAvailableWallets();
+      const hasRealWallets = realWallets.length > 0;
       
-      if (isDevelopment) {
+      if (!hasRealWallets) {
         // Use new mock data
         const mockUser = getMockUserByAddressNew(address);
         const mockStats = getMockUserStatsByAddress(address);
@@ -190,9 +196,10 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setIsLoading(true);
       
-      // Use mock data in development mode
-      const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
-      const manager = isDevelopment ? mockWalletManager : walletManager;
+      // Check if real wallets are available first
+      const realWallets = walletManager.getAvailableWallets();
+      const hasRealWallets = realWallets.length > 0;
+      const manager = hasRealWallets ? walletManager : mockWalletManager;
       
       // If no wallet type specified, try to connect to the first available wallet
       if (!walletType) {

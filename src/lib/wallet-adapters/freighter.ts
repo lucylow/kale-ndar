@@ -13,7 +13,13 @@ export class FreighterAdapter implements WalletAdapter {
   icon = '🦋';
 
   isAvailable(): boolean {
-    return !!(window.freighterApi || window.freighter);
+    const available = !!(window.freighterApi || window.freighter);
+    console.log('Freighter detection:', {
+      freighterApi: !!window.freighterApi,
+      freighter: !!window.freighter,
+      available
+    });
+    return available;
   }
 
   async connect(): Promise<WalletConnection> {
