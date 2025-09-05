@@ -8,7 +8,8 @@ import {
   Briefcase, 
   Settings,
   BarChart3,
-  Wallet
+  Wallet,
+  Target
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -19,6 +20,7 @@ const Sidebar = () => {
     { path: '/kale', icon: Sprout, label: 'KALE Farming' },
     { path: '/reflector', icon: TrendingUp, label: 'Reflector Oracle' },
     { path: '/defi', icon: Coins, label: 'DeFi Protocols' },
+    { path: '/markets', icon: Target, label: 'Prediction Markets' },
     { path: '/portfolio', icon: Briefcase, label: 'Portfolio' },
     { path: '/settings', icon: Settings, label: 'Settings' }
   ];

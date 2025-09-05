@@ -16,6 +16,7 @@ import KalePage from "./pages/KalePage";
 import ReflectorPage from "./pages/ReflectorPage";
 import DeFiPage from "./pages/DeFiPage";
 import Portfolio from "./pages/Portfolio";
+import PredictionMarkets from "./pages/PredictionMarkets";
 import Settings from "./pages/Settings";
 import WalletTest from "./pages/WalletTest";
 import NotFound from "./pages/NotFound";
@@ -108,6 +109,21 @@ const App = () => (
                           <Sidebar />
                           <main className="flex-1 ml-64 p-6 pt-24">
                             <Portfolio />
+                          </main>
+                        </div>
+                        <Footer />
+                      </div>
+                    </AuthGuard>
+                  } />
+                  
+                  <Route path="/markets" element={
+                    <AuthGuard>
+                      <div className="flex flex-col min-h-screen">
+                        <Header />
+                        <div className="flex flex-1">
+                          <Sidebar />
+                          <main className="flex-1 ml-64 p-6 pt-24">
+                            <PredictionMarkets />
                           </main>
                         </div>
                         <Footer />

@@ -36,6 +36,7 @@ const Footer = () => {
               <li><Link to="/kale" className="text-gray-600 hover:text-gray-900 transition-colors">KALE Farming</Link></li>
               <li><Link to="/reflector" className="text-gray-600 hover:text-gray-900 transition-colors">Reflector Oracle</Link></li>
               <li><Link to="/defi" className="text-gray-600 hover:text-gray-900 transition-colors">DeFi Protocols</Link></li>
+              <li><Link to="/markets" className="text-gray-600 hover:text-gray-900 transition-colors">Prediction Markets</Link></li>
               <li><Link to="/portfolio" className="text-gray-600 hover:text-gray-900 transition-colors">Portfolio</Link></li>
             </ul>
           </div>

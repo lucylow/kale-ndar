@@ -12,7 +12,8 @@ import {
   Users,
   Zap,
   Activity,
-  Clock
+  Clock,
+  Target
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,7 @@ const Dashboard = () => {
   const quickActions = [
     { title: 'Start Farming', description: 'Begin KALE farming', link: '/kale', icon: Sprout, color: 'bg-green-500' },
     { title: 'View Prices', description: 'Check Reflector feeds', link: '/reflector', icon: TrendingUp, color: 'bg-blue-500' },
+    { title: 'Prediction Markets', description: 'Bet on real-world events', link: '/markets', icon: Target, color: 'bg-indigo-500' },
     { title: 'Manage Portfolio', description: 'View your assets', link: '/portfolio', icon: BarChart3, color: 'bg-purple-500' },
     { title: 'DeFi Protocols', description: 'Explore integrations', link: '/defi', icon: Shield, color: 'bg-orange-500' }
   ];
@@ -196,7 +198,7 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-gray-900">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {quickActions.map((action, index) => (
             <Link
               key={index}

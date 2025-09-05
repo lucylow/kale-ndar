@@ -27,6 +27,9 @@ const Header = () => {
             <Link to="/defi" className="text-gray-600 hover:text-gray-900 transition-colors">
               DeFi
             </Link>
+            <Link to="/markets" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Markets
+            </Link>
           </nav>
         </div>
         
