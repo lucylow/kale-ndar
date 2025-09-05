@@ -1,10 +1,10 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, token, Address, Env, Vec, Map,
-    panic_with_error, log,
+    contract, contractimpl, contracttype, token, Address, Env, Vec, Map, Symbol,
+    panic_with_error, log, String, BytesN, Val, TryFromVal,
 };
-use shared_types::{StakeInfo, ContractError, Config};
+use shared_types::{StakeInfo, ContractError, Config, MarketInfo, FeeInfo};
 
 const DAY_IN_LEDGERS: u32 = 17280;
 const INSTANCE_BUMP_AMOUNT: u32 = 7 * DAY_IN_LEDGERS;
@@ -18,6 +18,13 @@ pub enum DataKey {
     RewardPool,
     LastRewardUpdate,
     StakerList,
+    FeeCollector,
+    PlatformFees,
+    MarketInfo(BytesN<32>),
+    MarketCounter,
+    UserMarkets(Address),
+    FeeRate,
+    CollectedFees,
 }
 
 #[contract]
@@ -32,6 +39,8 @@ impl KaleIntegrationContract {
         kale_token: Address,
         reward_rate_per_second: i128,
         min_stake_amount: i128,
+        fee_collector: Address,
+        platform_fee_rate: u32,
     ) {
         if env.storage().instance().has(&DataKey::Config) {
             panic_with_error!(&env, ContractError::NotAuthorized);
@@ -41,7 +50,7 @@ impl KaleIntegrationContract {
             admin: admin.clone(),
             kale_token,
             oracle_address: Address::from_string(&env.string().from_str("")), // Not used in this contract
-            platform_fee_rate: 0, // Not used in this contract
+            platform_fee_rate,
             min_stake_amount,
             reward_rate_per_second,
             max_market_duration: 0, // Not used in this contract
@@ -53,6 +62,11 @@ impl KaleIntegrationContract {
         env.storage().instance().set(&DataKey::RewardPool, &0i128);
         env.storage().instance().set(&DataKey::LastRewardUpdate, &env.ledger().timestamp());
         env.storage().instance().set(&DataKey::StakerList, &Vec::<Address>::new(&env));
+        env.storage().instance().set(&DataKey::FeeCollector, &fee_collector);
+        env.storage().instance().set(&DataKey::PlatformFees, &0i128);
+        env.storage().instance().set(&DataKey::MarketCounter, &0u32);
+        env.storage().instance().set(&DataKey::FeeRate, &platform_fee_rate);
+        env.storage().instance().set(&DataKey::CollectedFees, &0i128);
 
         env.storage()
             .instance()
@@ -302,6 +316,159 @@ impl KaleIntegrationContract {
         let seconds_per_year = 365 * 24 * 60 * 60;
         let annual_rewards = config.reward_rate_per_second * seconds_per_year;
         ((annual_rewards * 10000) / total_staked) as u32 // Return as basis points
+    }
+
+    /// Create a new prediction market
+    pub fn create_market(
+        env: Env,
+        creator: Address,
+        description: String,
+        asset_symbol: String,
+        target_price: i128,
+        condition: u32, // 0: Above, 1: Below
+        resolve_time: u64,
+        market_fee: i128,
+    ) -> BytesN<32> {
+        creator.require_auth();
+
+        let config: Config = env.storage().instance().get(&DataKey::Config).unwrap();
+        let token_client = token::Client::new(&env, &config.kale_token);
+
+        // Collect market creation fee
+        if market_fee > 0 {
+            token_client.transfer(&creator, &env.current_contract_address(), &market_fee);
+            
+            // Add fee to platform fees
+            let mut platform_fees: i128 = env.storage().instance().get(&DataKey::PlatformFees).unwrap_or(0);
+            platform_fees += market_fee;
+            env.storage().instance().set(&DataKey::PlatformFees, &platform_fees);
+        }
+
+        // Generate market ID
+        let mut market_counter: u32 = env.storage().instance().get(&DataKey::MarketCounter).unwrap_or(0);
+        market_counter += 1;
+        env.storage().instance().set(&DataKey::MarketCounter, &market_counter);
+
+        let market_id = env.crypto().sha256(&env.crypto().sha256(&env.crypto().sha256(&BytesN::from_array(&env, &[
+            creator.to_string().as_bytes()[0],
+            market_counter as u8,
+            (market_counter >> 8) as u8,
+            (market_counter >> 16) as u8,
+            (market_counter >> 24) as u8,
+        ]))));
+
+        let market_info = MarketInfo {
+            id: market_id.clone(),
+            creator: creator.clone(),
+            description,
+            asset_symbol,
+            target_price,
+            condition,
+            resolve_time,
+            created_at: env.ledger().timestamp(),
+            resolved: false,
+            outcome: None,
+            total_for: 0,
+            total_against: 0,
+            market_fee,
+        };
+
+        env.storage().persistent().set(&DataKey::MarketInfo(market_id.clone()), &market_info);
+
+        // Add market to user's markets list
+        let mut user_markets: Vec<BytesN<32>> = env.storage().persistent()
+            .get(&DataKey::UserMarkets(creator.clone()))
+            .unwrap_or_else(|| Vec::new(&env));
+        user_markets.push_back(market_id.clone());
+        env.storage().persistent().set(&DataKey::UserMarkets(creator), &user_markets);
+
+        log!(&env, "Market created: {} by {}", market_id, creator);
+        market_id
+    }
+
+    /// Get market information
+    pub fn get_market_info(env: Env, market_id: BytesN<32>) -> MarketInfo {
+        env.storage().persistent()
+            .get(&DataKey::MarketInfo(market_id))
+            .unwrap_or_else(|| panic_with_error!(&env, ContractError::MarketNotFound))
+    }
+
+    /// Get user's markets
+    pub fn get_user_markets(env: Env, user: Address) -> Vec<BytesN<32>> {
+        env.storage().persistent()
+            .get(&DataKey::UserMarkets(user))
+            .unwrap_or_else(|| Vec::new(&env))
+    }
+
+    /// Collect platform fees (admin only)
+    pub fn collect_fees(env: Env, admin: Address) -> i128 {
+        admin.require_auth();
+
+        let config: Config = env.storage().instance().get(&DataKey::Config).unwrap();
+        if admin != config.admin {
+            panic_with_error!(&env, ContractError::NotAuthorized);
+        }
+
+        let fee_collector: Address = env.storage().instance().get(&DataKey::FeeCollector).unwrap();
+        let platform_fees: i128 = env.storage().instance().get(&DataKey::PlatformFees).unwrap_or(0);
+
+        if platform_fees > 0 {
+            let token_client = token::Client::new(&env, &config.kale_token);
+            token_client.transfer(&env.current_contract_address(), &fee_collector, &platform_fees);
+
+            // Update collected fees counter
+            let mut collected_fees: i128 = env.storage().instance().get(&DataKey::CollectedFees).unwrap_or(0);
+            collected_fees += platform_fees;
+            env.storage().instance().set(&DataKey::CollectedFees, &collected_fees);
+
+            // Reset platform fees
+            env.storage().instance().set(&DataKey::PlatformFees, &0i128);
+
+            log!(&env, "Collected {} KALE fees by admin", platform_fees);
+        }
+
+        platform_fees
+    }
+
+    /// Get platform fee information
+    pub fn get_fee_info(env: Env) -> FeeInfo {
+        let platform_fees: i128 = env.storage().instance().get(&DataKey::PlatformFees).unwrap_or(0);
+        let collected_fees: i128 = env.storage().instance().get(&DataKey::CollectedFees).unwrap_or(0);
+        let fee_rate: u32 = env.storage().instance().get(&DataKey::FeeRate).unwrap_or(0);
+        let fee_collector: Address = env.storage().instance().get(&DataKey::FeeCollector).unwrap();
+
+        FeeInfo {
+            platform_fees,
+            collected_fees,
+            fee_rate,
+            fee_collector,
+        }
+    }
+
+    /// Update fee rate (admin only)
+    pub fn update_fee_rate(env: Env, admin: Address, new_fee_rate: u32) {
+        admin.require_auth();
+
+        let config: Config = env.storage().instance().get(&DataKey::Config).unwrap();
+        if admin != config.admin {
+            panic_with_error!(&env, ContractError::NotAuthorized);
+        }
+
+        env.storage().instance().set(&DataKey::FeeRate, &new_fee_rate);
+        log!(&env, "Fee rate updated to {} by admin", new_fee_rate);
+    }
+
+    /// Update fee collector (admin only)
+    pub fn update_fee_collector(env: Env, admin: Address, new_fee_collector: Address) {
+        admin.require_auth();
+
+        let config: Config = env.storage().instance().get(&DataKey::Config).unwrap();
+        if admin != config.admin {
+            panic_with_error!(&env, ContractError::NotAuthorized);
+        }
+
+        env.storage().instance().set(&DataKey::FeeCollector, &new_fee_collector);
+        log!(&env, "Fee collector updated to {} by admin", new_fee_collector);
     }
 
     // Private helper functions

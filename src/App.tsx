@@ -19,6 +19,7 @@ import Portfolio from "./pages/Portfolio";
 import PredictionMarkets from "./pages/PredictionMarkets";
 import Settings from "./pages/Settings";
 import WalletTest from "./pages/WalletTest";
+import PitchDeck from "./pages/PitchDeck";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./components/AuthGuard";
 
@@ -34,11 +35,12 @@ const App = () => (
             <Sonner />
             <DevModeIndicator />
             <BrowserRouter>
-              <div className="min-h-screen bg-gray-50">
+              <div className="min-h-screen bg-background text-foreground">
                 <Routes>
                   {/* Landing page without layout */}
                   <Route path="/" element={<Index />} />
                   <Route path="/wallet-test" element={<WalletTest />} />
+                  <Route path="/pitch-deck" element={<PitchDeck />} />
                   
                   {/* App pages with layout */}
                   <Route path="/dashboard" element={

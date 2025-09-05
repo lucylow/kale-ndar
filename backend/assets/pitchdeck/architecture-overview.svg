@@ -1,0 +1,109 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: 'Arial', sans-serif; font-size: 24px; font-weight: bold; fill: #1f2937; }
+      .subtitle { font-family: 'Arial', sans-serif; font-size: 18px; font-weight: bold; fill: #374151; }
+      .text { font-family: 'Arial', sans-serif; font-size: 12px; fill: #4b5563; }
+      .small-text { font-family: 'Arial', sans-serif; font-size: 10px; fill: #6b7280; }
+      .layer-box { fill: #f3f4f6; stroke: #d1d5db; stroke-width: 2; }
+      .service-box { fill: #e5e7eb; stroke: #9ca3af; stroke-width: 1; }
+      .arrow { stroke: #3b82f6; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="675" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" class="title">Technical Architecture: KALE-ndar Prediction Market Platform</text>
+  <text x="600" y="65" text-anchor="middle" class="subtitle">Multi-Layered Blockchain Integration Platform</text>
+  
+  <!-- Client Layer -->
+  <rect x="50" y="100" width="1100" height="80" class="layer-box" rx="8"/>
+  <text x="70" y="125" class="subtitle">CLIENT LAYER</text>
+  <rect x="70" y="135" width="500" height="35" class="service-box" rx="4"/>
+  <text x="80" y="155" class="text">Next.js Frontend (TypeScript)</text>
+  <rect x="580" y="135" width="500" height="35" class="service-box" rx="4"/>
+  <text x="590" y="155" class="text">Mobile SDK (React Native)</text>
+  
+  <!-- API Gateway Layer -->
+  <rect x="50" y="200" width="1100" height="80" class="layer-box" rx="8"/>
+  <text x="70" y="225" class="subtitle">API GATEWAY LAYER</text>
+  <rect x="70" y="235" width="500" height="35" class="service-box" rx="4"/>
+  <text x="80" y="255" class="text">Node.js Microservices Architecture</text>
+  <rect x="580" y="235" width="500" height="35" class="service-box" rx="4"/>
+  <text x="590" y="255" class="text">Authentication Service</text>
+  
+  <!-- Business Logic Layer -->
+  <rect x="50" y="300" width="1100" height="120" class="layer-box" rx="8"/>
+  <text x="70" y="325" class="subtitle">BUSINESS LOGIC LAYER</text>
+  <rect x="70" y="335" width="200" height="70" class="service-box" rx="4"/>
+  <text x="80" y="355" class="text">Market Service</text>
+  <text x="80" y="370" class="small-text">• Market Creation</text>
+  <text x="80" y="385" class="small-text">• Resolution</text>
+  
+  <rect x="290" y="335" width="200" height="70" class="service-box" rx="4"/>
+  <text x="300" y="355" class="text">Betting Service</text>
+  <text x="300" y="370" class="small-text">• Place Bets</text>
+  <text x="300" y="385" class="small-text">• Calculations</text>
+  
+  <rect x="510" y="335" width="200" height="70" class="service-box" rx="4"/>
+  <text x="520" y="355" class="text">Oracle Service</text>
+  <text x="520" y="370" class="small-text">• Price Feeds</text>
+  <text x="520" y="385" class="small-text">• Event Data</text>
+  
+  <rect x="730" y="335" width="200" height="70" class="service-box" rx="4"/>
+  <text x="740" y="355" class="text">Wallet Service</text>
+  <text x="740" y="370" class="small-text">• Tx Management</text>
+  <text x="740" y="385" class="small-text">• Balance Tracking</text>
+  
+  <rect x="950" y="335" width="200" height="70" class="service-box" rx="4"/>
+  <text x="960" y="355" class="text">Analytics Engine</text>
+  <text x="960" y="370" class="small-text">• Market Trends</text>
+  <text x="960" y="385" class="small-text">• User Analytics</text>
+  
+  <!-- Blockchain Layer -->
+  <rect x="50" y="440" width="1100" height="120" class="layer-box" rx="8"/>
+  <text x="70" y="465" class="subtitle">BLOCKCHAIN LAYER</text>
+  <rect x="70" y="475" width="300" height="70" class="service-box" rx="4"/>
+  <text x="80" y="495" class="text">Stellar Smart Contracts (Rust)</text>
+  <text x="80" y="510" class="small-text">• PredictionMarket Contract</text>
+  <text x="80" y="525" class="small-text">• MarketFactory Contract</text>
+  
+  <rect x="390" y="475" width="300" height="70" class="service-box" rx="4"/>
+  <text x="400" y="495" class="text">External Oracle Integration</text>
+  <text x="400" y="510" class="small-text">• Reflector Oracle</text>
+  <text x="400" y="525" class="small-text">• KALE Token Contract</text>
+  
+  <rect x="710" y="475" width="300" height="70" class="service-box" rx="4"/>
+  <text x="720" y="495" class="text">Decentralized Storage</text>
+  <text x="720" y="510" class="small-text">• IPFS/Arweave</text>
+  <text x="720" y="525" class="small-text">• Metadata Storage</text>
+  
+  <!-- Data Layer -->
+  <rect x="50" y="580" width="1100" height="80" class="layer-box" rx="8"/>
+  <text x="70" y="605" class="subtitle">DATA LAYER</text>
+  <rect x="70" y="615" width="250" height="35" class="service-box" rx="4"/>
+  <text x="80" y="635" class="text">TimescaleDB</text>
+  <rect x="330" y="615" width="250" height="35" class="service-box" rx="4"/>
+  <text x="340" y="635" class="text">Redis Cluster</text>
+  <rect x="590" y="615" width="250" height="35" class="service-box" rx="4"/>
+  <text x="600" y="635" class="text">IPFS Cluster</text>
+  <rect x="850" y="615" width="250" height="35" class="service-box" rx="4"/>
+  <text x="860" y="635" class="text">MongoDB Atlas</text>
+  
+  <!-- Connection Arrows -->
+  <line x1="600" y1="180" x2="600" y2="200" class="arrow"/>
+  <line x1="600" y1="280" x2="600" y2="300" class="arrow"/>
+  <line x1="600" y1="420" x2="600" y2="440" class="arrow"/>
+  <line x1="600" y1="560" x2="600" y2="580" class="arrow"/>
+  
+  <!-- Labels for arrows -->
+  <text x="610" y="195" class="small-text">HTTPS/WebSocket</text>
+  <text x="610" y="295" class="small-text">gRPC/Protocol Buffers</text>
+  <text x="610" y="435" class="small-text">Stellar RPC/Soroban</text>
+  <text x="610" y="575" class="small-text">Decentralized Storage</text>
+</svg>

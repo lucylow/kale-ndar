@@ -39,16 +39,16 @@ const ReflectorPage = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-8 text-white">
+      <div className="bg-gradient-card rounded-xl p-8 shadow-card border border-white/10 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Reflector Oracle</h1>
-            <p className="text-blue-100 text-lg">
+            <h1 className="text-4xl font-display font-bold mb-4 text-gradient">Reflector Oracle</h1>
+            <p className="text-muted-foreground text-xl">
               Access real-time price feeds and create custom subscriptions for your DeFi applications
             </p>
           </div>
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-            <TrendingUp className="w-10 h-10" />
+          <div className="w-20 h-20 bg-accent-teal/20 rounded-full flex items-center justify-center">
+            <TrendingUp className="w-10 h-10 text-accent-teal" />
           </div>
         </div>
       </div>

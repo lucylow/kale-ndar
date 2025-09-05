@@ -1,28 +1,33 @@
 # KALE-ndar Backend
 
-A comprehensive backend service for the KALE-ndar prediction market platform, built with Node.js, Express, PostgreSQL, and integrated with the Stellar blockchain.
+A comprehensive backend service for the KALE-ndar prediction market platform built on Stellar blockchain with Soroban smart contracts.
 
-## 🚀 Features
+## Features
 
-- **RESTful API** - Complete API for markets, users, and blockchain interactions
-- **Real-time Events** - WebSocket support for live market updates
-- **Blockchain Integration** - Direct integration with Stellar Soroban contracts
-- **Event Listener** - Automated blockchain event monitoring
-- **Database Management** - PostgreSQL with automatic schema initialization
-- **Security** - Rate limiting, CORS, input validation, and security headers
-- **Logging** - Structured logging with Winston
-- **Docker Support** - Complete containerization with Docker Compose
+- **Stellar Blockchain Integration**: Full RPC integration with Stellar network
+- **KALE Token Management**: Complete token operations including transfers, minting, burning
+- **Market Creation**: Create and manage prediction markets on Stellar DEX
+- **Fee Collection**: Automated fee collection and distribution system
+- **Soroban Smart Contracts**: Integration with Rust-based smart contracts
+- **TypeScript**: Fully typed backend with comprehensive error handling
+- **RESTful API**: Clean API endpoints with validation and documentation
 
-## 📋 Prerequisites
+## Architecture
 
-- Node.js 18+ 
-- PostgreSQL 13+
-- Redis (optional, for caching)
-- Docker & Docker Compose (for containerized deployment)
+### Services
 
-## 🛠️ Installation
+1. **StellarRpcService**: Handles all Stellar network interactions
+2. **KaleTokenService**: Manages KALE token operations
+3. **MarketCreationService**: Handles market creation and trading
+4. **FeeCollectionService**: Manages fee collection and distribution
 
-### Local Development
+### Smart Contracts
+
+- **KALE Integration Contract**: Main contract for staking, market creation, and fee collection
+- **Market Factory Contract**: Creates and manages prediction markets
+- **Reflector Oracle Contract**: Provides price feeds for market resolution
+
+## Installation
 
 1. **Clone the repository**
    ```bash
@@ -41,250 +46,228 @@ A comprehensive backend service for the KALE-ndar prediction market platform, bu
    # Edit .env with your configuration
    ```
 
-4. **Set up PostgreSQL**
+4. **Build the project**
    ```bash
-   # Create database
-   createdb kalendar
-   
-   # Or using Docker
-   docker run --name postgres -e POSTGRES_DB=kalendar -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pass -p 5432:5432 -d postgres:15-alpine
+   npm run build
    ```
 
-5. **Start the services**
+5. **Start the server**
    ```bash
-   # Start API server
+   npm start
+   # or for development
    npm run dev
-   
-   # Start event listener (in another terminal)
-   npm run event-listener
    ```
 
-### Docker Deployment
+## Environment Configuration
 
-1. **Set up environment variables**
-   ```bash
-   cp env.example .env
-   # Edit .env with your production configuration
-   ```
+### Required Environment Variables
 
-2. **Start all services**
-   ```bash
-   docker-compose up -d
-   ```
+```env
+# Server
+PORT=3000
+NODE_ENV=development
 
-3. **Check service status**
-   ```bash
-   docker-compose ps
-   docker-compose logs -f api
-   ```
+# Stellar Network
+HORIZON_URL=https://horizon-testnet.stellar.org
+NETWORK_PASSPHRASE=Test SDF Network ; September 2015
+SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
 
-## 📚 API Documentation
+# Contract Addresses
+KALE_TOKEN_CONTRACT_ID=your-kale-token-contract-id
+KALE_INTEGRATION_CONTRACT_ID=your-kale-integration-contract-id
+FEE_COLLECTOR_ADDRESS=your-fee-collector-address
 
-### Base URL
-- Development: `http://localhost:3000`
-- Production: `https://api.kale-ndar.com`
-
-### Authentication
-Most endpoints require authentication via wallet signature. Include the user's wallet address in the request headers:
-```
-X-User-Address: <wallet-address>
+# KALE Token
+KALE_ISSUER_ADDRESS=your-kale-issuer-address
+KALE_TOTAL_SUPPLY=1000000000
+KALE_DECIMALS=7
 ```
 
-### Endpoints
+## API Endpoints
 
-#### Markets
+### KALE Token Operations
 
-- `GET /api/markets` - Get all markets with pagination
-- `GET /api/markets/:id` - Get specific market details
-- `POST /api/markets` - Create new market
-- `POST /api/markets/:id/bet` - Place bet on market
-- `POST /api/markets/:id/resolve` - Resolve market
-- `GET /api/markets/:id/bets/:user` - Get user's bets for market
+- `GET /api/kale/info` - Get KALE token information
+- `GET /api/kale/balance/:address` - Get KALE balance for address
+- `POST /api/kale/transfer` - Transfer KALE tokens
+- `POST /api/kale/mint` - Mint KALE tokens (admin)
+- `POST /api/kale/burn` - Burn KALE tokens
+- `POST /api/kale/offers/sell` - Create sell offer (KALE for XLM)
+- `POST /api/kale/offers/buy` - Create buy offer (XLM for KALE)
+- `GET /api/kale/orderbook` - Get KALE/XLM order book
+- `GET /api/kale/price` - Get current KALE price
 
-#### Users
+### Market Creation
 
-- `GET /api/users/:address` - Get user profile
-- `POST /api/users/:address` - Create/update user profile
-- `GET /api/users/:address/stats` - Get user statistics
-- `GET /api/users/:address/bets` - Get user's betting history
-- `GET /api/users/leaderboard` - Get leaderboard
+- `POST /api/markets/create` - Create new prediction market
+- `GET /api/markets/:marketId` - Get market information
+- `GET /api/markets/user/:userAddress` - Get user's markets
+- `POST /api/markets/offers/create` - Create market offer
+- `POST /api/markets/offers/cancel` - Cancel market offer
+- `POST /api/markets/offers/kale-xlm` - Create KALE/XLM trading offers
+- `GET /api/markets/stats/kale` - Get KALE trading statistics
 
-#### Blockchain
+### Fee Collection
 
-- `GET /api/blockchain/status` - Get blockchain connection status
-- `GET /api/blockchain/contracts` - Get contract deployment status
+- `POST /api/fees/collect` - Collect platform fees (admin)
+- `GET /api/fees/info` - Get current fee information
+- `POST /api/fees/update-rate` - Update fee rate (admin)
+- `POST /api/fees/update-collector` - Update fee collector (admin)
+- `POST /api/fees/calculate` - Calculate fees for transaction
+- `POST /api/fees/distribute` - Distribute fees to stakeholders
+- `GET /api/fees/stats` - Get fee statistics
+- `GET /api/fees/history` - Get fee collection history
+
+### Blockchain Operations
+
+- `GET /api/blockchain/status` - Get blockchain status
+- `GET /api/blockchain/contracts` - Get contract details
 - `GET /api/blockchain/transaction/:hash` - Get transaction status
-- `GET /api/blockchain/markets/:contractId` - Get market from blockchain
-- `GET /api/blockchain/oracle/price/:asset` - Get oracle price
-- `GET /api/blockchain/token/balance/:address` - Get KALE token balance
 - `GET /api/blockchain/events` - Get recent blockchain events
 - `GET /api/blockchain/stats` - Get network statistics
 
-#### Health
+### Health & Monitoring
 
-- `GET /health` - Basic health check
-- `GET /health/detailed` - Detailed health check with database
-- `GET /health/database` - Database health check
-- `GET /health/websocket` - WebSocket health check
+- `GET /api/health` - Basic health check
+- `GET /api/health/detailed` - Detailed health check
+- `GET /api/health/ready` - Readiness check
+- `GET /api/health/live` - Liveness check
 
-### WebSocket Events
+## Smart Contract Integration
 
-Connect to `ws://localhost:3000/ws` for real-time updates:
+### KALE Integration Contract
 
-```javascript
-const ws = new WebSocket('ws://localhost:3000/ws');
+The main contract handles:
 
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  
-  switch (data.type) {
-    case 'market_created':
-      console.log('New market:', data.data);
-      break;
-    case 'market_resolved':
-      console.log('Market resolved:', data.data);
-      break;
-    case 'bet_placed':
-      console.log('Bet placed:', data.data);
-      break;
-    case 'winnings_claimed':
-      console.log('Winnings claimed:', data.data);
-      break;
-  }
-};
+- **Staking**: Stake KALE tokens for rewards
+- **Market Creation**: Create prediction markets with fees
+- **Fee Collection**: Collect and distribute platform fees
+- **Reward Distribution**: Distribute staking rewards
 
-// Subscribe to specific market updates
-ws.send(JSON.stringify({
-  type: 'subscribe_market',
-  payload: { marketId: 'market_123' }
-}));
+### Contract Methods
+
+```rust
+// Staking
+pub fn stake(env: Env, staker: Address, amount: i128)
+pub fn unstake(env: Env, staker: Address, amount: i128)
+pub fn claim_rewards(env: Env, staker: Address) -> i128
+
+// Market Creation
+pub fn create_market(env: Env, creator: Address, ...) -> BytesN<32>
+pub fn get_market_info(env: Env, market_id: BytesN<32>) -> MarketInfo
+
+// Fee Collection
+pub fn collect_fees(env: Env, admin: Address) -> i128
+pub fn get_fee_info(env: Env) -> FeeInfo
 ```
 
-## 🔧 Configuration
+## Development
 
-### Environment Variables
+### Scripts
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment (development/production) | `development` |
-| `PORT` | API server port | `3000` |
-| `DB_HOST` | PostgreSQL host | `localhost` |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_NAME` | Database name | `kalendar` |
-| `DB_USER` | Database user | `postgres` |
-| `DB_PASSWORD` | Database password | `password` |
-| `SOROBAN_RPC_URL` | Stellar RPC URL | `https://soroban-testnet.stellar.org` |
-| `FACTORY_CONTRACT_ID` | Market factory contract ID | - |
-| `KALE_TOKEN_CONTRACT_ID` | KALE token contract ID | - |
-| `REFLECTOR_CONTRACT_ID` | Reflector oracle contract ID | - |
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build TypeScript to JavaScript
+- `npm start` - Start production server
+- `npm test` - Run tests
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking
 
-### Database Schema
+### Project Structure
 
-The application automatically creates the following tables:
+```
+src/
+├── api/
+│   └── server.ts              # Main server file
+├── routes/
+│   ├── blockchain.routes.ts   # Blockchain operations
+│   ├── kale-token.routes.ts   # KALE token operations
+│   ├── market-creation.routes.ts # Market creation
+│   ├── fee-collection.routes.ts # Fee collection
+│   ├── health.routes.ts        # Health checks
+│   └── users.routes.ts        # User management
+├── services/
+│   ├── stellar-rpc.service.ts # Stellar RPC service
+│   ├── kale-token.service.ts   # KALE token service
+│   ├── market-creation.service.ts # Market creation service
+│   └── fee-collection.service.ts # Fee collection service
+└── utils/
+    └── logger.ts              # Winston logger configuration
+```
 
-- `markets` - Prediction markets
-- `bets` - User bets
-- `users` - User profiles
-- `market_events` - Blockchain events
-
-## 🚀 Deployment
-
-### Production Setup
-
-1. **Set up environment**
-   ```bash
-   export NODE_ENV=production
-   export DB_HOST=your-db-host
-   export SOROBAN_RPC_URL=https://soroban-mainnet.stellar.org
-   # ... other environment variables
-   ```
-
-2. **Deploy with Docker**
-   ```bash
-   docker-compose -f docker-compose.prod.yml up -d
-   ```
-
-3. **Set up reverse proxy (Nginx)**
-   ```bash
-   # Configure nginx.conf for your domain
-   docker-compose up -d nginx
-   ```
-
-### Monitoring
-
-- **Health checks**: `GET /health/detailed`
-- **Logs**: `docker-compose logs -f api`
-- **Database**: Connect to PostgreSQL and run queries
-- **Metrics**: Implement Prometheus metrics (optional)
-
-## 🔒 Security
-
-- Rate limiting on all API endpoints
-- CORS configuration
-- Input validation with Joi
-- Security headers with Helmet
-- SQL injection protection
-- XSS protection
-
-## 📊 Logging
-
-Logs are written to:
-- Console (development)
-- `logs/combined.log` (all levels)
-- `logs/error.log` (errors only)
-
-Log levels: `error`, `warn`, `info`, `http`, `debug`
-
-## 🧪 Testing
+## Testing
 
 ```bash
-# Run tests
+# Run all tests
 npm test
+
+# Run tests in watch mode
+npm run test:watch
 
 # Run tests with coverage
 npm run test:coverage
-
-# Run integration tests
-npm run test:integration
 ```
 
-## 📝 Scripts
+## Deployment
+
+### Docker Deployment
 
 ```bash
-# Development
-npm run dev              # Start API server in development
-npm run event-listener   # Start event listener
+# Build Docker image
+docker build -t kale-ndar-backend .
 
-# Production
-npm start               # Start API server in production
-npm run build           # Build for production
-
-# Database
-npm run db:migrate      # Run database migrations
-npm run db:seed         # Seed database with test data
-
-# Deployment
-npm run deploy          # Deploy contracts to blockchain
+# Run container
+docker run -p 3000:3000 --env-file .env kale-ndar-backend
 ```
 
-## 🤝 Contributing
+### Production Considerations
+
+1. **Environment Variables**: Set all required environment variables
+2. **Database**: Set up PostgreSQL database
+3. **Redis**: Configure Redis for caching
+4. **Monitoring**: Set up logging and monitoring
+5. **Security**: Configure CORS, rate limiting, and security headers
+6. **SSL**: Use HTTPS in production
+
+## Security
+
+- **Input Validation**: All inputs are validated using Joi schemas
+- **Rate Limiting**: API endpoints are rate limited
+- **CORS**: Cross-origin requests are properly configured
+- **Helmet**: Security headers are set
+- **Error Handling**: Sensitive information is not exposed in errors
+
+## Monitoring
+
+- **Health Checks**: Comprehensive health check endpoints
+- **Logging**: Structured logging with Winston
+- **Metrics**: Performance and error metrics
+- **Alerts**: Configurable alerts for critical issues
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests
-5. Submit a pull request
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
 
-## 📄 License
+## License
 
 MIT License - see LICENSE file for details
 
-## 🆘 Support
+## Support
 
-- **Documentation**: Check the API docs
-- **Issues**: Create an issue on GitHub
-- **Discord**: Join our community Discord
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation
 
----
+## Roadmap
 
-Built with ❤️ by the KALE-ndar team
+- [ ] Enhanced market resolution mechanisms
+- [ ] Advanced fee distribution strategies
+- [ ] Real-time WebSocket updates
+- [ ] Advanced analytics and reporting
+- [ ] Multi-chain support
+- [ ] Mobile API optimization

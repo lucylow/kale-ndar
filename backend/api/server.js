@@ -16,6 +16,7 @@ const marketRoutes = require('../routes/markets');
 const userRoutes = require('../routes/users');
 const blockchainRoutes = require('../routes/blockchain');
 const healthRoutes = require('../routes/health');
+const pitchdeckRoutes = require('../routes/pitchdeck');
 
 const app = express();
 const server = createServer(app);
@@ -76,6 +77,7 @@ app.use('/health', healthRoutes);
 app.use('/api/markets', marketRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/blockchain', blockchainRoutes);
+app.use('/api/pitchdeck', pitchdeckRoutes);
 
 // WebSocket endpoint
 app.get('/ws', (req, res) => {

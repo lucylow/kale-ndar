@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contracttype, Address, String, Vec};
+use soroban_sdk::{contracttype, Address, String, Vec, BytesN, Option};
 
 /// Market status enumeration
 #[contracttype]
@@ -107,6 +107,35 @@ pub enum ContractError {
     InvalidTimestamp,
     StakeNotFound,
     InsufficientStake,
+}
+
+/// Market information structure for KALE integration
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct MarketInfo {
+    pub id: BytesN<32>,
+    pub creator: Address,
+    pub description: String,
+    pub asset_symbol: String,
+    pub target_price: i128,
+    pub condition: u32, // 0: Above, 1: Below
+    pub resolve_time: u64,
+    pub created_at: u64,
+    pub resolved: bool,
+    pub outcome: Option<bool>,
+    pub total_for: i128,
+    pub total_against: i128,
+    pub market_fee: i128,
+}
+
+/// Fee information structure
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct FeeInfo {
+    pub platform_fees: i128,
+    pub collected_fees: i128,
+    pub fee_rate: u32,
+    pub fee_collector: Address,
 }
 
 /// Configuration structure for contracts

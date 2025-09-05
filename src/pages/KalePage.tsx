@@ -37,73 +37,73 @@ const KalePage = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-8 text-white">
+      <div className="bg-gradient-card rounded-xl p-8 shadow-card border border-white/10 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">KALE Farming</h1>
-            <p className="text-green-100 text-lg">
+            <h1 className="text-4xl font-display font-bold mb-4 text-gradient">KALE Farming</h1>
+            <p className="text-muted-foreground text-xl">
               Participate in proof-of-teamwork mining and earn KALE tokens through collaborative farming
             </p>
           </div>
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-            <Sprout className="w-10 h-10" />
+          <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
+            <Sprout className="w-10 h-10 text-primary" />
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Staked</p>
-                <p className="text-2xl font-bold text-gray-900">{farmingStats.totalStaked} KALE</p>
+                <p className="text-sm text-muted-foreground">Total Staked</p>
+                <p className="text-2xl font-bold text-foreground">{farmingStats.totalStaked} KALE</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Daily Yield</p>
-                <p className="text-2xl font-bold text-gray-900">+{farmingStats.dailyYield} KALE</p>
+                <p className="text-sm text-muted-foreground">Daily Yield</p>
+                <p className="text-2xl font-bold text-foreground">+{farmingStats.dailyYield} KALE</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-accent-teal/20 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-accent-teal" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">APY</p>
-                <p className="text-2xl font-bold text-gray-900">{farmingStats.apy}%</p>
+                <p className="text-sm text-muted-foreground">APY</p>
+                <p className="text-2xl font-bold text-foreground">{farmingStats.apy}%</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-accent-purple/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-accent-purple" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Team Size</p>
-                <p className="text-2xl font-bold text-gray-900">{farmingStats.teamSize}</p>
+                <p className="text-sm text-muted-foreground">Team Size</p>
+                <p className="text-2xl font-bold text-foreground">{farmingStats.teamSize}</p>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-accent-gold/20 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-accent-gold" />
               </div>
             </div>
           </CardContent>
@@ -120,16 +120,16 @@ const KalePage = () => {
             </TabsList>
             
             <TabsContent value="stake" className="space-y-6">
-              <Card>
+              <Card className="bg-gradient-card border-white/10 shadow-card">
                 <CardHeader>
-                  <CardTitle>Stake KALE Tokens</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-foreground">Stake KALE Tokens</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Stake your KALE tokens to participate in proof-of-teamwork farming
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Amount to Stake
                     </label>
                     <div className="relative">
@@ -138,27 +138,28 @@ const KalePage = () => {
                         value={stakeAmount}
                         onChange={(e) => setStakeAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="w-full px-4 py-3 bg-background/50 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground"
                       />
-                      <div className="absolute right-3 top-3 text-gray-500">KALE</div>
+                      <div className="absolute right-3 top-3 text-muted-foreground">KALE</div>
                     </div>
                   </div>
                   
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-secondary/20 rounded-lg p-4 border border-white/10">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Available Balance</span>
-                      <span className="font-medium">1,234.56 KALE</span>
+                      <span className="text-muted-foreground">Available Balance</span>
+                      <span className="font-medium text-foreground">1,234.56 KALE</span>
                     </div>
                     <div className="flex items-center justify-between text-sm mt-2">
-                      <span className="text-gray-600">Estimated Daily Yield</span>
-                      <span className="font-medium text-green-600">+{stakeAmount ? (parseFloat(stakeAmount) * 0.01).toFixed(2) : '0.00'} KALE</span>
+                      <span className="text-muted-foreground">Estimated Daily Yield</span>
+                      <span className="font-medium text-primary">+{stakeAmount ? (parseFloat(stakeAmount) * 0.01).toFixed(2) : '0.00'} KALE</span>
                     </div>
                   </div>
                   
                   <Button 
                     onClick={handleStake}
                     disabled={!stakeAmount || isStaking}
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    variant="hero"
+                    className="w-full"
                   >
                     {isStaking ? 'Staking...' : 'Stake KALE'}
                   </Button>
@@ -167,29 +168,29 @@ const KalePage = () => {
             </TabsContent>
             
             <TabsContent value="harvest" className="space-y-6">
-              <Card>
+              <Card className="bg-gradient-card border-white/10 shadow-card">
                 <CardHeader>
-                  <CardTitle>Harvest Rewards</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-foreground">Harvest Rewards</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Claim your earned KALE tokens from farming
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="bg-green-50 rounded-lg p-4">
+                  <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
                     <div className="flex items-center justify-between">
-                      <span className="text-green-800 font-medium">Available to Harvest</span>
-                      <span className="text-green-600 font-bold text-lg">45.78 KALE</span>
+                      <span className="text-primary font-medium">Available to Harvest</span>
+                      <span className="text-primary font-bold text-lg">45.78 KALE</span>
                     </div>
                   </div>
                   
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     <div className="flex items-center space-x-2 mb-2">
                       <Info className="w-4 h-4" />
                       <span>Next harvest available in: {farmingStats.nextHarvest}</span>
                     </div>
                   </div>
                   
-                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                  <Button variant="hero" className="w-full">
                     Harvest Rewards
                   </Button>
                 </CardContent>
@@ -200,38 +201,38 @@ const KalePage = () => {
 
         {/* Team Section */}
         <div>
-          <Card>
+          <Card className="bg-gradient-card border-white/10 shadow-card">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
+              <CardTitle className="flex items-center space-x-2 text-foreground">
                 <Users className="w-5 h-5" />
                 <span>Your Team</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-muted-foreground">
                 Collaborate with your team to maximize farming rewards
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {teamMembers.map((member, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg border border-white/10">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
                       {member.name[0]}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{member.name}</p>
+                      <p className="font-medium text-foreground">{member.name}</p>
                       <Badge variant={member.status === 'active' ? 'default' : 'secondary'} className="text-xs">
                         {member.status}
                       </Badge>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">{member.contribution}%</p>
-                    <p className="text-xs text-gray-500">contribution</p>
+                    <p className="text-sm font-medium text-foreground">{member.contribution}%</p>
+                    <p className="text-xs text-muted-foreground">contribution</p>
                   </div>
                 </div>
               ))}
               
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-white/20 hover:bg-accent/20">
                 <ArrowUpRight className="w-4 h-4 mr-2" />
                 Invite Team Members
               </Button>
