@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useWallet } from "@/contexts/WalletContext";
 import { apiService, ApiError } from "@/services/api";
 import { Market, MarketCondition } from "@/types/market";
+import MockDataDemo from "@/components/MockDataDemo";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -22,7 +24,12 @@ import {
   Wallet,
   Activity,
   Trophy,
-  Star
+  Star,
+  Zap,
+  TrendingUp as TrendingUpIcon,
+  Award,
+  Eye,
+  RefreshCw
 } from "lucide-react";
 import MarketList from "@/components/MarketList";
 import { YieldOptimizer } from "@/components/YieldOptimizer";
@@ -168,81 +175,112 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-display font-bold mb-2">
-              Welcome back, {user?.username || 'Trader'}!
-            </h1>
-            <p className="text-muted-foreground">
-              Ready to make your next prediction?
-            </p>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-primary rounded-xl">
+                <BarChart3 className="h-6 w-6 text-background" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-display font-bold">
+                  Welcome back, {user?.username || 'Trader'}!
+                </h1>
+                <p className="text-muted-foreground">
+                  Ready to make your next prediction?
+                </p>
+              </div>
+            </div>
           </div>
-          <Button variant="hero" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create Market
-          </Button>
+          <div className="flex gap-3">
+            <Button variant="outline" className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </Button>
+            <Button variant="hero" className="gap-2 hover:scale-105 transition-transform">
+              <Plus className="h-4 w-4" />
+              Create Market
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="bg-gradient-card border-white/10 shadow-card">
+          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Bets</p>
-                  <p className="text-2xl font-bold text-primary">
+                  <p className="text-2xl font-bold text-primary group-hover:scale-105 transition-transform">
                     {userStats?.total_bets || 0}
                   </p>
+                  <div className="mt-2">
+                    <Progress value={Math.min((userStats?.total_bets || 0) / 10 * 100, 100)} className="h-1" />
+                  </div>
                 </div>
-                <div className="p-3 bg-primary/20 rounded-lg">
+                <div className="p-3 bg-primary/20 rounded-lg group-hover:scale-110 transition-transform">
                   <BarChart3 className="h-6 w-6 text-primary" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-card border-white/10 shadow-card">
+          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Winnings</p>
-                  <p className="text-2xl font-bold text-accent-gold">
+                  <p className="text-2xl font-bold text-accent-gold group-hover:scale-105 transition-transform">
                     {formatAmount(userStats?.total_winnings || 0)} KALE
                   </p>
+                  <div className="mt-2">
+                    <Badge variant="secondary" className="text-xs">
+                      <TrendingUpIcon className="h-3 w-3 mr-1" />
+                      +12.5% this week
+                    </Badge>
+                  </div>
                 </div>
-                <div className="p-3 bg-accent-gold/20 rounded-lg">
+                <div className="p-3 bg-accent-gold/20 rounded-lg group-hover:scale-110 transition-transform">
                   <Trophy className="h-6 w-6 text-accent-gold" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-card border-white/10 shadow-card">
+          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Win Rate</p>
-                  <p className="text-2xl font-bold text-accent-teal">
+                  <p className="text-2xl font-bold text-accent-teal group-hover:scale-105 transition-transform">
                     {(userStats?.win_rate || 0).toFixed(1)}%
                   </p>
+                  <div className="mt-2">
+                    <Progress value={userStats?.win_rate || 0} className="h-1" />
+                  </div>
                 </div>
-                <div className="p-3 bg-accent-teal/20 rounded-lg">
+                <div className="p-3 bg-accent-teal/20 rounded-lg group-hover:scale-110 transition-transform">
                   <TrendingUp className="h-6 w-6 text-accent-teal" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-card border-white/10 shadow-card">
+          <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Active Bets</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-2xl font-bold text-foreground group-hover:scale-105 transition-transform">
                     {userStats?.pending_claims || 0}
                   </p>
+                  <div className="mt-2">
+                    <Badge variant="outline" className="text-xs">
+                      <Zap className="h-3 w-3 mr-1" />
+                      Live
+                    </Badge>
+                  </div>
                 </div>
-                <div className="p-3 bg-secondary/20 rounded-lg">
+                <div className="p-3 bg-secondary/20 rounded-lg group-hover:scale-110 transition-transform">
                   <Activity className="h-6 w-6 text-foreground" />
                 </div>
               </div>
@@ -251,34 +289,53 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Wallet Info */}
-        <Card className="bg-gradient-card border-white/10 shadow-card mb-8">
+        <Card className="bg-gradient-card border-white/10 shadow-card mb-8 hover:shadow-card-hover transition-all duration-300">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5" />
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <Wallet className="h-5 w-5 text-primary" />
+              </div>
               Wallet Information
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Connected Address</p>
-                <p className="font-mono text-sm">{formatAddress(wallet.publicKey!)}</p>
+                <p className="font-mono text-sm bg-secondary/20 px-3 py-2 rounded-lg border border-white/10">
+                  {formatAddress(wallet.publicKey!)}
+                </p>
               </div>
-              <Badge variant="secondary" className="gap-1">
-                <Star className="h-3 w-3" />
-                Verified
-              </Badge>
+              <div className="flex gap-2">
+                <Badge variant="secondary" className="gap-1">
+                  <Star className="h-3 w-3" />
+                  Verified
+                </Badge>
+                <Badge variant="outline" className="gap-1">
+                  <Award className="h-3 w-3" />
+                  Trusted
+                </Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Recent Markets */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-display font-bold">Recent Markets</h2>
-            <Button variant="outline" onClick={() => navigate('/')}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-accent-teal/20 rounded-lg">
+                <Eye className="h-5 w-5 text-accent-teal" />
+              </div>
+              <h2 className="text-2xl font-display font-bold">Recent Markets</h2>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/')}
+              className="gap-2 hover:scale-105 transition-transform"
+            >
               View All Markets
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
           
@@ -343,10 +400,10 @@ const Dashboard: React.FC = () => {
                       <Button
                         variant="hero"
                         size="sm"
-                        className="w-full"
+                        className="w-full group hover:scale-105 transition-transform"
                         onClick={() => navigate('/')}
                       >
-                        <TrendingUp className="h-4 w-4 mr-2" />
+                        <TrendingUp className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
                         View Market
                       </Button>
                     </div>
@@ -356,6 +413,9 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Mock Data Demo (Development Only) */}
+        <MockDataDemo />
 
         {/* Yield Optimizer */}
         <YieldOptimizer />

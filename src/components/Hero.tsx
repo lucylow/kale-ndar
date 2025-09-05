@@ -94,48 +94,57 @@ const Hero = () => {
           </p>
 
           {/* Stats */}
-          <div className="flex justify-center gap-8 mb-12 animate-fade-in">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-12 animate-fade-in max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">$2.4M</div>
-              <div className="text-sm text-muted-foreground">Total Volume</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">$2.4M</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Total Volume</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent-teal">1,247</div>
-              <div className="text-sm text-muted-foreground">Active Markets</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent-teal">1,247</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Active Markets</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent-gold">24.5%</div>
-              <div className="text-sm text-muted-foreground">Avg. ROI</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent-gold">24.5%</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Avg. ROI</div>
             </div>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 animate-fade-in px-4">
             <Button 
               variant="hero" 
               size="lg" 
-              className="text-lg px-8 py-6 group hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 group hover:scale-105 transition-all duration-300 cursor-pointer w-full sm:w-auto"
               onClick={handleGetStarted}
               disabled={isLoading || isConnecting}
               type="button"
             >
-              {isConnecting ? 'Connecting...' : wallet.isConnected ? 'Start Predicting' : 'Get Started Now'}
-              <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              {isConnecting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-background border-t-transparent mr-2" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  {wallet.isConnected ? 'Start Predicting' : 'Get Started Now'}
+                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </Button>
             <Button 
               variant="outline" 
               size="lg" 
-              className="text-lg px-8 py-6 group hover:bg-accent/20 transition-all duration-300"
+              className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 group hover:bg-accent/20 transition-all duration-300 w-full sm:w-auto"
               onClick={handleWatchDemo}
             >
-              <Play className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+              <Play className="h-4 w-4 sm:h-5 sm:w-5 mr-2 group-hover:scale-110 transition-transform" />
               Watch Demo
             </Button>
           </div>
 
           {/* Hero Image */}
-          <div className="relative max-w-5xl mx-auto animate-fade-in">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-card border border-white/10 shadow-card group">
+          <div className="relative max-w-5xl mx-auto animate-fade-in px-4">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-card border border-white/10 shadow-card group">
               <img
                 src={heroDashboard}
                 alt="KALE-ndar Prediction Market Dashboard"
@@ -145,17 +154,17 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
               
               {/* Floating elements */}
-              <div className="absolute top-4 right-4 p-3 bg-primary/90 rounded-lg backdrop-blur-sm animate-float shadow-lg">
-                <span className="text-primary-foreground font-semibold text-sm">+24.5% ROI</span>
+              <div className="absolute top-2 sm:top-4 right-2 sm:right-4 p-2 sm:p-3 bg-primary/90 rounded-lg backdrop-blur-sm animate-float shadow-lg">
+                <span className="text-primary-foreground font-semibold text-xs sm:text-sm">+24.5% ROI</span>
               </div>
               
-              <div className="absolute bottom-4 left-4 p-3 bg-accent-teal/90 rounded-lg backdrop-blur-sm animate-float shadow-lg" style={{animationDelay: "2s"}}>
-                <span className="text-background font-semibold text-sm">1,247 Active Markets</span>
+              <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 p-2 sm:p-3 bg-accent-teal/90 rounded-lg backdrop-blur-sm animate-float shadow-lg" style={{animationDelay: "2s"}}>
+                <span className="text-background font-semibold text-xs sm:text-sm">1,247 Active Markets</span>
               </div>
 
               {/* New floating element */}
-              <div className="absolute top-1/2 left-4 p-3 bg-accent-gold/90 rounded-lg backdrop-blur-sm animate-float shadow-lg" style={{animationDelay: "4s"}}>
-                <span className="text-background font-semibold text-sm">$2.4M Volume</span>
+              <div className="absolute top-1/2 left-2 sm:left-4 p-2 sm:p-3 bg-accent-gold/90 rounded-lg backdrop-blur-sm animate-float shadow-lg" style={{animationDelay: "4s"}}>
+                <span className="text-background font-semibold text-xs sm:text-sm">$2.4M Volume</span>
               </div>
             </div>
           </div>

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import custom animations */
+@import './styles/animations.css';
+
 /* KALE-ndar Design System - Modern prediction market platform
 All colors MUST be HSL. Semantic tokens for consistent theming.
 */

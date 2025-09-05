@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import DevModeIndicator from "@/components/DevModeIndicator";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -19,6 +20,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <DevModeIndicator />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
