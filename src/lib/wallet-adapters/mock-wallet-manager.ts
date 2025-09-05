@@ -1,5 +1,6 @@
 import { WalletManager } from './wallet-manager';
 import { mockWallets } from '@/data/mockWalletData';
+import { WalletType } from './types';
 
 export class MockWalletManager extends WalletManager {
   constructor() {
@@ -40,8 +41,8 @@ export class MockWalletManager extends WalletManager {
     this.currentWallet = null;
   }
 
-  getCurrentWallet(): string | null {
-    return this.currentWallet;
+  getCurrentWallet(): WalletType | null {
+    return this.currentWallet as WalletType | null;
   }
 
   getCurrentConnection(): any {
