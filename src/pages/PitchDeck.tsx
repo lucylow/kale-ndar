@@ -116,10 +116,10 @@ const PitchDeck: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             {architectureData?.title || 'KALE-ndar Technical Architecture'}
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             {architectureData?.subtitle || 'Multi-layered blockchain integration platform showcasing our prediction market infrastructure'}
           </p>
         </div>

@@ -13,6 +13,9 @@ import marketCreationRoutes from '../routes/market-creation.routes';
 import feeCollectionRoutes from '../routes/fee-collection.routes';
 import healthRoutes from '../routes/health.routes';
 import usersRoutes from '../routes/users.routes';
+import bettingRoutes from '../routes/betting.routes';
+import marketResolutionRoutes from '../routes/market-resolution.routes';
+import oracleRoutes from '../routes/oracle.routes';
 
 // Load environment variables
 dotenv.config();
@@ -89,6 +92,9 @@ app.use('/api/markets', marketCreationRoutes);
 app.use('/api/fees', feeCollectionRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/betting', bettingRoutes);
+app.use('/api/resolution', marketResolutionRoutes);
+app.use('/api/oracle', oracleRoutes);
 
 // API documentation endpoint
 app.get('/api', (req, res) => {
@@ -103,6 +109,9 @@ app.get('/api', (req, res) => {
       feeCollection: '/api/fees',
       health: '/api/health',
       users: '/api/users',
+      betting: '/api/betting',
+      marketResolution: '/api/resolution',
+      oracle: '/api/oracle',
     },
     documentation: '/api/docs',
   });
