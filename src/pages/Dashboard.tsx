@@ -52,23 +52,24 @@ const Dashboard = () => {
   }, []);
 
   const quickActions = [
-    { title: 'Start Farming', description: 'Begin KALE farming', link: '/kale', icon: Sprout, color: 'bg-green-500' },
-    { title: 'View Prices', description: 'Check Reflector feeds', link: '/reflector', icon: TrendingUp, color: 'bg-blue-500' },
-    { title: 'Prediction Markets', description: 'Bet on real-world events', link: '/markets', icon: Target, color: 'bg-indigo-500' },
-    { title: 'Manage Portfolio', description: 'View your assets', link: '/portfolio', icon: BarChart3, color: 'bg-purple-500' },
-    { title: 'DeFi Protocols', description: 'Explore integrations', link: '/defi', icon: Shield, color: 'bg-orange-500' }
+    { title: 'Start Farming', description: 'Begin KALE farming', link: '/kale', icon: Sprout },
+    { title: 'View Prices', description: 'Check Reflector feeds', link: '/reflector', icon: TrendingUp },
+    { title: 'Prediction Markets', description: 'Bet on real-world events', link: '/markets', icon: Target },
+    { title: 'Manage Portfolio', description: 'View your assets', link: '/portfolio', icon: BarChart3 },
+    { title: 'DeFi Protocols', description: 'Explore integrations', link: '/defi', icon: Shield }
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-background pt-20 px-6">
+      <div className="container mx-auto space-y-8">
       {/* Welcome Header */}
-      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+      <div className="bg-gradient-card rounded-xl p-8 shadow-card border border-white/10 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Welcome back!</h1>
-            <p className="text-gray-600 mt-1">Here's your Stellar DeFi overview</p>
+            <h1 className="text-3xl font-display font-bold text-foreground">Welcome back!</h1>
+            <p className="text-muted-foreground mt-2 text-lg">Here's your Stellar DeFi overview</p>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Calendar className="w-4 h-4" />
             <span>{new Date().toLocaleDateString()}</span>
           </div>
@@ -76,72 +77,72 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Portfolio</p>
-                <p className="text-2xl font-bold text-gray-900">$12,345</p>
+                <p className="text-sm text-muted-foreground">Total Portfolio</p>
+                <p className="text-2xl font-bold text-foreground">$12,345</p>
                 <div className="flex items-center space-x-1 mt-1">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-500">+5.2%</span>
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-primary">+5.2%</span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">KALE Balance</p>
-                <p className="text-2xl font-bold text-gray-900">{kaleStats.balance}</p>
+                <p className="text-sm text-muted-foreground">KALE Balance</p>
+                <p className="text-2xl font-bold text-foreground">{kaleStats.balance}</p>
                 <div className="flex items-center space-x-1 mt-1">
-                  <span className="text-sm text-gray-500">+{kaleStats.dailyYield} today</span>
+                  <span className="text-sm text-muted-foreground">+{kaleStats.dailyYield} today</span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Sprout className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
+                <Sprout className="w-6 h-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">XRF Tokens</p>
-                <p className="text-2xl font-bold text-gray-900">{reflectorStats.xrfBalance}</p>
+                <p className="text-sm text-muted-foreground">XRF Tokens</p>
+                <p className="text-2xl font-bold text-foreground">{reflectorStats.xrfBalance}</p>
                 <div className="flex items-center space-x-1 mt-1">
-                  <span className="text-sm text-gray-500">{reflectorStats.subscriptions} subscriptions</span>
+                  <span className="text-sm text-muted-foreground">{reflectorStats.subscriptions} subscriptions</span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-accent-teal/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-accent-teal" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Active Positions</p>
-                <p className="text-2xl font-bold text-gray-900">8</p>
+                <p className="text-sm text-muted-foreground">Active Positions</p>
+                <p className="text-2xl font-bold text-foreground">8</p>
                 <div className="flex items-center space-x-1 mt-1">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-500">All profitable</span>
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-primary">All profitable</span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Coins className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-accent-gold/20 rounded-lg flex items-center justify-center">
+                <Coins className="w-6 h-6 text-accent-gold" />
               </div>
             </div>
           </CardContent>
@@ -149,14 +150,14 @@ const Dashboard = () => {
       </div>
 
       {/* Portfolio Chart */}
-      <Card>
+      <Card className="bg-gradient-card border-white/10 shadow-card animate-fade-in">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Portfolio Performance</CardTitle>
+            <CardTitle className="text-foreground">Portfolio Performance</CardTitle>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">7D</Button>
-              <Button size="sm">30D</Button>
-              <Button variant="outline" size="sm">90D</Button>
+              <Button variant="outline" size="sm" className="border-white/20 hover:bg-accent/20">7D</Button>
+              <Button variant="hero" size="sm">30D</Button>
+              <Button variant="outline" size="sm" className="border-white/20 hover:bg-accent/20">90D</Button>
             </div>
           </div>
         </CardHeader>
@@ -164,30 +165,37 @@ const Dashboard = () => {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={portfolioData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                <YAxis stroke="hsl(var(--muted-foreground))" />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    color: 'hsl(var(--foreground))'
+                  }}
+                />
                 <Line 
                   type="monotone" 
                   dataKey="value" 
-                  stroke="#3B82F6" 
-                  strokeWidth={2}
-                  dot={{ fill: '#3B82F6' }}
+                  stroke="hsl(var(--accent-teal))" 
+                  strokeWidth={3}
+                  dot={{ fill: 'hsl(var(--accent-teal))' }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="kale" 
-                  stroke="#10B981" 
+                  stroke="hsl(var(--primary))" 
                   strokeWidth={2}
-                  dot={{ fill: '#10B981' }}
+                  dot={{ fill: 'hsl(var(--primary))' }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="xrf" 
-                  stroke="#8B5CF6" 
+                  stroke="hsl(var(--accent-purple))" 
                   strokeWidth={2}
-                  dot={{ fill: '#8B5CF6' }}
+                  dot={{ fill: 'hsl(var(--accent-purple))' }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -196,33 +204,33 @@ const Dashboard = () => {
       </Card>
 
       {/* Quick Actions */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">Quick Actions</h2>
+      <div className="space-y-6 animate-fade-in">
+        <h2 className="text-2xl font-display font-bold text-foreground">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {quickActions.map((action, index) => (
             <Link
               key={index}
               to={action.link}
-              className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow group"
+              className="bg-gradient-card rounded-xl p-6 border border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group hover-lift"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 ${action.color} rounded-lg flex items-center justify-center`}>
-                  <action.icon className="w-5 h-5 text-white" />
+                <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <action.icon className="w-6 h-6 text-background" />
                 </div>
-                <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
-              <h3 className="font-medium text-gray-900">{action.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{action.description}</p>
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{action.title}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
             </Link>
           ))}
         </div>
       </div>
 
       {/* Recent Activity */}
-      <Card>
+      <Card className="bg-gradient-card border-white/10 shadow-card animate-fade-in">
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Your latest transactions and activities</CardDescription>
+          <CardTitle className="text-foreground">Recent Activity</CardTitle>
+          <CardDescription className="text-muted-foreground">Your latest transactions and activities</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -232,20 +240,20 @@ const Dashboard = () => {
               { type: 'stake', description: 'Staked KALE tokens', time: '1 day ago', amount: '100 KALE' },
               { type: 'trade', description: 'Swapped XLM for USDC', time: '2 days ago', amount: '500 XLM' }
             ].map((activity, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+              <div key={index} className="flex items-center justify-between py-4 border-b border-white/10 last:border-b-0 hover:bg-accent/10 rounded-lg px-2 transition-colors">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    {activity.type === 'farming' && <Sprout className="w-4 h-4 text-green-600" />}
-                    {activity.type === 'oracle' && <TrendingUp className="w-4 h-4 text-blue-600" />}
-                    {activity.type === 'stake' && <Shield className="w-4 h-4 text-purple-600" />}
-                    {activity.type === 'trade' && <Coins className="w-4 h-4 text-orange-600" />}
+                  <div className="w-10 h-10 bg-secondary/50 rounded-full flex items-center justify-center">
+                    {activity.type === 'farming' && <Sprout className="w-5 h-5 text-primary" />}
+                    {activity.type === 'oracle' && <TrendingUp className="w-5 h-5 text-accent-teal" />}
+                    {activity.type === 'stake' && <Shield className="w-5 h-5 text-accent-purple" />}
+                    {activity.type === 'trade' && <Coins className="w-5 h-5 text-accent-gold" />}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{activity.description}</p>
-                    <p className="text-xs text-gray-500">{activity.time}</p>
+                    <p className="text-sm font-medium text-foreground">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">{activity.time}</p>
                   </div>
                 </div>
-                <span className={`text-sm font-medium ${activity.amount.startsWith('+') ? 'text-green-600' : activity.amount.startsWith('-') ? 'text-red-600' : 'text-gray-600'}`}>
+                <span className={`text-sm font-semibold ${activity.amount.startsWith('+') ? 'text-primary' : activity.amount.startsWith('-') ? 'text-destructive' : 'text-muted-foreground'}`}>
                   {activity.amount}
                 </span>
               </div>
@@ -253,6 +261,7 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

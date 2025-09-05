@@ -66,20 +66,20 @@ const PredictionMarkets = () => {
   };
 
   const MarketCard = ({ market }: { market: PredictionMarket }) => (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift group">
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
-          <Badge variant={market.status === 'open' ? 'default' : 'secondary'}>
+          <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
             {market.category}
           </Badge>
-          <div className="flex items-center space-x-1 text-sm text-gray-500">
+          <div className="flex items-center space-x-1 text-sm text-muted-foreground">
             <Clock className="w-4 h-4" />
             <span>{formatTimeUntilEnd(market.endDate)}</span>
           </div>
         </div>
-        <CardTitle className="text-lg leading-tight">{market.title}</CardTitle>
-        <CardDescription className="text-sm">{market.description}</CardDescription>
-        <div className="flex items-center space-x-2 text-sm text-gray-500 mt-2">
+        <CardTitle className="text-lg leading-tight text-foreground group-hover:text-primary transition-colors">{market.title}</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">{market.description}</CardDescription>
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-2">
           <Users className="w-4 h-4" />
           <span>by {formatAddress(market.creator)}</span>
         </div>
@@ -88,10 +88,10 @@ const PredictionMarkets = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             {market.options.map((option) => (
-              <div key={option.id} className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-lg font-bold text-gray-900">{option.label}</div>
-                <div className="text-sm text-gray-600">Odds: {option.odds}x</div>
-                <div className="text-xs text-gray-500 mt-1">
+              <div key={option.id} className="text-center p-3 bg-secondary/20 rounded-lg border border-white/10">
+                <div className="text-lg font-bold text-foreground">{option.label}</div>
+                <div className="text-sm text-muted-foreground">Odds: {option.odds}x</div>
+                <div className="text-xs text-muted-foreground mt-1">
                   {option.totalBets} bets • ${option.totalAmount.toLocaleString()}
                 </div>
                 {market.status === 'settled' && option.result && (
@@ -103,11 +103,11 @@ const PredictionMarkets = () => {
             ))}
           </div>
           
-          <div className="flex items-center justify-between pt-2 border-t">
-            <div className="text-sm text-gray-600">
-              Total Pool: <span className="font-semibold">${market.totalPool.toLocaleString()}</span>
+          <div className="flex items-center justify-between pt-2 border-t border-white/10">
+            <div className="text-sm text-muted-foreground">
+              Total Pool: <span className="font-semibold text-foreground">${market.totalPool.toLocaleString()}</span>
             </div>
-            <Button size="sm" variant="outline">
+            <Button variant="hero" size="sm" className="group">
               {market.status === 'open' ? 'Place Bet' : 'View Results'}
             </Button>
           </div>
@@ -117,89 +117,90 @@ const PredictionMarkets = () => {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-background pt-20 px-6">
+      <div className="container mx-auto space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-8 text-white">
+      <div className="bg-gradient-hero rounded-xl p-8 text-foreground shadow-card border border-white/10 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Prediction Markets</h1>
-            <p className="text-indigo-100 text-lg">
+            <h1 className="text-4xl font-display font-bold mb-4 text-gradient">Prediction Markets</h1>
+            <p className="text-muted-foreground text-xl">
               Bet on real-world events and earn rewards for accurate predictions
             </p>
           </div>
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-            <TrendingUp className="w-10 h-10" />
+          <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
+            <TrendingUp className="w-10 h-10 text-primary" />
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 animate-fade-in">
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Markets</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalMarkets}</p>
+                <p className="text-sm text-muted-foreground">Total Markets</p>
+                <p className="text-2xl font-bold text-foreground">{stats.totalMarkets}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Open Markets</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.openMarkets}</p>
+                <p className="text-sm text-muted-foreground">Open Markets</p>
+                <p className="text-2xl font-bold text-foreground">{stats.openMarkets}</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-accent-teal/20 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-accent-teal" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Settled Markets</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.settledMarkets}</p>
+                <p className="text-sm text-muted-foreground">Settled Markets</p>
+                <p className="text-2xl font-bold text-foreground">{stats.settledMarkets}</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-accent-purple/20 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-accent-purple" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Pool</p>
-                <p className="text-2xl font-bold text-gray-900">${(stats.totalPool / 1000).toFixed(0)}K</p>
+                <p className="text-sm text-muted-foreground">Total Pool</p>
+                <p className="text-2xl font-bold text-foreground">${(stats.totalPool / 1000).toFixed(0)}K</p>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-accent-gold/20 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-accent-gold" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Bets</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalBets.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Total Bets</p>
+                <p className="text-2xl font-bold text-foreground">{stats.totalBets.toLocaleString()}</p>
               </div>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-destructive/20 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-destructive" />
               </div>
             </div>
           </CardContent>
@@ -207,25 +208,25 @@ const PredictionMarkets = () => {
       </div>
 
       {/* Filters and Search */}
-      <Card>
+      <Card className="bg-gradient-card border-white/10 shadow-card animate-fade-in">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search markets..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-background/50 border-white/20"
                 />
               </div>
             </div>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="w-full md:w-48 bg-background/50 border-white/20">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-card border-white/20">
                 <SelectItem value="all">All Categories</SelectItem>
                 {categoryStats.map((cat) => (
                   <SelectItem key={cat.category} value={cat.category}>
@@ -235,17 +236,17 @@ const PredictionMarkets = () => {
               </SelectContent>
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="w-full md:w-48 bg-background/50 border-white/20">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-card border-white/20">
                 <SelectItem value="endDate">End Date</SelectItem>
                 <SelectItem value="totalPool">Total Pool</SelectItem>
                 <SelectItem value="totalBets">Total Bets</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-indigo-600 hover:bg-indigo-700">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button variant="hero" className="group">
+              <Plus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
               Create Market
             </Button>
           </div>
@@ -284,6 +285,7 @@ const PredictionMarkets = () => {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };

@@ -36,67 +36,68 @@ const Portfolio = () => {
   const totalChange = '+3.2%';
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-background pt-20 px-6">
+      <div className="container mx-auto space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-8 text-white">
+      <div className="bg-gradient-hero rounded-xl p-8 text-foreground shadow-card border border-white/10 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Portfolio</h1>
-            <p className="text-indigo-100 text-lg">
+            <h1 className="text-4xl font-display font-bold mb-4 text-gradient">Portfolio</h1>
+            <p className="text-muted-foreground text-xl">
               Track and manage your Stellar ecosystem investments
             </p>
           </div>
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-            <Briefcase className="w-10 h-10" />
+          <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
+            <Briefcase className="w-10 h-10 text-primary" />
           </div>
         </div>
       </div>
 
       {/* Portfolio Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Value</p>
-                <p className="text-2xl font-bold text-gray-900">${totalValue.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Total Value</p>
+                <p className="text-2xl font-bold text-foreground">${totalValue.toLocaleString()}</p>
                 <div className="flex items-center space-x-1 mt-1">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-500">{totalChange}</span>
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-primary">{totalChange}</span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Assets</p>
-                <p className="text-2xl font-bold text-gray-900">{assets.length}</p>
-                <p className="text-sm text-gray-500 mt-1">Diversified</p>
+                <p className="text-sm text-muted-foreground">Assets</p>
+                <p className="text-2xl font-bold text-foreground">{assets.length}</p>
+                <p className="text-sm text-muted-foreground mt-1">Diversified</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <PieChart className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-accent-teal/20 rounded-lg flex items-center justify-center">
+                <PieChart className="w-6 h-6 text-accent-teal" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Best Performer</p>
-                <p className="text-2xl font-bold text-gray-900">KALE</p>
-                <p className="text-sm text-green-500 mt-1">+5.2%</p>
+                <p className="text-sm text-muted-foreground">Best Performer</p>
+                <p className="text-2xl font-bold text-foreground">KALE</p>
+                <p className="text-sm text-primary mt-1">+5.2%</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-accent-purple/20 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-accent-purple" />
               </div>
             </div>
           </CardContent>
@@ -113,25 +114,32 @@ const Portfolio = () => {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Chart */}
-            <Card>
+            <Card className="bg-gradient-card border-white/10 shadow-card">
               <CardHeader>
-                <CardTitle>Portfolio Performance</CardTitle>
-                <CardDescription>Value over time</CardDescription>
+                <CardTitle className="text-foreground">Portfolio Performance</CardTitle>
+                <CardDescription className="text-muted-foreground">Value over time</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={portfolioData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          color: 'hsl(var(--foreground))'
+                        }}
+                      />
                       <Line 
                         type="monotone" 
                         dataKey="value" 
-                        stroke="#3B82F6" 
-                        strokeWidth={2}
-                        dot={{ fill: '#3B82F6' }}
+                        stroke="hsl(var(--accent-teal))" 
+                        strokeWidth={3}
+                        dot={{ fill: 'hsl(var(--accent-teal))' }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -140,10 +148,10 @@ const Portfolio = () => {
             </Card>
 
             {/* Asset Allocation */}
-            <Card>
+            <Card className="bg-gradient-card border-white/10 shadow-card">
               <CardHeader>
-                <CardTitle>Asset Allocation</CardTitle>
-                <CardDescription>Portfolio distribution</CardDescription>
+                <CardTitle className="text-foreground">Asset Allocation</CardTitle>
+                <CardDescription className="text-muted-foreground">Portfolio distribution</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-80">
@@ -162,7 +170,14 @@ const Portfolio = () => {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          color: 'hsl(var(--foreground))'
+                        }}
+                      />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                 </div>
@@ -171,9 +186,9 @@ const Portfolio = () => {
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                        <span className="text-sm">{item.name}</span>
+                        <span className="text-sm text-foreground">{item.name}</span>
                       </div>
-                      <span className="text-sm font-medium">{item.value}%</span>
+                      <span className="text-sm font-medium text-foreground">{item.value}%</span>
                     </div>
                   ))}
                 </div>
@@ -183,27 +198,27 @@ const Portfolio = () => {
         </TabsContent>
 
         <TabsContent value="assets" className="space-y-6">
-          <Card>
+          <Card className="bg-gradient-card border-white/10 shadow-card">
             <CardHeader>
-              <CardTitle>Your Assets</CardTitle>
-              <CardDescription>Detailed breakdown of your holdings</CardDescription>
+              <CardTitle className="text-foreground">Your Assets</CardTitle>
+              <CardDescription className="text-muted-foreground">Detailed breakdown of your holdings</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {assets.map((asset, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={index} className="flex items-center justify-between p-4 border border-white/10 rounded-lg hover:bg-accent/10 transition-all duration-300 hover-lift">
                     <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-background font-bold text-lg">
                         {asset.symbol[0]}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{asset.symbol}</p>
-                        <p className="text-sm text-gray-500">{asset.balance.toLocaleString()} tokens</p>
+                        <p className="font-medium text-foreground">{asset.symbol}</p>
+                        <p className="text-sm text-muted-foreground">{asset.balance.toLocaleString()} tokens</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-gray-900">${asset.value.toLocaleString()}</p>
-                      <Badge variant={asset.changeType === 'positive' ? 'default' : 'destructive'} className="text-xs">
+                      <p className="font-bold text-foreground">${asset.value.toLocaleString()}</p>
+                      <Badge variant={asset.changeType === 'positive' ? 'default' : 'destructive'} className="text-xs mt-1">
                         {asset.change}
                       </Badge>
                     </div>
@@ -215,10 +230,10 @@ const Portfolio = () => {
         </TabsContent>
 
         <TabsContent value="history" className="space-y-6">
-          <Card>
+          <Card className="bg-gradient-card border-white/10 shadow-card">
             <CardHeader>
-              <CardTitle>Transaction History</CardTitle>
-              <CardDescription>Recent portfolio activity</CardDescription>
+              <CardTitle className="text-foreground">Transaction History</CardTitle>
+              <CardDescription className="text-muted-foreground">Recent portfolio activity</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -228,20 +243,20 @@ const Portfolio = () => {
                   { type: 'harvest', description: 'Harvested farming rewards', amount: '+12.5 KALE', time: '2 days ago' },
                   { type: 'buy', description: 'Purchased XRF tokens', amount: '+25 XRF', time: '3 days ago' }
                 ].map((transaction, index) => (
-                  <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                  <div key={index} className="flex items-center justify-between py-4 border-b border-white/10 last:border-b-0 hover:bg-accent/10 rounded-lg px-2 transition-colors">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                        {transaction.type === 'swap' && <TrendingUp className="w-4 h-4 text-blue-600" />}
-                        {transaction.type === 'stake' && <Briefcase className="w-4 h-4 text-green-600" />}
-                        {transaction.type === 'harvest' && <TrendingUp className="w-4 h-4 text-purple-600" />}
-                        {transaction.type === 'buy' && <TrendingUp className="w-4 h-4 text-orange-600" />}
+                      <div className="w-10 h-10 bg-secondary/50 rounded-full flex items-center justify-center">
+                        {transaction.type === 'swap' && <TrendingUp className="w-5 h-5 text-accent-teal" />}
+                        {transaction.type === 'stake' && <Briefcase className="w-5 h-5 text-primary" />}
+                        {transaction.type === 'harvest' && <TrendingUp className="w-5 h-5 text-accent-purple" />}
+                        {transaction.type === 'buy' && <TrendingUp className="w-5 h-5 text-accent-gold" />}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
-                        <p className="text-xs text-gray-500">{transaction.time}</p>
+                        <p className="text-sm font-medium text-foreground">{transaction.description}</p>
+                        <p className="text-xs text-muted-foreground">{transaction.time}</p>
                       </div>
                     </div>
-                    <span className="text-sm font-medium text-green-600">{transaction.amount}</span>
+                    <span className="text-sm font-semibold text-primary">{transaction.amount}</span>
                   </div>
                 ))}
               </div>
@@ -249,6 +264,7 @@ const Portfolio = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };
