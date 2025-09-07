@@ -3,12 +3,7 @@ import { Bell, X, TrendingUp, TrendingDown, AlertCircle, CheckCircle } from 'luc
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL || '',
-  import.meta.env.VITE_SUPABASE_ANON_KEY || ''
-);
+import { supabase } from '@/integrations/supabase/client';
 
 interface Notification {
   id: string;
