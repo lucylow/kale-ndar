@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
-import { Sprout, TrendingUp, Users, Clock, ArrowUpRight, Info } from 'lucide-react';
+import { Sprout, TrendingUp, Users, Clock, ArrowUpRight, Info, Share2, UserPlus, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useWallet } from '@/contexts/WalletContext';
+import { blockchainService } from '@/services/blockchain';
 
 const KalePage = () => {
+  const { toast } = useToast();
+  const { wallet } = useWallet();
   const [stakeAmount, setStakeAmount] = useState('');
   const [isStaking, setIsStaking] = useState(false);
+  const [isHarvesting, setIsHarvesting] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
   const farmingStats = {
     totalStaked: 1234.56,
@@ -32,6 +44,84 @@ const KalePage = () => {
       setIsStaking(false);
       setStakeAmount('');
     }, 2000);
+  };
+
+  const handleHarvest = async () => {
+    if (!wallet.isConnected || !wallet.publicKey) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to harvest rewards",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsHarvesting(true);
+      
+      // Use the blockchain service to harvest KALE
+      const result = await blockchainService.harvestKale(
+        wallet.publicKey,
+        'stake_1', // Mock stake ID - in production this would be dynamic
+        wallet.signTransaction
+      );
+      
+      toast({
+        title: "Harvest Successful! 🎉",
+        description: `Successfully harvested 45.78 KALE tokens`,
+        duration: 5000,
+      });
+      
+      // Update farming stats in a real app
+      console.log('Harvest result:', result);
+      
+    } catch (error) {
+      console.error('Error harvesting rewards:', error);
+      toast({
+        title: "Harvest Failed",
+        description: error instanceof Error ? error.message : "Failed to harvest rewards",
+        variant: "destructive",
+      });
+    } finally {
+      setIsHarvesting(false);
+    }
+  };
+
+  const handleInviteTeamMember = async () => {
+    if (!inviteEmail.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter an email address to send the invitation",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsInviting(true);
+      
+      // Simulate sending invitation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Invitation Sent! 📧",
+        description: `Invitation sent to ${inviteEmail}`,
+        duration: 5000,
+      });
+      
+      setInviteEmail('');
+      setIsInviteDialogOpen(false);
+      
+    } catch (error) {
+      console.error('Error sending invitation:', error);
+      toast({
+        title: "Invitation Failed",
+        description: "Failed to send invitation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInviting(false);
+    }
   };
 
   // Mock prediction markets data
@@ -256,8 +346,20 @@ const KalePage = () => {
                     </div>
                   </div>
                   
-                  <Button variant="hero" className="w-full">
-                    Harvest Rewards
+                  <Button 
+                    variant="hero" 
+                    className="w-full"
+                    onClick={handleHarvest}
+                    disabled={isHarvesting}
+                  >
+                    {isHarvesting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Harvesting...
+                      </>
+                    ) : (
+                      'Harvest Rewards'
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -298,10 +400,63 @@ const KalePage = () => {
                 </div>
               ))}
               
-              <Button variant="outline" className="w-full border-white/20 hover:bg-accent/20">
-                <ArrowUpRight className="w-4 h-4 mr-2" />
-                Invite Team Members
-              </Button>
+              <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full border-white/20 hover:bg-accent/20">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Invite Team Members
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Share2 className="w-5 h-5" />
+                      Invite Team Member
+                    </DialogTitle>
+                    <DialogDescription>
+                      Send an invitation to join your KALE farming team and share rewards.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter email address"
+                        value={inviteEmail}
+                        onChange={(e) => setInviteEmail(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleInviteTeamMember()}
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsInviteDialogOpen(false)}
+                        disabled={isInviting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={handleInviteTeamMember}
+                        disabled={isInviting}
+                      >
+                        {isInviting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Share2 className="w-4 h-4 mr-2" />
+                            Send Invitation
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         </div>
