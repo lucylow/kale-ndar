@@ -16,6 +16,9 @@ import usersRoutes from '../routes/users.routes';
 import bettingRoutes from '../routes/betting.routes';
 import marketResolutionRoutes from '../routes/market-resolution.routes';
 import oracleRoutes from '../routes/oracle.routes';
+import teamBettingRoutes from '../routes/team-betting.routes';
+import nftReceiptsRoutes from '../routes/nft-receipts.routes';
+import gamificationRoutes from '../routes/gamification.routes';
 
 // Load environment variables
 dotenv.config();
@@ -95,6 +98,9 @@ app.use('/api/users', usersRoutes);
 app.use('/api/betting', bettingRoutes);
 app.use('/api/resolution', marketResolutionRoutes);
 app.use('/api/oracle', oracleRoutes);
+app.use('/api/teams', teamBettingRoutes);
+app.use('/api/nft-receipts', nftReceiptsRoutes);
+app.use('/api/gamification', gamificationRoutes);
 
 // API documentation endpoint
 app.get('/api', (req, res) => {
@@ -112,6 +118,9 @@ app.get('/api', (req, res) => {
       betting: '/api/betting',
       marketResolution: '/api/resolution',
       oracle: '/api/oracle',
+      teamBetting: '/api/teams',
+      nftReceipts: '/api/nft-receipts',
+      gamification: '/api/gamification',
     },
     documentation: '/api/docs',
   });
