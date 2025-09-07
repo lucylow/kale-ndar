@@ -26,12 +26,15 @@ import {
 import { mockMarkets, mockUsers, mockBets, mockLeaderboard, mockPriceData, mockKaleBalances } from '@/data/mockData';
 import { mockUserProfiles } from '@/data/mockUserProfiles';
 import { useToast } from '@/hooks/use-toast';
+import TeamBettingDemo from '@/components/demo/TeamBettingDemo';
+import NFTReceiptsDemo from '@/components/demo/NFTReceiptsDemo';
 
 const Demo = () => {
   const { toast } = useToast();
   const [activeDemo, setActiveDemo] = useState<string>('overview');
   const [demoProgress, setDemoProgress] = useState(0);
   const [isRunningDemo, setIsRunningDemo] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<string>('');
 
   // Simulate demo progress
   useEffect(() => {
@@ -310,7 +313,15 @@ const Demo = () => {
                 <Card 
                   key={feature.id} 
                   className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={feature.demo}
+                  onClick={() => {
+                    if (feature.id === 'team-betting') {
+                      setSelectedFeature('team-betting');
+                    } else if (feature.id === 'nft-receipts') {
+                      setSelectedFeature('nft-receipts');
+                    } else {
+                      feature.demo();
+                    }
+                  }}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
@@ -329,6 +340,15 @@ const Demo = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Interactive Demos */}
+      {selectedFeature === 'team-betting' && (
+        <TeamBettingDemo />
+      )}
+      
+      {selectedFeature === 'nft-receipts' && (
+        <NFTReceiptsDemo />
+      )}
 
       {/* Live Markets Demo */}
       <Card>

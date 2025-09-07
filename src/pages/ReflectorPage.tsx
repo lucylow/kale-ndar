@@ -241,9 +241,39 @@ const ReflectorPage = () => {
                 )}
 
                 {/* Standard Feeds */}
-                <h3 className="text-lg font-semibold mb-3">Standard Price Feeds</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold">Standard Price Feeds</h3>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setPriceFeeds(prev => prev.map(feed => {
+                          const change = (Math.random() - 0.5) * 0.1;
+                          const newPrice = feed.price * (1 + change);
+                          const changePercent = ((newPrice - feed.price) / feed.price * 100).toFixed(2);
+                          
+                          return {
+                            ...feed,
+                            price: newPrice,
+                            change: `${changePercent > 0 ? '+' : ''}${changePercent}%`,
+                            volume: (parseFloat(feed.volume.replace('M', '')) * (1 + Math.random() * 0.1)).toFixed(1) + 'M'
+                          };
+                        }));
+                        setLastUpdate(new Date());
+                      }}
+                      className="h-8 px-3"
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      Refresh
+                    </Button>
+                    <Badge variant="outline" className="text-xs">
+                      {isConnected ? 'Live Updates' : 'Manual Refresh'}
+                    </Badge>
+                  </div>
+                </div>
                 {priceFeeds.map((feed, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors">
+                  <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-all duration-300 group">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
                         {feed.symbol.split('/')[0][0]}
@@ -254,8 +284,17 @@ const ReflectorPage = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-foreground">${feed.price.toLocaleString()}</p>
-                      <Badge variant={feed.change.startsWith('+') ? 'default' : 'destructive'} className="text-xs">
+                      <p className="font-bold text-foreground transition-all duration-300 group-hover:scale-105">
+                        ${feed.price.toLocaleString()}
+                      </p>
+                      <Badge 
+                        variant={feed.change.startsWith('+') ? 'default' : 'destructive'} 
+                        className={`text-xs transition-all duration-300 ${
+                          feed.change.startsWith('+') 
+                            ? 'bg-green-100 text-green-800 border-green-200' 
+                            : 'bg-red-100 text-red-800 border-red-200'
+                        }`}
+                      >
                         {feed.change}
                       </Badge>
                     </div>
