@@ -18,6 +18,7 @@ import {
   Filter,
   RefreshCw,
   Eye,
+  Activity,
   Heart,
   MessageCircle
 } from 'lucide-react';

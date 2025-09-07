@@ -117,6 +117,7 @@ const SocialBetting: React.FC<SocialBettingProps> = ({
       userName: 'You',
       marketId: market.id,
       ...betForm,
+      odds: 1.5,
       likes: 0,
       comments: 0,
       shares: 0,

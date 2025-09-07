@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { WalletProvider } from "@/contexts/WalletContext";
+import { PersonalizationProvider } from "@/contexts/PersonalizationContext";
+import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { I18nProvider } from "@/contexts/I18nContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import DevModeIndicator from "@/components/DevModeIndicator";
 import Header from "@/components/common/Header";
@@ -30,9 +33,12 @@ const queryClient = new QueryClient();
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <WalletProvider>
-          <TooltipProvider>
+      <I18nProvider>
+        <AccessibilityProvider>
+          <PersonalizationProvider>
+            <ThemeProvider>
+              <WalletProvider>
+                <TooltipProvider>
             <Toaster />
             <Sonner />
             <DevModeIndicator />
@@ -170,9 +176,12 @@ const App = () => (
                 </Routes>
               </div>
             </BrowserRouter>
-          </TooltipProvider>
-        </WalletProvider>
-      </ThemeProvider>
+                </TooltipProvider>
+              </WalletProvider>
+            </ThemeProvider>
+          </PersonalizationProvider>
+        </AccessibilityProvider>
+      </I18nProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );

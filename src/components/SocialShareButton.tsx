@@ -6,7 +6,7 @@ import {
   Twitter, 
   MessageCircle, 
   Send, 
-  Reddit, 
+  MessageSquare, 
   Linkedin,
   Copy,
   Check,
@@ -39,7 +39,7 @@ const SocialShareButton: React.FC<SocialShareButtonProps> = ({
     twitter: Twitter,
     discord: MessageCircle,
     telegram: Send,
-    reddit: Reddit,
+    reddit: MessageSquare,
     linkedin: Linkedin,
   };
 

@@ -142,28 +142,25 @@ const SocialAnalytics: React.FC<SocialAnalyticsProps> = ({
         },
       ],
       audienceInsights: {
-        demographics: [
-          { range: '18-24', percentage: 25 },
-          { range: '25-34', percentage: 40 },
-          { range: '35-44', percentage: 22 },
-          { range: '45-54', percentage: 10 },
-          { range: '55+', percentage: 3 },
-        ],
-        locations: [
-          { country: 'United States', percentage: 35 },
-          { country: 'United Kingdom', percentage: 18 },
-          { country: 'Canada', percentage: 12 },
-          { country: 'Australia', percentage: 8 },
-          { country: 'Germany', percentage: 7 },
-          { country: 'Other', percentage: 20 },
-        ],
-        interests: [
-          { category: 'Cryptocurrency', percentage: 45 },
-          { category: 'Trading', percentage: 32 },
-          { category: 'Technology', percentage: 28 },
-          { category: 'Finance', percentage: 25 },
-          { category: 'Sports', percentage: 15 },
-        ],
+        demographics: {
+          ageGroups: [
+            { range: '18-24', percentage: 25 },
+            { range: '25-34', percentage: 40 },
+            { range: '35-44', percentage: 22 },
+            { range: '45-54', percentage: 10 },
+            { range: '55+', percentage: 3 },
+          ],
+          locations: [
+            { country: 'US', percentage: 45 },
+            { country: 'EU', percentage: 30 },
+            { country: 'Asia', percentage: 25 },
+          ],
+          interests: [
+            { category: 'Finance', percentage: 60 },
+            { category: 'Technology', percentage: 35 },
+            { category: 'Gaming', percentage: 25 },
+          ],
+        },
         behavior: {
           activeHours: [
             { hour: 9, activity: 85 },
