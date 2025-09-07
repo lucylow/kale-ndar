@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useWallet } from '@/contexts/WalletContext';
-import { reflectorOracleService } from '@/services/reflector-oracle';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Plus, 
   Globe, 
@@ -122,23 +122,16 @@ const CreateCustomFeedModal: React.FC<CreateCustomFeedModalProps> = ({ onFeedCre
         totalRevenue: 0,
       };
 
-      // Create custom feed via API
-      const response = await fetch('/api/oracle/custom-feeds', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...feedData,
-          // Note: In production, wallet signing would be handled securely
-        }),
+      // Create custom feed via Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('oracle-custom-feeds', {
+        body: feedData
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to create custom feed: ${response.statusText}`);
+      if (error) {
+        throw new Error(`Failed to create custom feed: ${error.message}`);
       }
 
-      const result = await response.json();
+      const result = data;
 
       toast({
         title: "Custom Feed Created! 🎉",

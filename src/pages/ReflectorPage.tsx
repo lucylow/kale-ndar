@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Eye, Plus, Zap, DollarSign, Activity, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { TrendingUp, Eye, Plus, Zap, DollarSign, Activity, Wifi, WifiOff, RefreshCw, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,14 +9,17 @@ import { Label } from '@/components/ui/label';
 import CreateCustomFeedModal from '@/components/CreateCustomFeedModal';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useToast } from '@/hooks/use-toast';
+import { useWallet } from '@/contexts/WalletContext';
 
 const ReflectorPage = () => {
   const { toast } = useToast();
+  const { wallet } = useWallet();
   const [subscriptionAmount, setSubscriptionAmount] = useState('');
   const [selectedFeed, setSelectedFeed] = useState('');
   const [customFeeds, setCustomFeeds] = useState<any[]>([]);
   const [realTimeData, setRealTimeData] = useState<any>({});
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   // WebSocket connection for real-time data
   const { connectionState, isConnected, subscribeToMarket, unsubscribeFromMarket } = useWebSocket({
@@ -97,8 +100,73 @@ const ReflectorPage = () => {
   ];
 
   const handleSubscribe = async () => {
-    // Handle subscription logic
-    console.log('Subscribing to feed:', selectedFeed, 'Amount:', subscriptionAmount);
+    if (!wallet.isConnected || !wallet.publicKey) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to create a subscription",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedFeed || !subscriptionAmount) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a feed and enter an amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const amount = parseFloat(subscriptionAmount);
+    if (amount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid amount greater than 0",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (amount > oracleStats.xrfBalance) {
+      toast({
+        title: "Insufficient Balance",
+        description: "You don't have enough XRF tokens for this subscription",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSubscribing(true);
+      
+      // Simulate subscription process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Subscription Created! 🎉",
+        description: `Successfully subscribed to ${selectedFeed} with ${amount} XRF`,
+        duration: 5000,
+      });
+      
+      // Reset form
+      setSelectedFeed('');
+      setSubscriptionAmount('');
+      
+      // Update stats (in a real app, this would come from the API response)
+      // This is just for demo purposes
+      
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      toast({
+        title: "Subscription Failed",
+        description: error instanceof Error ? error.message : "Failed to create subscription",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsSubscribing(false);
+    }
   };
 
   const handleCustomFeedCreated = (feed: any) => {
@@ -359,10 +427,17 @@ const ReflectorPage = () => {
                   
                   <Button 
                     onClick={handleSubscribe}
-                    disabled={!selectedFeed || !subscriptionAmount}
+                    disabled={!selectedFeed || !subscriptionAmount || isSubscribing}
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
-                    Create Subscription
+                    {isSubscribing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      'Create Subscription'
+                    )}
                   </Button>
                 </CardContent>
               </Card>
