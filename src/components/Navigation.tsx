@@ -154,7 +154,12 @@ const Navigation = () => {
                 Dashboard
               </Button>
             ) : (
-              <Button variant="hero" size="sm" className="hover:scale-105 transition-transform">
+              <Button 
+                variant="hero" 
+                size="sm" 
+                className="hover:scale-105 transition-transform"
+                onClick={() => navigate('/')}
+              >
                 Start Predicting
               </Button>
             )}

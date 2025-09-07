@@ -112,11 +112,23 @@ const MarketCreation: React.FC = () => {
         // Step 2: Use harvested KALE to create market
         await handleCreateMarket(harvestResult.claimedAmount);
       } else {
-        alert('No harvestable rewards available');
+        const { toast } = await import('@/hooks/use-toast');
+        toast({
+          title: "No Harvestable Rewards",
+          description: "You don't have any harvestable KALE rewards at the moment",
+          variant: "destructive",
+          duration: 3000,
+        });
       }
     } catch (error) {
       console.error('Error in harvest and bet:', error);
-      alert('Error harvesting and creating market');
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: "Harvest Failed",
+        description: error instanceof Error ? error.message : "Error harvesting and creating market",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +158,14 @@ const MarketCreation: React.FC = () => {
       );
 
       if (result.status === 'success') {
-        alert(`Market created successfully! Hash: ${result.hash.substring(0, 8)}...`);
+        // Use toast instead of alert
+        const { toast } = await import('@/hooks/use-toast');
+        toast({
+          title: "Market Created Successfully! 🎉",
+          description: `Transaction hash: ${result.hash.substring(0, 8)}...`,
+          duration: 5000,
+        });
+        
         // Reset form
         setForm({
           title: '',
@@ -160,11 +179,23 @@ const MarketCreation: React.FC = () => {
           creatorFee: '2',
         });
       } else {
-        alert(`Failed to create market: ${result.message}`);
+        const { toast } = await import('@/hooks/use-toast');
+        toast({
+          title: "Market Creation Failed",
+          description: result.message || "Failed to create market",
+          variant: "destructive",
+          duration: 5000,
+        });
       }
     } catch (error) {
       console.error('Error creating market:', error);
-      alert('Error creating market');
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: "Error Creating Market",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }

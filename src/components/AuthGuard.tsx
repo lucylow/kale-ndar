@@ -16,9 +16,14 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && !wallet.isConnected) {
-      navigate(redirectTo);
-    }
+    // Add a small delay to prevent immediate redirects during wallet initialization
+    const timer = setTimeout(() => {
+      if (!isLoading && !wallet.isConnected) {
+        navigate(redirectTo);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, [wallet.isConnected, isLoading, navigate, redirectTo]);
 
   // Show loading while checking authentication

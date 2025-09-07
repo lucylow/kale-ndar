@@ -16,11 +16,14 @@ import {
 } from '@/data/predictionMarketData';
 import MarketList from '@/components/MarketList';
 import SimpleVirtualList from '@/components/SimpleVirtualList';
+import BetModal from '@/components/BetModal';
 
 const PredictionMarkets = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('endDate');
+  const [betModalOpen, setBetModalOpen] = useState(false);
+  const [selectedMarket, setSelectedMarket] = useState<PredictionMarket | null>(null);
 
   const stats = getMarketStats();
   const categoryStats = getCategoryStats();
@@ -48,7 +51,10 @@ const PredictionMarkets = () => {
     }
   });
 
-  const formatTimeUntilEnd = (endDate: string): string => {
+  const formatTimeUntilEnd = (endDate: string, status: string): string => {
+    if (status === 'settled') return 'Settled';
+    if (status === 'cancelled') return 'Cancelled';
+    
     const now = new Date();
     const end = new Date(endDate);
     const diff = end.getTime() - now.getTime();
@@ -67,16 +73,40 @@ const PredictionMarkets = () => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
+  const handlePlaceBet = async (marketId: string, optionId: string, amount: number) => {
+    // Simulate bet placement
+    console.log(`Placing bet: Market ${marketId}, Option ${optionId}, Amount $${amount}`);
+    
+    // In a real app, this would call the smart contract
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+    
+    alert(`Bet placed successfully!\n\nMarket: ${selectedMarket?.title}\nOption: ${selectedMarket?.options.find(opt => opt.id === optionId)?.label}\nAmount: $${amount}\n\nTransaction would be submitted to the blockchain.`);
+  };
+
   const MarketCard = ({ market }: { market: PredictionMarket }) => (
     <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift group">
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
-          <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
-            {market.category}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+              {market.category}
+            </Badge>
+            <Badge 
+              variant={market.status === 'open' ? 'default' : market.status === 'settled' ? 'secondary' : 'destructive'}
+              className={`text-xs ${
+                market.status === 'open' 
+                  ? 'bg-green-500/20 text-green-500 border-green-500/30' 
+                  : market.status === 'settled'
+                  ? 'bg-blue-500/20 text-blue-500 border-blue-500/30'
+                  : 'bg-red-500/20 text-red-500 border-red-500/30'
+              }`}
+            >
+              {market.status === 'open' ? 'Open' : market.status === 'settled' ? 'Settled' : 'Cancelled'}
+            </Badge>
+          </div>
           <div className="flex items-center space-x-1 text-sm text-muted-foreground">
             <Clock className="w-4 h-4" />
-            <span>{formatTimeUntilEnd(market.endDate)}</span>
+            <span>{formatTimeUntilEnd(market.endDate, market.status)}</span>
           </div>
         </div>
         <CardTitle className="text-lg leading-tight text-foreground group-hover:text-primary transition-colors">{market.title}</CardTitle>
@@ -90,15 +120,37 @@ const PredictionMarkets = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             {market.options.map((option) => (
-              <div key={option.id} className="text-center p-3 bg-secondary/20 rounded-lg border border-white/10">
-                <div className="text-lg font-bold text-foreground">{option.label}</div>
+              <div 
+                key={option.id} 
+                className={`text-center p-3 rounded-lg border transition-all ${
+                  market.status === 'settled' && option.result === 'won'
+                    ? 'bg-green-500/20 border-green-500/30 ring-2 ring-green-500/20'
+                    : market.status === 'settled' && option.result === 'lost'
+                    ? 'bg-red-500/10 border-red-500/20 opacity-60'
+                    : 'bg-secondary/20 border-white/10'
+                }`}
+              >
+                <div className={`text-lg font-bold ${
+                  market.status === 'settled' && option.result === 'won' 
+                    ? 'text-green-500' 
+                    : 'text-foreground'
+                }`}>
+                  {option.label}
+                </div>
                 <div className="text-sm text-muted-foreground">Odds: {option.odds}x</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   {option.totalBets} bets • ${option.totalAmount.toLocaleString()}
                 </div>
                 {market.status === 'settled' && option.result && (
-                  <Badge variant={option.result === 'won' ? 'default' : 'destructive'} className="mt-2">
-                    {option.result === 'won' ? 'Won' : 'Lost'}
+                  <Badge 
+                    variant={option.result === 'won' ? 'default' : 'destructive'} 
+                    className={`mt-2 ${
+                      option.result === 'won' 
+                        ? 'bg-green-500 text-white' 
+                        : 'bg-red-500 text-white'
+                    }`}
+                  >
+                    {option.result === 'won' ? '✓ Won' : '✗ Lost'}
                   </Badge>
                 )}
               </div>
@@ -109,8 +161,24 @@ const PredictionMarkets = () => {
             <div className="text-sm text-muted-foreground">
               Total Pool: <span className="font-semibold text-foreground">${market.totalPool.toLocaleString()}</span>
             </div>
-            <Button variant="hero" size="sm" className="group">
-              {market.status === 'open' ? 'Place Bet' : 'View Results'}
+            <Button 
+              variant="hero" 
+              size="sm" 
+              className="group"
+              disabled={market.status === 'settled' || market.status === 'cancelled'}
+              onClick={() => {
+                if (market.status === 'open') {
+                  // Open bet modal
+                  setSelectedMarket(market);
+                  setBetModalOpen(true);
+                } else if (market.status === 'settled') {
+                  // Handle view results logic
+                  const winningOption = market.options.find(opt => opt.result === 'won');
+                  alert(`Market Results: ${market.title}\n\nWinning Option: ${winningOption?.label || 'Unknown'}\nTotal Pool: $${market.totalPool.toLocaleString()}\n\nThis would show detailed results and payout information.`);
+                }
+              }}
+            >
+              {market.status === 'open' ? 'Place Bet' : market.status === 'settled' ? 'View Results' : 'Cancelled'}
             </Button>
           </div>
         </div>
@@ -287,6 +355,19 @@ const PredictionMarkets = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Bet Modal */}
+      {selectedMarket && (
+        <BetModal
+          isOpen={betModalOpen}
+          onClose={() => {
+            setBetModalOpen(false);
+            setSelectedMarket(null);
+          }}
+          market={selectedMarket}
+          onPlaceBet={handlePlaceBet}
+        />
+      )}
       </div>
     </div>
   );

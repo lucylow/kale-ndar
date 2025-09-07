@@ -23,13 +23,27 @@ const Hero = () => {
       try {
         setIsConnecting(true);
         console.log('Attempting to connect wallet...');
-        await connectWallet();
+        
+        // Show connecting toast
         toast({
-          title: "Wallet Connected!",
-          description: "Redirecting to your dashboard...",
+          title: "Connecting Wallet...",
+          description: "Please approve the connection in your wallet",
+          duration: 3000,
         });
-        // Navigate to dashboard
-        navigate('/dashboard');
+        
+        await connectWallet();
+        
+        toast({
+          title: "Wallet Connected! 🎉",
+          description: "Redirecting to your dashboard...",
+          duration: 2000,
+        });
+        
+        // Small delay for better UX
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+        
       } catch (error) {
         console.error('Wallet connection failed:', error);
         toast({
@@ -38,6 +52,7 @@ const Hero = () => {
             ? "No Stellar wallets are available. Please install a Stellar wallet like Freighter, Lobstr, Rabet, or Albedo."
             : error instanceof Error ? error.message : "Failed to connect wallet. Please make sure your wallet is installed and unlocked.",
           variant: "destructive",
+          duration: 5000,
         });
       } finally {
         setIsConnecting(false);
@@ -54,6 +69,7 @@ const Hero = () => {
     toast({
       title: "Demo Coming Soon",
       description: "Interactive demo will be available soon. Try connecting your wallet to explore the platform!",
+      duration: 3000,
     });
   };
 

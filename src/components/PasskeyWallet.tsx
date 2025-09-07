@@ -12,9 +12,11 @@ import {
   AlertCircle,
   Key,
   Lock,
-  Zap
+  Zap,
+  TrendingUp
 } from 'lucide-react';
 import { useWallet } from '@/contexts/WalletContext';
+import { useNavigate } from 'react-router-dom';
 
 interface PasskeyWalletProps {
   onConnect?: () => void;
@@ -24,6 +26,7 @@ interface PasskeyWalletProps {
 const PasskeyWallet: React.FC<PasskeyWalletProps> = ({ onConnect, onCancel }) => {
   const { connectWallet } = useWallet();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isConnecting, setIsConnecting] = useState(false);
   const [step, setStep] = useState<'intro' | 'authenticate' | 'success'>('intro');
 
@@ -197,8 +200,18 @@ const PasskeyWallet: React.FC<PasskeyWalletProps> = ({ onConnect, onCancel }) =>
         </div>
       </div>
 
-      <div className="text-xs text-muted-foreground">
-        Redirecting to dashboard...
+      <div className="space-y-3">
+        <div className="text-xs text-muted-foreground">
+          Your passkey is now active! You can start earning bonus rewards.
+        </div>
+        <Button 
+          onClick={() => navigate('/dashboard')}
+          className="gap-2 hover:scale-105 transition-transform"
+          variant="default"
+        >
+          <TrendingUp className="h-4 w-4" />
+          Go to Dashboard
+        </Button>
       </div>
     </div>
   );

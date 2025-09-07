@@ -155,17 +155,30 @@ const WalletConnector: React.FC = () => {
           </Badge>
         )}
 
-        {/* Disconnect Button */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleDisconnect}
-          className="gap-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-all"
-          disabled={isLoading}
-        >
-          <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">Disconnect</span>
-        </Button>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {currentWalletType === 'passkey' && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/passkey-demo')}
+              className="gap-2 hover:bg-blue-500/10 hover:text-blue-500 hover:border-blue-500/20 transition-all"
+            >
+              <Shield className="h-4 w-4" />
+              <span className="hidden sm:inline">Passkey Demo</span>
+            </Button>
+          )}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDisconnect}
+            className="gap-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-all"
+            disabled={isLoading}
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Disconnect</span>
+          </Button>
+        </div>
       </div>
     );
   }

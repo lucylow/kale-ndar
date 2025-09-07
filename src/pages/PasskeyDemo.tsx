@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useWallet } from '@/contexts/WalletContext';
+import { useNavigate } from 'react-router-dom';
 import PasskeyWalletConnector from '@/components/PasskeyWalletConnector';
 import PasskeyTest from '@/components/PasskeyTest';
+import PasskeyButtonGuide from '@/components/PasskeyButtonGuide';
 import { 
   Shield, 
   Fingerprint, 
@@ -18,12 +20,15 @@ import {
   Laptop,
   TrendingUp,
   DollarSign,
-  Clock
+  Clock,
+  ArrowLeft,
+  Home
 } from 'lucide-react';
 
 const PasskeyDemo: React.FC = () => {
   const { wallet, user, userStats, currentWalletType } = useWallet();
-  const [activeTab, setActiveTab] = useState<'overview' | 'security' | 'benefits' | 'testing'>('overview');
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'overview' | 'security' | 'benefits' | 'testing' | 'guide'>('overview');
 
   const isPasskeyConnected = wallet.isConnected && currentWalletType === 'passkey';
 
@@ -102,8 +107,36 @@ const PasskeyDemo: React.FC = () => {
         </Card>
       </div>
 
-      <div className="text-center">
+      <div className="text-center space-y-4">
         <PasskeyWalletConnector />
+        
+        {/* Additional Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button 
+            onClick={() => navigate('/dashboard')}
+            variant="outline"
+            className="gap-2"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Go to Dashboard
+          </Button>
+          <Button 
+            onClick={() => navigate('/markets')}
+            variant="outline"
+            className="gap-2"
+          >
+            <DollarSign className="h-4 w-4" />
+            View Markets
+          </Button>
+          <Button 
+            onClick={() => navigate('/portfolio')}
+            variant="outline"
+            className="gap-2"
+          >
+            <Shield className="h-4 w-4" />
+            Check Portfolio
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -198,6 +231,29 @@ const PasskeyDemo: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Security Actions */}
+      <div className="text-center space-y-4">
+        <h3 className="text-lg font-semibold text-foreground">Security Actions</h3>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button 
+            onClick={() => navigate('/settings')}
+            variant="outline"
+            className="gap-2"
+          >
+            <Lock className="h-4 w-4" />
+            Security Settings
+          </Button>
+          <Button 
+            onClick={() => setActiveTab('testing')}
+            variant="outline"
+            className="gap-2"
+          >
+            <CheckCircle className="h-4 w-4" />
+            Run Security Tests
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -304,6 +360,37 @@ const PasskeyDemo: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Benefits Actions */}
+      <div className="text-center space-y-4">
+        <h3 className="text-lg font-semibold text-foreground">Start Earning Benefits</h3>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button 
+            onClick={() => navigate('/kale')}
+            variant="default"
+            className="gap-2 bg-gradient-to-r from-accent-gold to-yellow-500 hover:from-accent-gold/80 hover:to-yellow-500/80"
+          >
+            <Zap className="h-4 w-4" />
+            Start Staking
+          </Button>
+          <Button 
+            onClick={() => navigate('/defi')}
+            variant="outline"
+            className="gap-2"
+          >
+            <TrendingUp className="h-4 w-4" />
+            DeFi Opportunities
+          </Button>
+          <Button 
+            onClick={() => setActiveTab('overview')}
+            variant="outline"
+            className="gap-2"
+          >
+            <Shield className="h-4 w-4" />
+            Connect Passkey
+          </Button>
+        </div>
+      </div>
     </div>
   );
 
@@ -317,6 +404,19 @@ const PasskeyDemo: React.FC = () => {
       </div>
       
       <PasskeyTest />
+    </div>
+  );
+
+  const renderGuide = () => (
+    <div className="space-y-6">
+      <div className="text-center space-y-4">
+        <h2 className="text-2xl font-bold text-foreground">Button Functionality Guide</h2>
+        <p className="text-muted-foreground">
+          Complete overview of all buttons and their functionality
+        </p>
+      </div>
+      
+      <PasskeyButtonGuide />
     </div>
   );
 
@@ -360,6 +460,24 @@ const PasskeyDemo: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <Button 
+              onClick={() => navigate(-1)}
+              variant="outline"
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <Button 
+              onClick={() => navigate('/')}
+              variant="outline"
+              className="gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+          </div>
           <h1 className="text-4xl font-bold text-foreground mb-4">
             Passkey Wallet Demo
           </h1>
@@ -378,7 +496,8 @@ const PasskeyDemo: React.FC = () => {
               { id: 'overview', label: 'Overview', icon: Shield },
               { id: 'security', label: 'Security', icon: Lock },
               { id: 'benefits', label: 'Benefits', icon: Zap },
-              { id: 'testing', label: 'Testing', icon: CheckCircle }
+              { id: 'testing', label: 'Testing', icon: CheckCircle },
+              { id: 'guide', label: 'Button Guide', icon: AlertCircle }
             ].map((tab) => (
               <Button
                 key={tab.id}
@@ -399,6 +518,7 @@ const PasskeyDemo: React.FC = () => {
           {activeTab === 'security' && renderSecurity()}
           {activeTab === 'benefits' && renderBenefits()}
           {activeTab === 'testing' && renderTesting()}
+          {activeTab === 'guide' && renderGuide()}
         </div>
 
         {/* Footer */}

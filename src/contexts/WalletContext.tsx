@@ -214,6 +214,10 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       const connection = await manager.connectWallet(walletType);
       
+      if (!connection) {
+        throw new Error('Failed to establish wallet connection');
+      }
+      
       setCurrentWalletType(walletType);
       setWallet({
         isConnected: true,
@@ -221,13 +225,20 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         signTransaction: connection.signTransaction
       });
       
-      console.log('Wallet connected successfully');
+      console.log('Wallet connected successfully:', connection.publicKey);
       
       // Load user data after connecting
       await loadUserData(connection.publicKey);
       
     } catch (error) {
       console.error('Error connecting wallet:', error);
+      // Reset wallet state on error
+      setWallet({
+        isConnected: false,
+        publicKey: null,
+        signTransaction: async () => { throw new Error('Wallet not connected'); }
+      });
+      setCurrentWalletType(null);
       throw new Error(error instanceof Error ? error.message : 'Failed to connect wallet');
     } finally {
       setIsLoading(false);

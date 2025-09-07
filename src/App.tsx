@@ -25,6 +25,7 @@ import Settings from "./pages/Settings";
 import WalletTest from "./pages/WalletTest";
 import PitchDeck from "./pages/PitchDeck";
 import PasskeyDemo from "./pages/PasskeyDemo";
+import ButtonFunctionalityTest from "./components/ButtonFunctionalityTest";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./components/AuthGuard";
 
@@ -48,6 +49,7 @@ const App = () => (
                   {/* Landing page without layout */}
                   <Route path="/" element={<Index />} />
                   <Route path="/wallet-test" element={<WalletTest />} />
+                  <Route path="/button-test" element={<ButtonFunctionalityTest />} />
                   <Route path="/pitch-deck" element={<PitchDeck />} />
                   <Route path="/passkey-demo" element={<PasskeyDemo />} />
                   
