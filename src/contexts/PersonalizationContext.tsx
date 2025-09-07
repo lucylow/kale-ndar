@@ -61,13 +61,28 @@ interface PersonalizationProviderProps {
 }
 
 export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = ({ children }) => {
-  const [settings, setSettings] = useState<PersonalizationSettings>(() => {
-    const stored = localStorage.getItem('kale-personalization');
-    return stored ? { ...defaultSettings, ...JSON.parse(stored) } : defaultSettings;
-  });
+  // Initialize with default settings to avoid localStorage access during render
+  const [settings, setSettings] = useState<PersonalizationSettings>(defaultSettings);
+
+  // Use useEffect for localStorage initialization
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('kale-personalization');
+      if (stored) {
+        const storedSettings = JSON.parse(stored);
+        setSettings({ ...defaultSettings, ...storedSettings });
+      }
+    } catch (error) {
+      console.warn('Failed to load personalization settings:', error);
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('kale-personalization', JSON.stringify(settings));
+    try {
+      localStorage.setItem('kale-personalization', JSON.stringify(settings));
+    } catch (error) {
+      console.warn('Failed to save personalization settings:', error);
+    }
   }, [settings]);
 
   const updateSettings = (updates: Partial<PersonalizationSettings>) => {

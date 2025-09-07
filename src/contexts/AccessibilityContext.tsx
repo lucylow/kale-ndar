@@ -34,21 +34,31 @@ interface AccessibilityProviderProps {
 }
 
 export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ children }) => {
-  const [settings, setSettings] = useState<AccessibilitySettings>(() => {
-    const stored = localStorage.getItem('kale-accessibility');
-    const userSettings = stored ? JSON.parse(stored) : {};
-    
-    // Detect user preferences
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
-    
-    return {
-      ...defaultSettings,
-      ...userSettings,
-      reducedMotion: userSettings.reducedMotion ?? prefersReducedMotion,
-      highContrast: userSettings.highContrast ?? prefersHighContrast,
-    };
-  });
+  // Initialize with default settings to avoid browser API access during render
+  const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
+
+  // Use useEffect for initialization to avoid SSR/hydration issues
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('kale-accessibility');
+      const userSettings = stored ? JSON.parse(stored) : {};
+      
+      // Detect user preferences
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
+      
+      const initialSettings = {
+        ...defaultSettings,
+        ...userSettings,
+        reducedMotion: userSettings.reducedMotion ?? prefersReducedMotion,
+        highContrast: userSettings.highContrast ?? prefersHighContrast,
+      };
+      
+      setSettings(initialSettings);
+    } catch (error) {
+      console.warn('Failed to initialize accessibility settings:', error);
+    }
+  }, []);
 
   const [announcer, setAnnouncer] = useState<HTMLDivElement | null>(null);
 
