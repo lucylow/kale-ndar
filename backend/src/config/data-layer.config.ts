@@ -145,3 +145,4 @@ export function getDataLayerConfig(): DataLayerConfig {
   
   return config;
 }
+

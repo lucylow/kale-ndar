@@ -133,3 +133,4 @@ The component uses Tailwind CSS classes and can be customized by:
 - Interactive architecture diagram elements
 - Voice-over narration support
 - Mobile-optimized touch gestures
+

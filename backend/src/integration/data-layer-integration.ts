@@ -148,3 +148,4 @@ export async function closeDataLayer(): Promise<void> {
 }
 
 export default DataLayerIntegration;
+

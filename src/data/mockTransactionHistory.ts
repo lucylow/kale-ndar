@@ -403,3 +403,4 @@ export const addActivityLog = (activity: Omit<ActivityLog, 'id' | 'timestamp'>):
   };
   mockActivityLogs.unshift(newActivity);
 };
+

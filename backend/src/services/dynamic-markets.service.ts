@@ -650,3 +650,4 @@ export class DynamicMarketsService {
     logger.info('Auto-generated market stored:', market);
   }
 }
+

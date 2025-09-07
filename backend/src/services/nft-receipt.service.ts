@@ -638,3 +638,4 @@ export class NFTReceiptService {
     logger.info('Receipt updated:', receipt);
   }
 }
+

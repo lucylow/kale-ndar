@@ -366,3 +366,4 @@ export const getMarketVolatility = (marketId: string): number | undefined => {
 export const getPlatformGrowth = (): PlatformAnalytics => {
   return mockPlatformAnalytics;
 };
+
