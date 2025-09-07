@@ -130,7 +130,7 @@ const CreateCustomFeedModal: React.FC<CreateCustomFeedModalProps> = ({ onFeedCre
         },
         body: JSON.stringify({
           ...feedData,
-          userSecret: wallet.secretKey, // This would be handled securely in production
+          // Note: In production, wallet signing would be handled securely
         }),
       });
 

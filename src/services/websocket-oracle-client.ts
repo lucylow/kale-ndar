@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 
 export interface WebSocketMessage {
-  type: 'priceUpdate' | 'metricsUpdate' | 'nodeStatus' | 'error' | 'ping' | 'pong';
+  type: 'priceUpdate' | 'metricsUpdate' | 'nodeStatus' | 'error' | 'ping' | 'pong' | 'subscribe' | 'unsubscribe' | 'getLatestPrices' | 'getMetrics' | 'getNodeStatus';
   data?: any;
   timestamp: number;
   id?: string;

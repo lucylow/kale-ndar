@@ -18,6 +18,7 @@ import {
   BarChart3,
   Wallet,
   Activity,
+  Database,
   Clock,
   CheckCircle,
   XCircle,

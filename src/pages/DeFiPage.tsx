@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useWallet } from '@/contexts/WalletContext';
-import defiService, { Protocol, YieldStrategy, PortfolioPosition, DeFiStats } from '@/services/defiService';
+import defiService, { Protocol, YieldStrategy, PortfolioPosition, DeFiStats as DeFiStatsType } from '@/services/defiService';
 import ProtocolCard from '@/components/defi/ProtocolCard';
 import StrategyCard from '@/components/defi/StrategyCard';
 import PortfolioCard from '@/components/defi/PortfolioCard';
@@ -19,7 +19,7 @@ const DeFiPage = () => {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [yieldStrategies, setYieldStrategies] = useState<YieldStrategy[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioPosition[]>([]);
-  const [defiStats, setDefiStats] = useState<DeFiStats | null>(null);
+  const [defiStats, setDefiStats] = useState<DeFiStatsType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProtocol, setSelectedProtocol] = useState('');
 
