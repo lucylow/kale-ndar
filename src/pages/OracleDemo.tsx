@@ -24,11 +24,12 @@ import {
 import { toast } from 'sonner';
 import LiveOracleDashboard from '@/components/LiveOracleDashboard';
 import RealTimePriceChart from '@/components/RealTimePriceChart';
-import { getWebSocketOracleClient, PriceUpdate, OracleMetrics, OracleNode } from '@/services/websocket-oracle-client';
+import { getHybridOracleClient, PriceUpdate, OracleMetrics, OracleNode, ConnectionMode } from '@/services/hybrid-oracle-client';
 
 const OracleDemo: React.FC = () => {
-  const [wsClient] = useState(() => getWebSocketOracleClient());
+  const [oracleClient] = useState(() => getHybridOracleClient());
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionMode, setConnectionMode] = useState<ConnectionMode>('offline');
   const [priceUpdates, setPriceUpdates] = useState<Record<string, PriceUpdate>>({});
   const [priceHistory, setPriceHistory] = useState<Record<string, any[]>>({});
   const [oracleMetrics, setOracleMetrics] = useState<OracleMetrics | null>(null);
@@ -36,6 +37,7 @@ const OracleDemo: React.FC = () => {
   const [isLiveUpdates, setIsLiveUpdates] = useState(true);
   const [selectedAsset, setSelectedAsset] = useState<string>('');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   // Supported assets
   const supportedAssets = [
@@ -67,27 +69,38 @@ const OracleDemo: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Setup WebSocket event listeners
-    wsClient.on('connected', () => {
+    // Setup hybrid oracle client event listeners
+    oracleClient.on('connected', (data: any) => {
       setIsConnected(true);
-      toast.success('Connected to Reflector Oracle WebSocket');
+      setConnectionMode(data.mode);
+      setConnectionError(null);
+      
+      const modeText = data.mode === 'websocket' ? 'WebSocket' : 'HTTP';
+      toast.success(`Connected to Reflector Oracle via ${modeText}`);
       
       // Subscribe to all assets
       const assetIds = supportedAssets.map(asset => asset.id);
-      wsClient.subscribeToAssets(assetIds);
+      oracleClient.subscribeToAssets(assetIds);
       
       // Request initial data
-      wsClient.requestLatestPrices();
-      wsClient.requestMetrics();
-      wsClient.requestNodeStatus();
+      oracleClient.requestLatestPrices();
+      oracleClient.requestMetrics();
+      oracleClient.requestNodeStatus();
     });
 
-    wsClient.on('disconnected', () => {
+    oracleClient.on('disconnected', () => {
       setIsConnected(false);
-      toast.error('Disconnected from Reflector Oracle WebSocket');
+      setConnectionMode('offline');
+      toast.error('Disconnected from Reflector Oracle');
     });
 
-    wsClient.on('priceUpdate', (data: any) => {
+    oracleClient.on('modeChanged', (data: any) => {
+      const modeText = data.to === 'websocket' ? 'WebSocket' : 'HTTP';
+      toast.info(`Switched to ${modeText} mode`);
+      setConnectionMode(data.to);
+    });
+
+    oracleClient.on('priceUpdate', (data: any) => {
       if (data.updates) {
         // Handle batch updates
         data.updates.forEach((update: PriceUpdate) => {
@@ -118,13 +131,13 @@ const OracleDemo: React.FC = () => {
       }
     });
 
-    wsClient.on('metricsUpdate', (data: any) => {
+    oracleClient.on('metricsUpdate', (data: any) => {
       if (data.metrics) {
         setOracleMetrics(data.metrics);
       }
     });
 
-    wsClient.on('nodeStatus', (data: any) => {
+    oracleClient.on('nodeStatus', (data: any) => {
       if (data.nodes) {
         setOracleNodes(data.nodes);
       } else if (data.status && data.node) {
@@ -139,35 +152,45 @@ const OracleDemo: React.FC = () => {
       }
     });
 
-    wsClient.on('error', (error: any) => {
-      console.error('WebSocket error:', error);
-      toast.error('WebSocket connection error');
+    oracleClient.on('error', (error: any) => {
+      console.error('Oracle client error:', error);
+      setConnectionError(`Connection error: ${error.error?.message || 'Unknown error'}`);
+      
+      if (error.mode === 'websocket') {
+        toast.error('WebSocket connection failed, trying HTTP fallback...');
+      } else {
+        toast.error('HTTP connection failed');
+      }
     });
 
-    wsClient.on('serverError', (error: string) => {
-      toast.error(`Server error: ${error}`);
-    });
-
-    // Connect to WebSocket
-    wsClient.connect();
+    // Connect to oracle service
+    oracleClient.connect();
 
     return () => {
-      wsClient.disconnect();
+      oracleClient.disconnect();
     };
-  }, [wsClient]);
+  }, [oracleClient]);
 
   const toggleLiveUpdates = () => {
     setIsLiveUpdates(!isLiveUpdates);
     if (!isLiveUpdates) {
-      wsClient.requestLatestPrices();
+      oracleClient.requestLatestPrices();
     }
   };
 
   const refreshData = () => {
-    wsClient.requestLatestPrices();
-    wsClient.requestMetrics();
-    wsClient.requestNodeStatus();
+    oracleClient.requestLatestPrices();
+    oracleClient.requestMetrics();
+    oracleClient.requestNodeStatus();
     toast.success('Data refreshed');
+  };
+
+  const switchToHttp = () => {
+    oracleClient.switchToHttp();
+  };
+
+  const switchToWebSocket = () => {
+    oracleClient.switchToWebSocket();
   };
 
   const simulateNodeFailure = (nodeId: string) => {
@@ -353,7 +376,9 @@ const OracleDemo: React.FC = () => {
                 {isConnected ? (
                   <>
                     <Wifi className="h-5 w-5 text-green-500" />
-                    <span className="text-green-500 font-medium">Connected</span>
+                    <span className="text-green-500 font-medium">
+                      Connected ({connectionMode.toUpperCase()})
+                    </span>
                   </>
                 ) : (
                   <>
@@ -362,6 +387,13 @@ const OracleDemo: React.FC = () => {
                   </>
                 )}
               </div>
+
+              {connectionError && (
+                <div className="flex items-center gap-2 text-red-500 text-sm">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>{connectionError}</span>
+                </div>
+              )}
 
               <Button
                 onClick={refreshData}
@@ -389,6 +421,30 @@ const OracleDemo: React.FC = () => {
                 <Settings className="h-4 w-4" />
                 {showAdvanced ? 'Hide' : 'Show'} Advanced
               </Button>
+
+              {showAdvanced && (
+                <>
+                  <Button
+                    onClick={switchToWebSocket}
+                    variant={connectionMode === 'websocket' ? 'default' : 'outline'}
+                    size="sm"
+                    disabled={!isConnected}
+                  >
+                    <Wifi className="h-4 w-4" />
+                    WebSocket
+                  </Button>
+
+                  <Button
+                    onClick={switchToHttp}
+                    variant={connectionMode === 'http' ? 'default' : 'outline'}
+                    size="sm"
+                    disabled={!isConnected}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    HTTP
+                  </Button>
+                </>
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -490,9 +546,10 @@ const OracleDemo: React.FC = () => {
             <div className="pt-4 border-t">
               <h4 className="font-medium mb-2">Connection Info</h4>
               <div className="text-sm text-muted-foreground space-y-1">
-                <div>Status: {wsClient.getConnectionStatus().isConnected ? 'Connected' : 'Disconnected'}</div>
-                <div>Subscribed Assets: {wsClient.getConnectionStatus().subscribedAssets.length}</div>
-                <div>WebSocket URL: {wsClient.getConnectionStatus().url}</div>
+                <div>Status: {oracleClient.getConnectionStatus().isConnected ? 'Connected' : 'Disconnected'}</div>
+                <div>Mode: {oracleClient.getConnectionStatus().mode.toUpperCase()}</div>
+                <div>Subscribed Assets: {oracleClient.getConnectionStatus().subscribedAssets.length}</div>
+                <div>Reconnect Attempts: {oracleClient.getConnectionStatus().reconnectAttempts}</div>
               </div>
             </div>
           </CardContent>
