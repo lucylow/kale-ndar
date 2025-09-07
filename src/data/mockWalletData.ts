@@ -56,22 +56,25 @@ export const mockWallets: WalletInfo[] = [
     name: 'Rabet',
     icon: '🐰',
     description: 'Open-source Stellar wallet with advanced features',
-    isAvailable: false,
+    isAvailable: true,
     adapter: {
       name: 'Rabet',
       icon: '🐰',
-      isAvailable: () => false,
-      connect: async () => {
-        throw new Error('Rabet wallet is not installed');
-      },
+      isAvailable: () => true,
+      connect: async () => ({
+        publicKey: 'GRABET1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+        signTransaction: async (transactionXdr: string) => {
+          console.log('Mock Rabet signing transaction:', transactionXdr);
+          return 'mock-rabet-signed-transaction-xdr';
+        }
+      }),
       disconnect: async () => {},
-      signTransaction: async () => {
-        throw new Error('Rabet wallet is not available');
+      signTransaction: async (transactionXdr: string, networkPassphrase: string) => {
+        console.log('Mock Rabet signing transaction:', transactionXdr, networkPassphrase);
+        return 'mock-rabet-signed-transaction-xdr';
       },
-      getPublicKey: async () => {
-        throw new Error('Rabet wallet is not available');
-      },
-      isConnected: async () => false
+      getPublicKey: async () => 'GRABET1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+      isConnected: async () => true
     }
   },
   {

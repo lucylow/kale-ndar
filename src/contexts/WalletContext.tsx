@@ -205,6 +205,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Always try to use real wallets first when forceRealWallets is enabled
       const useRealWallets = config.wallet.forceRealWallets !== false;
       
+<<<<<<< Updated upstream
       if (useRealWallets) {
         const availableRealWallets = walletManager.getAvailableWallets();
         
@@ -217,6 +218,21 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             `• Albedo (albedo.link)\n\n` +
             `After installation, refresh the page and try connecting again.`
           );
+=======
+      console.log('Wallet manager status:', {
+        hasRealWallets,
+        realWalletsCount: realWallets.length,
+        managerType: hasRealWallets ? 'real' : 'mock'
+      });
+      
+      // If no wallet type specified, try to connect to the first available wallet
+      if (!walletType) {
+        const availableWallets = manager.getAvailableWallets();
+        console.log('Available wallets:', availableWallets.map(w => w.name));
+        
+        if (availableWallets.length === 0) {
+          throw new Error('No Stellar wallets are available. Please install a Stellar wallet like Freighter, Lobstr, Rabet, or Albedo.');
+>>>>>>> Stashed changes
         }
         
         // If no wallet type specified, use the first available real wallet
@@ -288,8 +304,54 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         await loadUserData(connection.publicKey);
       }
       
+<<<<<<< Updated upstream
+=======
+      console.log(`Connecting to ${walletType} wallet...`);
+      
+      // Add timeout to connection attempt
+      const connectionPromise = manager.connectWallet(walletType);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Connection timeout after 30 seconds')), 30000)
+      );
+      
+      const connection = await Promise.race([connectionPromise, timeoutPromise]);
+      
+      if (!connection) {
+        throw new Error('Failed to establish wallet connection');
+      }
+      
+      setCurrentWalletType(walletType);
+      setWallet({
+        isConnected: true,
+        publicKey: connection.publicKey,
+        signTransaction: connection.signTransaction
+      });
+      
+      console.log('Wallet connected successfully:', connection.publicKey);
+      
+      // Load user data after connecting
+      await loadUserData(connection.publicKey);
+      
+>>>>>>> Stashed changes
     } catch (error) {
       console.error('Error connecting wallet:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to connect wallet';
+      if (error instanceof Error) {
+        if (error.message.includes('timeout')) {
+          errorMessage = 'Connection timeout. Please try again.';
+        } else if (error.message.includes('not installed')) {
+          errorMessage = 'Wallet not installed. Please install the wallet extension.';
+        } else if (error.message.includes('not available')) {
+          errorMessage = 'Wallet not available. Please check if the wallet is unlocked.';
+        } else if (error.message.includes('permission')) {
+          errorMessage = 'Permission denied. Please approve the connection in your wallet.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       // Reset wallet state on error
       setWallet({
         isConnected: false,
@@ -297,7 +359,11 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         signTransaction: async () => { throw new Error('Wallet not connected'); }
       });
       setCurrentWalletType(null);
+<<<<<<< Updated upstream
       throw error;
+=======
+      throw new Error(errorMessage);
+>>>>>>> Stashed changes
     } finally {
       setIsLoading(false);
     }

@@ -13,6 +13,7 @@ export class FreighterAdapter implements WalletAdapter {
   icon = '🦋';
 
   isAvailable(): boolean {
+<<<<<<< Updated upstream
     // Add more comprehensive detection for Freighter
     console.log('🔍 Checking Freighter availability...');
     
@@ -37,6 +38,27 @@ export class FreighterAdapter implements WalletAdapter {
     });
     
     return available;
+=======
+    try {
+      // Check multiple possible Freighter API locations
+      const freighterApi = window.freighterApi;
+      const freighter = window.freighter;
+      
+      const available = !!(freighterApi || freighter);
+      
+      console.log('Freighter detection:', {
+        freighterApi: !!freighterApi,
+        freighter: !!freighter,
+        available,
+        userAgent: navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Other'
+      });
+      
+      return available;
+    } catch (error) {
+      console.error('Error checking Freighter availability:', error);
+      return false;
+    }
+>>>>>>> Stashed changes
   }
 
   async connect(): Promise<WalletConnection> {
@@ -47,22 +69,40 @@ export class FreighterAdapter implements WalletAdapter {
     const api = window.freighterApi || window.freighter;
     
     try {
+      console.log('Attempting Freighter connection...');
+      
       // Check if Freighter is available and request permission
       try {
         const isAllowed = await api.isAllowed();
+        console.log('Freighter permission check:', isAllowed);
+        
         if (!isAllowed) {
+          console.log('Requesting Freighter permission...');
           await api.setAllowed();
         }
       } catch (permError) {
-        console.log('Permission check failed, trying direct connection...');
+        console.log('Permission check failed, trying direct connection...', permError);
       }
 
+<<<<<<< Updated upstream
       // Get network passphrase from config
       const networkPassphrase = this.getNetworkPassphrase();
       console.log('Using network:', networkPassphrase);
 
+=======
+      // Get the public key/address
+      console.log('Getting Freighter address...');
+>>>>>>> Stashed changes
       const addressResponse = await api.getAddress();
+      console.log('Freighter address response:', addressResponse);
+      
       const publicKey = typeof addressResponse === 'string' ? addressResponse : addressResponse.address;
+      
+      if (!publicKey) {
+        throw new Error('No public key returned from Freighter');
+      }
+
+      console.log('Freighter connected successfully:', publicKey);
 
       console.log(`✅ Freighter connected successfully!`);
       console.log(`📍 Address: ${publicKey}`);
@@ -71,13 +111,16 @@ export class FreighterAdapter implements WalletAdapter {
       return {
         publicKey,
         signTransaction: async (transactionXdr: string) => {
+          console.log('Signing transaction with Freighter...');
           const result = await api.signTransaction(transactionXdr, {
             networkPassphrase,
           });
+          console.log('Freighter signing result:', result);
           return typeof result === 'string' ? result : result.signedTxXdr;
         }
       };
     } catch (error) {
+      console.error('Freighter connection error:', error);
       throw new Error(`Failed to connect to Freighter: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

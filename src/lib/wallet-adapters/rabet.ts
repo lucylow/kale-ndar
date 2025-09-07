@@ -12,7 +12,21 @@ export class RabetAdapter implements WalletAdapter {
   icon = '🐰';
 
   isAvailable(): boolean {
-    return !!window.rabet;
+    try {
+      const rabet = window.rabet;
+      const available = !!rabet;
+      
+      console.log('Rabet detection:', {
+        rabet: !!rabet,
+        available,
+        userAgent: navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Other'
+      });
+      
+      return available;
+    } catch (error) {
+      console.error('Error checking Rabet availability:', error);
+      return false;
+    }
   }
 
   async connect(): Promise<WalletConnection> {
@@ -23,25 +37,47 @@ export class RabetAdapter implements WalletAdapter {
     const api = window.rabet;
     
     try {
+      console.log('Attempting Rabet connection...');
+      
       // Request permission to connect
-      const isAllowed = await api.isAllowed();
-      if (!isAllowed) {
-        await api.setAllowed();
+      try {
+        const isAllowed = await api.isAllowed();
+        console.log('Rabet permission check:', isAllowed);
+        
+        if (!isAllowed) {
+          console.log('Requesting Rabet permission...');
+          await api.setAllowed();
+        }
+      } catch (permError) {
+        console.log('Permission check failed, trying direct connection...', permError);
       }
 
+      // Get the public key/address
+      console.log('Getting Rabet address...');
       const addressResponse = await api.getAddress();
+      console.log('Rabet address response:', addressResponse);
+      
       const publicKey = typeof addressResponse === 'string' ? addressResponse : addressResponse.address;
+      
+      if (!publicKey) {
+        throw new Error('No public key returned from Rabet');
+      }
+
+      console.log('Rabet connected successfully:', publicKey);
 
       return {
         publicKey,
         signTransaction: async (transactionXdr: string) => {
+          console.log('Signing transaction with Rabet...');
           const result = await api.signTransaction(transactionXdr, {
             networkPassphrase: 'Test SDF Network ; September 2015', // Default testnet
           });
+          console.log('Rabet signing result:', result);
           return typeof result === 'string' ? result : result.signedTxXdr;
         }
       };
     } catch (error) {
+      console.error('Rabet connection error:', error);
       throw new Error(`Failed to connect to Rabet: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
