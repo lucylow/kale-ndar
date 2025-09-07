@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = {
   code: string;
@@ -132,19 +132,35 @@ interface I18nProviderProps {
 }
 
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(() => {
-    const stored = localStorage.getItem('kale-language');
-    const browserLang = navigator.language.split('-')[0];
-    const langCode = stored || browserLang || 'en';
-    return supportedLanguages.find(lang => lang.code === langCode) || supportedLanguages[0];
-  });
+  // Initialize with default language to avoid localStorage access issues
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(supportedLanguages[0]);
+
+  // Use useEffect for initialization to avoid SSR issues
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('kale-language');
+      const browserLang = navigator.language.split('-')[0];
+      const langCode = stored || browserLang || 'en';
+      const foundLanguage = supportedLanguages.find(lang => lang.code === langCode);
+      if (foundLanguage) {
+        setCurrentLanguage(foundLanguage);
+        document.documentElement.lang = foundLanguage.code;
+      }
+    } catch (error) {
+      console.warn('Failed to initialize language:', error);
+    }
+  }, []);
 
   const setLanguage = (languageCode: string) => {
-    const language = supportedLanguages.find(lang => lang.code === languageCode);
-    if (language) {
-      setCurrentLanguage(language);
-      localStorage.setItem('kale-language', languageCode);
-      document.documentElement.lang = languageCode;
+    try {
+      const language = supportedLanguages.find(lang => lang.code === languageCode);
+      if (language) {
+        setCurrentLanguage(language);
+        localStorage.setItem('kale-language', languageCode);
+        document.documentElement.lang = languageCode;
+      }
+    } catch (error) {
+      console.warn('Failed to set language:', error);
     }
   };
 
