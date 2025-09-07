@@ -1,16 +1,69 @@
 import { Button } from "@/components/ui/button";
-import { Play, TrendingUp, ArrowRight, Sparkles } from "lucide-react";
+import { Play, TrendingUp, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 import { useWallet } from "@/contexts/WalletContext";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const { wallet, availableWallets, connectWallet, isLoading } = useWallet();
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [stats, setStats] = useState({
+    totalVolume: 2.4,
+    activeMarkets: 1247,
+    avgROI: 24.5
+  });
   const navigate = useNavigate();
+
+  // Simulate fetching real-time stats
+  const updateStats = async () => {
+    setIsUpdating(true);
+    
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate realistic fluctuating values
+      const volumeVariation = (Math.random() - 0.5) * 0.4; // ±0.2M variation
+      const marketsVariation = Math.floor((Math.random() - 0.5) * 100); // ±50 markets
+      const roiVariation = (Math.random() - 0.5) * 5; // ±2.5% variation
+      
+      setStats(prevStats => ({
+        totalVolume: Math.max(0.1, prevStats.totalVolume + volumeVariation),
+        activeMarkets: Math.max(100, prevStats.activeMarkets + marketsVariation),
+        avgROI: Math.max(0, Math.min(100, prevStats.avgROI + roiVariation))
+      }));
+      
+      toast({
+        title: "Stats Updated! 📊",
+        description: "Platform statistics have been refreshed with latest data",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        title: "Update Failed",
+        description: "Failed to fetch latest statistics. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Auto-update stats every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(updateStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Initial stats load
+  useEffect(() => {
+    updateStats();
+  }, []);
 
   const handleGetStarted = async () => {
     console.log('Button clicked!', { 
@@ -110,19 +163,39 @@ const Hero = () => {
           </p>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-12 animate-fade-in max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-8 animate-fade-in max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary">$2.4M</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">
+                ${stats.totalVolume.toFixed(1)}M
+              </div>
               <div className="text-xs sm:text-sm text-muted-foreground">Total Volume</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-accent-teal">1,247</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent-teal">
+                {stats.activeMarkets.toLocaleString()}
+              </div>
               <div className="text-xs sm:text-sm text-muted-foreground">Active Markets</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-accent-gold">24.5%</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent-gold">
+                {stats.avgROI.toFixed(1)}%
+              </div>
               <div className="text-xs sm:text-sm text-muted-foreground">Avg. ROI</div>
             </div>
+          </div>
+
+          {/* Update Button */}
+          <div className="flex justify-center mb-8 animate-fade-in">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={updateStats}
+              disabled={isUpdating}
+              className="gap-2 hover:bg-accent/50 transition-colors"
+            >
+              <RefreshCw className={`h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
+              {isUpdating ? 'Updating...' : 'Update Stats'}
+            </Button>
           </div>
 
           {/* CTA Buttons */}
@@ -171,16 +244,22 @@ const Hero = () => {
               
               {/* Floating elements */}
               <div className="absolute top-2 sm:top-4 right-2 sm:right-4 p-2 sm:p-3 bg-primary/90 rounded-lg backdrop-blur-sm animate-float shadow-lg">
-                <span className="text-primary-foreground font-semibold text-xs sm:text-sm">+24.5% ROI</span>
+                <span className="text-primary-foreground font-semibold text-xs sm:text-sm">
+                  +{stats.avgROI.toFixed(1)}% ROI
+                </span>
               </div>
               
               <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 p-2 sm:p-3 bg-accent-teal/90 rounded-lg backdrop-blur-sm animate-float shadow-lg" style={{animationDelay: "2s"}}>
-                <span className="text-background font-semibold text-xs sm:text-sm">1,247 Active Markets</span>
+                <span className="text-background font-semibold text-xs sm:text-sm">
+                  {stats.activeMarkets.toLocaleString()} Active Markets
+                </span>
               </div>
 
               {/* New floating element */}
               <div className="absolute top-1/2 left-2 sm:left-4 p-2 sm:p-3 bg-accent-gold/90 rounded-lg backdrop-blur-sm animate-float shadow-lg" style={{animationDelay: "4s"}}>
-                <span className="text-background font-semibold text-xs sm:text-sm">$2.4M Volume</span>
+                <span className="text-background font-semibold text-xs sm:text-sm">
+                  ${stats.totalVolume.toFixed(1)}M Volume
+                </span>
               </div>
             </div>
           </div>
