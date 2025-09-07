@@ -38,12 +38,65 @@ const KalePage = () => {
   ];
 
   const handleStake = async () => {
-    setIsStaking(true);
-    // Simulate staking process
-    setTimeout(() => {
-      setIsStaking(false);
+    if (!wallet.isConnected || !wallet.publicKey) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to stake KALE tokens",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!stakeAmount || parseFloat(stakeAmount) <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid staking amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (parseFloat(stakeAmount) > 1234.56) { // Available balance check
+      toast({
+        title: "Insufficient Balance",
+        description: "You don't have enough KALE tokens to stake this amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsStaking(true);
+
+      // Use the blockchain service to stake KALE
+      const result = await blockchainService.stakeKale(
+        wallet.publicKey,
+        parseFloat(stakeAmount),
+        wallet.signTransaction
+      );
+
+      toast({
+        title: "Staking Successful! 🎉",
+        description: `Successfully staked ${stakeAmount} KALE tokens`,
+        duration: 5000,
+      });
+
+      // Clear the input and update UI
       setStakeAmount('');
-    }, 2000);
+      
+      // In a real app, you would refresh the farming stats here
+      console.log('Stake result:', result);
+
+    } catch (error) {
+      console.error('Error staking KALE:', error);
+      toast({
+        title: "Staking Failed",
+        description: error instanceof Error ? error.message : "Failed to stake KALE tokens",
+        variant: "destructive",
+      });
+    } finally {
+      setIsStaking(false);
+    }
   };
 
   const handleHarvest = async () => {

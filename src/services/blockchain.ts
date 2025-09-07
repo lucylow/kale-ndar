@@ -270,6 +270,31 @@ class BlockchainService {
     return await kaleIntegrationService.harvest(userAddress, stakeId, signTransaction);
   }
 
+  async stakeKale(
+    userAddress: string,
+    amount: number,
+    signTransaction: (tx: string) => Promise<string>
+  ): Promise<TransactionResult> {
+    try {
+      console.log('Staking KALE:', { userAddress, amount });
+      
+      // Use the existing plant functionality for staking
+      const txHash = await kaleIntegrationService.plant(userAddress, amount, signTransaction);
+      
+      return {
+        hash: txHash,
+        status: 'success',
+      };
+    } catch (error) {
+      console.error('Error staking KALE:', error);
+      return {
+        hash: '',
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
+
   // Reflector Oracle methods - delegate to Reflector service
   async getAssetPrice(asset: string, source: string = 'external') {
     return await reflectorOracleService.getAssetPrice(asset, source);
