@@ -19,7 +19,8 @@ import {
   Settings,
   BarChart3,
   Eye,
-  EyeOff
+  EyeOff,
+  AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import LiveOracleDashboard from '@/components/LiveOracleDashboard';
@@ -516,7 +517,7 @@ const OracleDemo: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Button
-                onClick={() => wsClient.requestLatestPrices()}
+                onClick={() => oracleClient.requestLatestPrices()}
                 variant="outline"
                 className="flex items-center gap-2"
               >
@@ -525,7 +526,7 @@ const OracleDemo: React.FC = () => {
               </Button>
               
               <Button
-                onClick={() => wsClient.requestMetrics()}
+                onClick={() => oracleClient.requestMetrics()}
                 variant="outline"
                 className="flex items-center gap-2"
               >
@@ -534,7 +535,7 @@ const OracleDemo: React.FC = () => {
               </Button>
               
               <Button
-                onClick={() => wsClient.requestNodeStatus()}
+                onClick={() => oracleClient.requestNodeStatus()}
                 variant="outline"
                 className="flex items-center gap-2"
               >

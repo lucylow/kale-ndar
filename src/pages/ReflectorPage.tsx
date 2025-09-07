@@ -20,9 +20,11 @@ const ReflectorPage = () => {
   const [realTimeData, setRealTimeData] = useState<any>({});
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [lastErrorTime, setLastErrorTime] = useState(0);
 
   // WebSocket connection for real-time data
   const { connectionState, isConnected, subscribeToMarket, unsubscribeFromMarket } = useWebSocket({
+    autoConnect: false, // Disable auto-connect to prevent connection errors in demo
     onMarketUpdate: (update) => {
       setRealTimeData(prev => ({
         ...prev,
@@ -38,13 +40,18 @@ const ReflectorPage = () => {
       });
     },
     onError: (error) => {
-      console.error('WebSocket error:', error);
-      toast({
-        title: "Connection Error",
-        description: "Failed to connect to real-time data feed",
-        variant: "destructive",
-        duration: 5000,
-      });
+      const now = Date.now();
+      // Throttle error messages to prevent spam (only show once every 30 seconds)
+      if (now - lastErrorTime > 30000) {
+        console.error('WebSocket error:', error);
+        toast({
+          title: "Connection Error", 
+          description: "Real-time feed unavailable - using simulated data",
+          variant: "destructive",
+          duration: 5000,
+        });
+        setLastErrorTime(now);
+      }
     }
   });
 
