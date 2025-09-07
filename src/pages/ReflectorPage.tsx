@@ -6,10 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import CreateCustomFeedModal from '@/components/CreateCustomFeedModal';
 
 const ReflectorPage = () => {
   const [subscriptionAmount, setSubscriptionAmount] = useState('');
   const [selectedFeed, setSelectedFeed] = useState('');
+  const [customFeeds, setCustomFeeds] = useState<any[]>([]);
 
   const oracleStats = {
     totalFeeds: 15,
@@ -34,6 +36,10 @@ const ReflectorPage = () => {
   const handleSubscribe = async () => {
     // Handle subscription logic
     console.log('Subscribing to feed:', selectedFeed, 'Amount:', subscriptionAmount);
+  };
+
+  const handleCustomFeedCreated = (feed: any) => {
+    setCustomFeeds(prev => [feed, ...prev]);
   };
 
   return (
@@ -119,10 +125,7 @@ const ReflectorPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>Available Price Feeds</span>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Custom Feed
-                </Button>
+                <CreateCustomFeedModal onFeedCreated={handleCustomFeedCreated} />
               </CardTitle>
               <CardDescription>
                 Real-time price data for various assets
@@ -130,6 +133,35 @@ const ReflectorPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {/* Custom Feeds */}
+                {customFeeds.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 text-blue-600">Your Custom Feeds</h3>
+                    {customFeeds.map((feed, index) => (
+                      <div key={`custom-${index}`} className="flex items-center justify-between p-4 border border-blue-200 rounded-lg bg-blue-50/50 hover:bg-blue-50 transition-colors">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                            {feed.assetCode[0]}
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{feed.name}</p>
+                            <p className="text-sm text-muted-foreground">{feed.assetCode}/{feed.baseCurrency}</p>
+                            <p className="text-xs text-blue-600">{feed.dataSource} • {feed.updateFrequency}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline" className="text-xs mb-1">
+                            {feed.status}
+                          </Badge>
+                          <p className="text-sm font-medium text-foreground">{feed.costPerUpdate} XRF</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Standard Feeds */}
+                <h3 className="text-lg font-semibold mb-3">Standard Price Feeds</h3>
                 {priceFeeds.map((feed, index) => (
                   <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors">
                     <div className="flex items-center space-x-4">
