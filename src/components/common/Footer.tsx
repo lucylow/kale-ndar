@@ -4,8 +4,8 @@ import { Github, Twitter, MessageCircle, Leaf } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-secondary border-t border-white/5 mt-auto">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <footer className="bg-secondary border-t border-white/5 mt-auto ml-64">
+      <div className="max-w-full mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
