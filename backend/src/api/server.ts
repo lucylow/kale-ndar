@@ -19,6 +19,8 @@ import oracleRoutes from '../routes/oracle.routes';
 import teamBettingRoutes from '../routes/team-betting.routes';
 import nftReceiptsRoutes from '../routes/nft-receipts.routes';
 import gamificationRoutes from '../routes/gamification.routes';
+import marketsRoutes from '../routes/markets';
+import betsRoutes from '../routes/bets';
 
 // Load environment variables
 dotenv.config();
@@ -91,11 +93,13 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/blockchain', blockchainRoutes);
 app.use('/api/kale', kaleTokenRoutes);
-app.use('/api/markets', marketCreationRoutes);
+app.use('/api/markets', marketsRoutes); // Updated to use new markets routes
+app.use('/api/bets', betsRoutes); // New betting routes
+app.use('/api/market-creation', marketCreationRoutes); // Keep old route for compatibility
 app.use('/api/fees', feeCollectionRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/betting', bettingRoutes);
+app.use('/api/betting', bettingRoutes); // Keep old route for compatibility
 app.use('/api/resolution', marketResolutionRoutes);
 app.use('/api/oracle', oracleRoutes);
 app.use('/api/teams', teamBettingRoutes);
