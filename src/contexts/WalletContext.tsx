@@ -43,36 +43,64 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       console.log('Initializing wallet manager...');
       
       try {
-        // Check if real wallets are available first
-        const realWallets = walletManager.getAvailableWallets();
-        const hasRealWallets = realWallets.length > 0;
+        // Force real wallets if configured
+        const useRealWallets = config.wallet.forceRealWallets !== false;
         
-        // Use real wallets if available, otherwise fall back to mock
-        const manager = hasRealWallets ? walletManager : mockWalletManager;
-        
-        console.log(`Using ${hasRealWallets ? 'real' : 'mock'} wallet manager. Available wallets:`, realWallets.length);
-        
-        // Get available wallets
-        const wallets = manager.getAllWallets();
-        setAvailableWallets(wallets);
-        
-        // Try to auto-connect to any available wallet
-        const connected = await manager.autoConnect();
-        
-        if (connected) {
-          const connection = manager.getCurrentConnection();
-          const walletType = manager.getCurrentWallet();
+        if (useRealWallets) {
+          // Check for available real wallets
+          const realWallets = walletManager.getAvailableWallets();
+          console.log(`Found ${realWallets.length} real Stellar wallets available`);
           
-          if (connection && walletType) {
-            setCurrentWalletType(walletType as WalletType);
-          setWallet({
-            isConnected: true,
-              publicKey: connection.publicKey,
-              signTransaction: connection.signTransaction
-          });
+          if (realWallets.length === 0) {
+            console.log('No real wallets detected, will require wallet installation');
+            setAvailableWallets(walletManager.getAllWallets()); // Show all wallets for installation guide
+          } else {
+            setAvailableWallets(realWallets);
+            
+            // Try to auto-connect to any available real wallet
+            const connected = await walletManager.autoConnect();
+            
+            if (connected) {
+              const connection = walletManager.getCurrentConnection();
+              const walletType = walletManager.getCurrentWallet();
+              
+              if (connection && walletType) {
+                setCurrentWalletType(walletType as WalletType);
+                setWallet({
+                  isConnected: true,
+                  publicKey: connection.publicKey,
+                  signTransaction: connection.signTransaction
+                });
+                
+                // Load user data
+                await loadUserData(connection.publicKey);
+              }
+            }
+          }
+        } else {
+          // Fallback to mock wallets for development
+          console.log('Using mock wallet manager for development');
+          const wallets = mockWalletManager.getAllWallets();
+          setAvailableWallets(wallets);
           
-          // Load user data
-            await loadUserData(connection.publicKey);
+          // Try to auto-connect to mock wallet
+          const connected = await mockWalletManager.autoConnect();
+          
+          if (connected) {
+            const connection = mockWalletManager.getCurrentConnection();
+            const walletType = mockWalletManager.getCurrentWallet();
+            
+            if (connection && walletType) {
+              setCurrentWalletType(walletType as WalletType);
+              setWallet({
+                isConnected: true,
+                publicKey: connection.publicKey,
+                signTransaction: connection.signTransaction
+              });
+              
+              // Load user data
+              await loadUserData(connection.publicKey);
+            }
           }
         }
       } catch (error) {
@@ -93,54 +121,14 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setIsLoading(true);
       
-      // Check if using real wallets or mock data
-      const realWallets = walletManager.getAvailableWallets();
-      const hasRealWallets = realWallets.length > 0;
-      
-      if (!hasRealWallets) {
-        // Use new mock data
-        const mockUser = getMockUserByAddressNew(address);
-        const mockStats = getMockUserStatsByAddress(address);
-        
-        if (mockUser) {
-          setUser(mockUser);
-        } else {
-          // Create a new user profile
-          setUser({
-            id: 0,
-            address,
-            username: null,
-            email: null,
-            created_at: new Date().toISOString(),
-            last_login: new Date().toISOString(),
-            total_bets: 0,
-            total_winnings: 0,
-          });
-        }
-        
-        if (mockStats) {
-          setUserStats(mockStats);
-        } else {
-          // Create default stats
-          setUserStats({
-            total_bets: 0,
-            total_bet_amount: 0,
-            claimed_bets: 0,
-            pending_claims: 0,
-            wins: 0,
-            losses: 0,
-            win_rate: 0,
-            recent_activity: [],
-          });
-        }
-      } else {
-      // Try to load user profile from API
+      // For real wallets, try to load from API first, fallback to mock data
       try {
         const userProfile = await apiService.getUserProfile(address);
         setUser(userProfile);
       } catch (error) {
+        console.log('API unavailable, using mock data for user profile');
         // Fallback to mock data
-        const mockUser = getMockUserByAddress(address);
+        const mockUser = getMockUserByAddressNew(address) || getMockUserByAddress(address);
         if (mockUser) {
           setUser(mockUser);
         } else {
@@ -163,8 +151,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const stats = await apiService.getUserStats(address);
         setUserStats(stats);
       } catch (error) {
+        console.log('API unavailable, using mock data for user stats');
         // Fallback to mock data
-        const mockStats = getMockUserStats(address);
+        const mockStats = getMockUserStatsByAddress(address) || getMockUserStats(address);
         if (mockStats) {
           setUserStats(mockStats);
         } else {
@@ -179,7 +168,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             win_rate: 0,
             recent_activity: [],
           });
-          }
         }
       }
       
@@ -196,39 +184,91 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setIsLoading(true);
       
-      // Check if real wallets are available first
-      const realWallets = walletManager.getAvailableWallets();
-      const hasRealWallets = realWallets.length > 0;
-      const manager = hasRealWallets ? walletManager : mockWalletManager;
+      // Always try to use real wallets first when forceRealWallets is enabled
+      const useRealWallets = config.wallet.forceRealWallets !== false;
       
-      // If no wallet type specified, try to connect to the first available wallet
-      if (!walletType) {
-        const availableWallets = manager.getAvailableWallets();
-        if (availableWallets.length === 0) {
-          throw new Error('No Stellar wallets are available. Please install a Stellar wallet like Freighter, Lobstr, Rabet, or Albedo.');
+      if (useRealWallets) {
+        const availableRealWallets = walletManager.getAvailableWallets();
+        
+        if (availableRealWallets.length === 0) {
+          throw new Error(
+            `No Stellar wallets detected. Please install a Stellar wallet:\n\n` +
+            `• Freighter (freighter.app) - Recommended\n` +
+            `• Lobstr (lobstr.co)\n` +
+            `• Rabet (rabet.io)\n` +
+            `• Albedo (albedo.link)\n\n` +
+            `After installation, refresh the page and try connecting again.`
+          );
         }
-        walletType = availableWallets[0].adapter.name.toLowerCase() as WalletType;
+        
+        // If no wallet type specified, use the first available real wallet
+        if (!walletType) {
+          walletType = availableRealWallets[0].adapter.name.toLowerCase() as WalletType;
+        }
+        
+        // Check if the requested wallet is available
+        const requestedWallet = availableRealWallets.find(
+          w => w.adapter.name.toLowerCase() === walletType
+        );
+        
+        if (!requestedWallet) {
+          throw new Error(
+            `${walletType} wallet is not installed or available. ` +
+            `Available wallets: ${availableRealWallets.map(w => w.name).join(', ')}`
+          );
+        }
+        
+        console.log(`Connecting to ${walletType} wallet...`);
+        
+        const connection = await walletManager.connectWallet(walletType);
+        
+        if (!connection) {
+          throw new Error('Failed to establish wallet connection');
+        }
+        
+        setCurrentWalletType(walletType);
+        setWallet({
+          isConnected: true,
+          publicKey: connection.publicKey,
+          signTransaction: connection.signTransaction
+        });
+        
+        console.log('Real Stellar wallet connected successfully:', connection.publicKey);
+        console.log('Network: Testnet (for testing) - switch to Mainnet in production');
+        
+        // Load user data after connecting
+        await loadUserData(connection.publicKey);
+        
+      } else {
+        // Fall back to mock wallets for development
+        console.log('Using mock wallet for development');
+        
+        if (!walletType) {
+          const availableWallets = mockWalletManager.getAvailableWallets();
+          if (availableWallets.length === 0) {
+            throw new Error('No mock wallets available');
+          }
+          walletType = availableWallets[0].adapter.name.toLowerCase() as WalletType;
+        }
+        
+        const connection = await mockWalletManager.connectWallet(walletType);
+        
+        if (!connection) {
+          throw new Error('Failed to establish mock wallet connection');
+        }
+        
+        setCurrentWalletType(walletType);
+        setWallet({
+          isConnected: true,
+          publicKey: connection.publicKey,
+          signTransaction: connection.signTransaction
+        });
+        
+        console.log('Mock wallet connected:', connection.publicKey);
+        
+        // Load user data after connecting
+        await loadUserData(connection.publicKey);
       }
-      
-      console.log(`Connecting to ${walletType} wallet...`);
-      
-      const connection = await manager.connectWallet(walletType);
-      
-      if (!connection) {
-        throw new Error('Failed to establish wallet connection');
-      }
-      
-      setCurrentWalletType(walletType);
-      setWallet({
-        isConnected: true,
-        publicKey: connection.publicKey,
-        signTransaction: connection.signTransaction
-      });
-      
-      console.log('Wallet connected successfully:', connection.publicKey);
-      
-      // Load user data after connecting
-      await loadUserData(connection.publicKey);
       
     } catch (error) {
       console.error('Error connecting wallet:', error);
@@ -239,7 +279,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         signTransaction: async () => { throw new Error('Wallet not connected'); }
       });
       setCurrentWalletType(null);
-      throw new Error(error instanceof Error ? error.message : 'Failed to connect wallet');
+      throw error;
     } finally {
       setIsLoading(false);
     }

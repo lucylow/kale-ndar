@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Leaf, Menu, X, Sun, Moon, Monitor, Bell, BarChart3, Target, Sparkles, Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import WalletConnector from "@/components/WalletConnector";
+import NetworkIndicator from "@/components/NetworkIndicator";
 import { useTheme } from "@/contexts/ThemeContext";
 import NotificationBadge from "@/components/ui/notification-badge";
 import ConnectionStatus from "@/components/ui/connection-status";
@@ -159,6 +160,9 @@ const Navigation = () => {
               <Play className="h-4 w-4" />
               Demo
             </Button>
+            
+            {/* Network Indicator */}
+            <NetworkIndicator />
             
             <WalletConnector />
             {wallet.isConnected ? (

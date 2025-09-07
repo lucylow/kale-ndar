@@ -40,14 +40,22 @@ export class FreighterAdapter implements WalletAdapter {
         console.log('Permission check failed, trying direct connection...');
       }
 
+      // Get network passphrase from config
+      const networkPassphrase = this.getNetworkPassphrase();
+      console.log('Using network:', networkPassphrase);
+
       const addressResponse = await api.getAddress();
       const publicKey = typeof addressResponse === 'string' ? addressResponse : addressResponse.address;
+
+      console.log(`✅ Freighter connected successfully!`);
+      console.log(`📍 Address: ${publicKey}`);
+      console.log(`🌐 Network: ${networkPassphrase.includes('Test') ? 'Testnet' : 'Mainnet'}`);
 
       return {
         publicKey,
         signTransaction: async (transactionXdr: string) => {
           const result = await api.signTransaction(transactionXdr, {
-            networkPassphrase: 'Test SDF Network ; September 2015', // Default testnet
+            networkPassphrase,
           });
           return typeof result === 'string' ? result : result.signedTxXdr;
         }
@@ -55,6 +63,17 @@ export class FreighterAdapter implements WalletAdapter {
     } catch (error) {
       throw new Error(`Failed to connect to Freighter: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  private getNetworkPassphrase(): string {
+    // Import config dynamically to avoid circular imports
+    const isTestnet = typeof window !== 'undefined' && 
+                     (window.location.hostname === 'localhost' || 
+                      window.location.hostname.includes('preview'));
+    
+    return isTestnet 
+      ? 'Test SDF Network ; September 2015'  // Testnet
+      : 'Public Global Stellar Network ; September 2015'; // Mainnet
   }
 
   async disconnect(): Promise<void> {
@@ -69,7 +88,7 @@ export class FreighterAdapter implements WalletAdapter {
 
     const api = window.freighterApi || window.freighter;
     const result = await api.signTransaction(transactionXdr, {
-      networkPassphrase,
+      networkPassphrase: networkPassphrase || this.getNetworkPassphrase(),
     });
     return typeof result === 'string' ? result : result.signedTxXdr;
   }

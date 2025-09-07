@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useWallet } from '@/contexts/WalletContext';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, LogOut, User, TrendingUp, DollarSign, ChevronDown, CheckCircle, AlertCircle, Shield, Zap } from 'lucide-react';
+import { Wallet, LogOut, User, TrendingUp, DollarSign, ChevronDown, CheckCircle, AlertCircle, Shield, Zap, Download } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { WalletType } from '@/lib/wallet-adapters/types';
 import { useNavigate } from 'react-router-dom';
 import WalletInstallGuide from './WalletInstallGuide';
+import WalletSetupGuide from './WalletSetupGuide';
 import SimpleWalletConnector from './SimpleWalletConnector';
 import PasskeyWalletConnector from './PasskeyWalletConnector';
 
@@ -275,15 +276,15 @@ const WalletConnector: React.FC = () => {
           className="gap-2 hover:scale-105 transition-transform"
           variant="hero"
         >
-          <AlertCircle className="h-4 w-4" />
+          <Download className="h-4 w-4" />
           Install Wallet
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-white/10">
         <DialogHeader>
-          <DialogTitle className="text-xl font-display">Install a Stellar Wallet</DialogTitle>
+          <DialogTitle className="text-xl font-display">Connect to Real Stellar Network</DialogTitle>
         </DialogHeader>
-        <WalletInstallGuide />
+        <WalletSetupGuide />
       </DialogContent>
     </Dialog>
   );

@@ -2,8 +2,16 @@
 export const config = {
   // Stellar/Soroban configuration
   soroban: {
-    rpcUrl: (typeof process !== 'undefined' && process.env?.VITE_SOROBAN_RPC_URL) || 'https://soroban-testnet.stellar.org',
-    networkPassphrase: (typeof process !== 'undefined' && process.env?.VITE_NETWORK_PASSPHRASE) || 'Test SDF Network ; September 2015',
+    rpcUrl: (typeof process !== 'undefined' && process.env?.VITE_SOROBAN_RPC_URL) || 
+            (typeof window !== 'undefined' && 
+             (window.location.hostname === 'localhost' || window.location.hostname.includes('preview'))
+             ? 'https://soroban-testnet.stellar.org'
+             : 'https://mainnet.sorobanrpc.com'),
+    networkPassphrase: (typeof process !== 'undefined' && process.env?.VITE_NETWORK_PASSPHRASE) || 
+                      (typeof window !== 'undefined' && 
+                       (window.location.hostname === 'localhost' || window.location.hostname.includes('preview'))
+                       ? 'Test SDF Network ; September 2015'
+                       : 'Public Global Stellar Network ; September 2015'),
     factoryContractId: (typeof process !== 'undefined' && process.env?.VITE_FACTORY_CONTRACT_ID) || '',
     
     // KALE Protocol Contract Addresses
@@ -49,8 +57,10 @@ export const config = {
   
   // Wallet configuration
   wallet: {
-    supportedWallets: ['freighter'],
+    supportedWallets: ['freighter', 'lobstr', 'rabet', 'albedo'],
     defaultWallet: 'freighter',
+    forceRealWallets: true, // Force real wallet connections instead of falling back to mock
+    network: 'testnet', // 'testnet' or 'mainnet'
   },
   
   // Market configuration
