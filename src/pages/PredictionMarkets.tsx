@@ -14,6 +14,8 @@ import {
   getCategoryStats,
   PredictionMarket 
 } from '@/data/predictionMarketData';
+import MarketList from '@/components/MarketList';
+import SimpleVirtualList from '@/components/SimpleVirtualList';
 
 const PredictionMarkets = () => {
   const [searchTerm, setSearchTerm] = useState('');

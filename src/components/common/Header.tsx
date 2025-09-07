@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import WalletConnection from './WalletConnection';
 import { useTheme } from '@/contexts/ThemeContext';
 import NotificationBadge from '@/components/ui/notification-badge';
+import RealtimeNotifications from '../RealtimeNotifications';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -58,6 +59,8 @@ const Header = () => {
           <div className="hidden md:flex items-center gap-4">
             <WalletConnection />
             
+            <RealtimeNotifications />
+            
             <Button
               variant="ghost"
               size="icon"
@@ -67,18 +70,6 @@ const Header = () => {
             >
               {getThemeIcon()}
             </Button>
-            
-            {/* Notification Button */}
-            <NotificationBadge count={notificationCount} variant="default">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-accent/50 transition-colors relative"
-                aria-label="Notifications"
-              >
-                <Bell className="h-4 w-4" />
-              </Button>
-            </NotificationBadge>
             
             <Link to="/settings" className="p-2 text-muted-foreground hover:text-accent-teal transition-colors">
               <Settings className="w-5 h-5" />
