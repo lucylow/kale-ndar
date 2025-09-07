@@ -6,6 +6,7 @@ import WalletConnection from './WalletConnection';
 import { useTheme } from '@/contexts/ThemeContext';
 import NotificationBadge from '@/components/ui/notification-badge';
 import RealtimeNotifications from '../RealtimeNotifications';
+import MobileMenu from '@/components/ui/mobile-menu';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,21 +43,22 @@ const Header = () => {
     }`}>
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Animated Logo */}
           <div className="flex items-center gap-3 group cursor-pointer">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="p-2 rounded-xl bg-gradient-primary transition-all duration-300 group-hover:scale-110 group-hover:shadow-primary">
-                <Leaf className="h-6 w-6 text-background" />
+              <div className="relative p-2 rounded-xl bg-gradient-primary transition-all duration-500 group-hover:scale-110 group-hover:shadow-primary animate-pulse-glow">
+                <Leaf className="h-6 w-6 text-background transition-all duration-300 group-hover:rotate-12" />
+                <div className="absolute inset-0 rounded-xl bg-gradient-primary opacity-30 animate-ping group-hover:animate-none" />
               </div>
-              <span className="text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors">
+              <span className="text-2xl font-display font-bold text-foreground group-hover:text-primary transition-all duration-300 hover:tracking-wide">
                 KALE-ndar
               </span>
             </Link>
           </div>
 
           
-          {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Enhanced Desktop Buttons */}
+          <div className="hidden md:flex items-center gap-2">
             <WalletConnection />
             
             <RealtimeNotifications />
@@ -65,19 +67,28 @@ const Header = () => {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="hover:bg-accent/50 transition-colors"
+              className="relative hover:bg-accent/50 transition-all duration-300 hover:scale-110 group"
               aria-label="Toggle theme"
             >
-              {getThemeIcon()}
+              <div className="transition-all duration-300 group-hover:rotate-180">
+                {getThemeIcon()}
+              </div>
             </Button>
             
-            <Link to="/settings" className="p-2 text-muted-foreground hover:text-accent-teal transition-colors">
-              <Settings className="w-5 h-5" />
+            <Link 
+              to="/settings" 
+              className="p-2 text-muted-foreground hover:text-accent-teal transition-all duration-300 hover:scale-110 hover:bg-accent-teal/10 rounded-lg group"
+            >
+              <Settings className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
             </Link>
-            <button className="p-2 text-muted-foreground hover:text-accent-teal transition-colors">
-              <User className="w-5 h-5" />
+            
+            <button className="p-2 text-muted-foreground hover:text-accent-teal transition-all duration-300 hover:scale-110 hover:bg-accent-teal/10 rounded-lg group">
+              <User className="w-5 h-5 transition-transform duration-300 group-hover:scale-125" />
             </button>
           </div>
+
+          {/* Mobile Menu */}
+          <MobileMenu />
         </div>
       </nav>
     </header>

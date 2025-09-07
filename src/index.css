@@ -190,13 +190,22 @@ All colors MUST be HSL. Semantic tokens for consistent theming.
 }
 
 @layer components {
-  /* Custom button variants */
+  /* Enhanced button variants */
   .btn-hero {
-    @apply bg-gradient-primary text-primary-foreground font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-primary hover:scale-105 focus:ring-2 focus:ring-primary/50 focus:outline-none;
+    @apply bg-gradient-primary text-primary-foreground font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-primary hover:scale-105 focus:ring-2 focus:ring-primary/50 focus:outline-none relative overflow-hidden;
+  }
+
+  .btn-hero::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full transition-transform duration-700;
+  }
+
+  .btn-hero:hover::before {
+    @apply translate-x-full;
   }
 
   .btn-outline {
-    @apply border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors focus:ring-2 focus:ring-ring focus:outline-none;
+    @apply border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300 focus:ring-2 focus:ring-ring focus:outline-none hover:scale-105;
   }
 
   /* Card styles */
@@ -208,14 +217,24 @@ All colors MUST be HSL. Semantic tokens for consistent theming.
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
   }
 
-  /* Text gradients */
+  /* Enhanced text effects */
   .text-gradient {
-    @apply bg-gradient-accent bg-clip-text text-transparent;
+    @apply bg-gradient-accent bg-clip-text text-transparent animate-gradient-shift;
+    background-size: 200% 200%;
   }
 
-  /* Glass effect */
+  .text-glow {
+    text-shadow: 0 0 10px hsl(var(--primary) / 0.5), 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  /* Enhanced glass effect */
   .glass {
-    @apply backdrop-blur-xl bg-background/80 border border-white/10;
+    @apply backdrop-blur-xl bg-background/80 border border-white/10 relative overflow-hidden;
+  }
+
+  .glass::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none;
   }
 
   /* Animated background */
@@ -225,11 +244,20 @@ All colors MUST be HSL. Semantic tokens for consistent theming.
     animation: gradient-shift 15s ease infinite;
   }
 
-  /* Loading states */
+  /* Enhanced loading states */
   .loading-shimmer {
     background: linear-gradient(90deg, transparent, hsl(var(--muted) / 0.5), transparent);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
+  }
+
+  .loading-skeleton {
+    @apply bg-muted/30 animate-pulse rounded-md;
+  }
+
+  .loading-dots::after {
+    content: '';
+    animation: loading-dots 1.5s infinite;
   }
 }
 

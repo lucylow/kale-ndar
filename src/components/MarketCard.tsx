@@ -25,40 +25,47 @@ const MarketCard = React.memo<MarketCardProps>(({
   formatAmount,
 }) => {
   return (
-    <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 group animate-fade-in">
-      <CardHeader>
+    <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-primary hover:-translate-y-2 transition-all duration-500 group animate-fade-in hover:border-primary/30 overflow-hidden relative">
+      <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
+      <CardHeader className="relative z-10">
         <div className="flex items-start justify-between mb-2">
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20 animate-pulse group-hover:animate-none">
             {market.oracleAsset.code}
           </Badge>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
+          <div className="flex items-center gap-1 text-xs text-muted-foreground group-hover:text-accent-teal transition-colors duration-300">
+            <Clock className="h-3 w-3 animate-pulse" />
             {formatTimeUntilResolve(market.resolveTime)}
           </div>
         </div>
-        <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+        <CardTitle className="text-lg leading-tight group-hover:text-primary transition-all duration-300 line-clamp-2 group-hover:scale-105 origin-left">
           {market.description}
         </CardTitle>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Users className="h-3 w-3" />
+        <div className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+          <Users className="h-3 w-3 group-hover:text-accent-teal transition-colors duration-300" />
           by {formatAddress(market.creator)}
         </div>
       </CardHeader>
       
-      <CardContent>
-        {/* Market Stats */}
+      <CardContent className="relative z-10">
+        {/* Enhanced Market Stats */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="text-center p-3 bg-primary/10 rounded-lg">
-            <div className="text-2xl font-bold text-primary">
+          <div className="text-center p-4 bg-primary/10 rounded-xl border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 group/stat">
+            <div className="text-2xl font-bold text-primary group-hover/stat:scale-110 transition-transform duration-300">
               {formatAmount(market.totalFor)}
             </div>
-            <div className="text-xs text-muted-foreground">FOR</div>
+            <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+              <TrendingUp className="h-3 w-3" />
+              FOR
+            </div>
           </div>
-          <div className="text-center p-3 bg-accent-teal/10 rounded-lg">
-            <div className="text-2xl font-bold text-accent-teal">
+          <div className="text-center p-4 bg-accent-teal/10 rounded-xl border border-accent-teal/20 hover:border-accent-teal/40 transition-all duration-300 hover:scale-105 group/stat">
+            <div className="text-2xl font-bold text-accent-teal group-hover/stat:scale-110 transition-transform duration-300">
               {formatAmount(market.totalAgainst)}
             </div>
-            <div className="text-xs text-muted-foreground">AGAINST</div>
+            <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+              <TrendingDown className="h-3 w-3" />
+              AGAINST
+            </div>
           </div>
         </div>
 
