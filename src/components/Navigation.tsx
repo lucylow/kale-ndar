@@ -165,7 +165,7 @@ const Navigation = () => {
             <NetworkIndicator />
             
             <WalletConnector />
-            {wallet.isConnected ? (
+            {wallet.isConnected && (
               <Button 
                 variant="hero" 
                 size="sm" 
@@ -174,15 +174,6 @@ const Navigation = () => {
               >
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
-              </Button>
-            ) : (
-              <Button 
-                variant="hero" 
-                size="sm" 
-                className="hover:scale-105 transition-transform"
-                onClick={() => navigate('/')}
-              >
-                Start Predicting
               </Button>
             )}
           </div>
@@ -318,7 +309,7 @@ const Navigation = () => {
               </Button>
               
               <WalletConnector />
-              {wallet.isConnected ? (
+              {wallet.isConnected && (
                 <Button 
                   variant="hero" 
                   size="sm" 
@@ -330,10 +321,6 @@ const Navigation = () => {
                 >
                   <BarChart3 className="h-4 w-4" />
                   Dashboard
-                </Button>
-              ) : (
-                <Button variant="hero" size="sm" className="w-full">
-                  Start Predicting
                 </Button>
               )}
             </div>
