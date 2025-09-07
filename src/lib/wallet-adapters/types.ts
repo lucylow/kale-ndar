@@ -22,4 +22,4 @@ export interface WalletInfo {
   adapter: WalletAdapter;
 }
 
-export type WalletType = 'freighter' | 'lobstr' | 'rabet' | 'albedo' | 'xbull';
+export type WalletType = 'freighter' | 'lobstr' | 'rabet' | 'albedo' | 'xbull' | 'passkey';

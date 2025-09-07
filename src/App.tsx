@@ -21,6 +21,7 @@ import PredictionMarkets from "./pages/PredictionMarkets";
 import Settings from "./pages/Settings";
 import WalletTest from "./pages/WalletTest";
 import PitchDeck from "./pages/PitchDeck";
+import PasskeyDemo from "./pages/PasskeyDemo";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./components/AuthGuard";
 
@@ -42,6 +43,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/wallet-test" element={<WalletTest />} />
                   <Route path="/pitch-deck" element={<PitchDeck />} />
+                  <Route path="/passkey-demo" element={<PasskeyDemo />} />
                   
                   {/* App pages with sidebar layout */}
                   <Route path="/dashboard" element={

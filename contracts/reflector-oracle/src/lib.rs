@@ -4,7 +4,10 @@ use soroban_sdk::{
     contract, contractimpl, contracttype, Address, Env, String, Vec, Map,
     panic_with_error, log,
 };
-use shared_types::{PriceFeed, EventData, MarketOutcome, ContractError};
+use shared_types::{
+    PriceFeed, EventData, MarketOutcome, ContractError, 
+    ContractCallResult, InteropError, OracleSubscription
+};
 
 const DAY_IN_LEDGERS: u32 = 17280;
 const INSTANCE_BUMP_AMOUNT: u32 = 7 * DAY_IN_LEDGERS;
@@ -339,6 +342,169 @@ impl ReflectorOracleContract {
         env.storage().instance().set(&DataKey::MaxPriceAge, &max_price_age);
 
         log!(&env, "Oracle config updated: min_confidence={}, max_price_age={}", min_confidence, max_price_age);
+    }
+
+    /// Enhanced price subscription with threshold notifications
+    pub fn subscribe_with_threshold(
+        env: Env,
+        subscriber: Address,
+        asset_name: String,
+        threshold: i128,
+        condition: u32, // 0: Above, 1: Below
+    ) -> ContractCallResult<OracleSubscription> {
+        subscriber.require_auth();
+
+        // Check if price is available for the asset
+        if !Self::is_price_available(env.clone(), asset_name.clone()) {
+            return ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Price not available for asset".to_string()),
+            };
+        }
+
+        // Create subscription
+        let subscription = OracleSubscription {
+            subscriber: subscriber.clone(),
+            asset_name: asset_name.clone(),
+            threshold,
+            condition,
+            created_at: env.ledger().timestamp(),
+            is_active: true,
+        };
+
+        // Store subscription
+        Self::subscribe(env.clone(), subscriber.clone(), asset_name.clone());
+
+        ContractCallResult {
+            success: true,
+            data: Some(subscription),
+            error: None,
+        }
+    }
+
+    /// Batch price update for multiple assets
+    pub fn batch_update_prices(
+        env: Env,
+        oracle_node: Address,
+        assets: Vec<String>,
+        prices: Vec<i128>,
+        confidences: Vec<u32>,
+        source: String,
+    ) -> ContractCallResult<Vec<String>> {
+        oracle_node.require_auth();
+
+        if !Self::is_authorized_oracle(&env, &oracle_node) {
+            return ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Unauthorized oracle node".to_string()),
+            };
+        }
+
+        if assets.len() != prices.len() || assets.len() != confidences.len() {
+            return ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Mismatched array lengths".to_string()),
+            };
+        }
+
+        let mut updated_assets = Vec::new(&env);
+        let min_confidence: u32 = env.storage().instance()
+            .get(&DataKey::MinConfidence)
+            .unwrap_or(80);
+
+        for i in 0..assets.len() {
+            let asset = assets.get(i).unwrap();
+            let price = prices.get(i).unwrap();
+            let confidence = confidences.get(i).unwrap();
+
+            if *confidence >= min_confidence {
+                Self::update_price(
+                    env.clone(),
+                    oracle_node.clone(),
+                    asset.clone(),
+                    *price,
+                    *confidence,
+                    source.clone(),
+                );
+                updated_assets.push_back(asset.clone());
+            }
+        }
+
+        ContractCallResult {
+            success: true,
+            data: Some(updated_assets),
+            error: None,
+        }
+    }
+
+    /// Get price with fallback mechanism
+    pub fn get_price_with_fallback(
+        env: Env,
+        asset_name: String,
+        fallback_price: i128,
+    ) -> ContractCallResult<i128> {
+        match env.storage().persistent().try_get(&DataKey::PriceFeed(asset_name.clone())) {
+            Ok(Some(price_feed)) => {
+                let max_age: u64 = env.storage().instance()
+                    .get(&DataKey::MaxPriceAge)
+                    .unwrap_or(3600);
+                
+                let current_time = env.ledger().timestamp();
+                
+                if current_time - price_feed.timestamp <= max_age {
+                    ContractCallResult {
+                        success: true,
+                        data: Some(price_feed.price),
+                        error: None,
+                    }
+                } else {
+                    ContractCallResult {
+                        success: true,
+                        data: Some(fallback_price),
+                        error: Some("Price too old, using fallback".to_string()),
+                    }
+                }
+            },
+            _ => ContractCallResult {
+                success: true,
+                data: Some(fallback_price),
+                error: Some("No price data, using fallback".to_string()),
+            },
+        }
+    }
+
+    /// Cross-contract validation for market resolution
+    pub fn validate_market_resolution(
+        env: Env,
+        asset_name: String,
+        target_price: i128,
+        condition: u32,
+        required_confidence: u32,
+    ) -> ContractCallResult<bool> {
+        let price_feed = Self::get_price(env.clone(), asset_name.clone());
+        
+        if price_feed.confidence < required_confidence {
+            return ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Insufficient confidence for resolution".to_string()),
+            };
+        }
+
+        let outcome = match condition {
+            0 => price_feed.price > target_price, // Above condition
+            1 => price_feed.price < target_price, // Below condition
+            _ => false,
+        };
+
+        ContractCallResult {
+            success: true,
+            data: Some(outcome),
+            error: None,
+        }
     }
 
     // Private helper functions

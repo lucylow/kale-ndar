@@ -4,7 +4,11 @@ use soroban_sdk::{
     contract, contractimpl, contracttype, token, Address, Env, Vec, Map, Symbol,
     panic_with_error, log, String, BytesN, Val, TryFromVal,
 };
-use shared_types::{StakeInfo, ContractError, Config, MarketInfo, FeeInfo};
+use shared_types::{
+    StakeInfo, ContractError, Config, MarketInfo, FeeInfo, 
+    ContractCallResult, InteropError, StakingPosition, PriceFeed
+};
+use shared_types::clients::ReflectorOracleClient;
 
 const DAY_IN_LEDGERS: u32 = 17280;
 const INSTANCE_BUMP_AMOUNT: u32 = 7 * DAY_IN_LEDGERS;
@@ -469,6 +473,142 @@ impl KaleIntegrationContract {
 
         env.storage().instance().set(&DataKey::FeeCollector, &new_fee_collector);
         log!(&env, "Fee collector updated to {} by admin", new_fee_collector);
+    }
+
+    /// Cross-contract call to get oracle price for KALE token
+    pub fn get_kale_price_from_oracle(env: Env, oracle_address: Address) -> ContractCallResult<i128> {
+        let oracle_client = ReflectorOracleClient::new(&env, &oracle_address);
+        
+        match oracle_client.try_get_price(&env, &oracle_address, String::from_str(&env, "KALE")) {
+            Ok(price_feed) => ContractCallResult {
+                success: true,
+                data: Some(price_feed.price),
+                error: None,
+            },
+            Err(_) => ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Oracle price fetch failed".to_string()),
+            },
+        }
+    }
+
+    /// Enhanced staking with oracle price validation
+    pub fn stake_with_price_validation(
+        env: Env,
+        staker: Address,
+        amount: i128,
+        oracle_address: Address,
+        min_price_threshold: i128,
+    ) -> ContractCallResult<i128> {
+        staker.require_auth();
+
+        // Get current KALE price from oracle
+        let price_result = Self::get_kale_price_from_oracle(env.clone(), oracle_address);
+        
+        if !price_result.success {
+            return ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Price validation failed".to_string()),
+            };
+        }
+
+        let current_price = price_result.data.unwrap();
+        
+        // Validate price threshold
+        if current_price < min_price_threshold {
+            return ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Price below minimum threshold".to_string()),
+            };
+        }
+
+        // Proceed with normal staking
+        Self::stake(env.clone(), staker.clone(), amount);
+        
+        ContractCallResult {
+            success: true,
+            data: Some(amount),
+            error: None,
+        }
+    }
+
+    /// Get comprehensive staking position with oracle data
+    pub fn get_enhanced_staking_position(
+        env: Env,
+        staker: Address,
+        oracle_address: Address,
+    ) -> ContractCallResult<StakingPosition> {
+        let stake_info = Self::get_stake_info(env.clone(), staker.clone());
+        let total_staked = Self::get_total_staked(env.clone());
+        let apy = Self::get_current_apy(env.clone());
+        
+        // Get current KALE price from oracle
+        let price_result = Self::get_kale_price_from_oracle(env.clone(), oracle_address);
+        let current_price = if price_result.success {
+            price_result.data.unwrap()
+        } else {
+            0 // Fallback if oracle fails
+        };
+
+        ContractCallResult {
+            success: true,
+            data: Some(StakingPosition {
+                staker: staker.clone(),
+                amount: stake_info.amount,
+                apy,
+                pending_rewards: stake_info.accumulated_rewards,
+                last_update: stake_info.last_reward_time,
+            }),
+            error: None,
+        }
+    }
+
+    /// Cross-contract market creation with enhanced validation
+    pub fn create_market_with_oracle_validation(
+        env: Env,
+        creator: Address,
+        description: String,
+        asset_symbol: String,
+        target_price: i128,
+        condition: u32,
+        resolve_time: u64,
+        market_fee: i128,
+        oracle_address: Address,
+    ) -> ContractCallResult<BytesN<32>> {
+        creator.require_auth();
+
+        // Validate oracle can provide price for the asset
+        let oracle_client = ReflectorOracleClient::new(&env, &oracle_address);
+        let price_available = oracle_client.is_price_available(&env, &oracle_address, asset_symbol.clone());
+        
+        if !price_available {
+            return ContractCallResult {
+                success: false,
+                data: None,
+                error: Some("Oracle cannot provide price for asset".to_string()),
+            };
+        }
+
+        // Create market
+        let market_id = Self::create_market(
+            env.clone(),
+            creator.clone(),
+            description,
+            asset_symbol,
+            target_price,
+            condition,
+            resolve_time,
+            market_fee,
+        );
+
+        ContractCallResult {
+            success: true,
+            data: Some(market_id),
+            error: None,
+        }
     }
 
     // Private helper functions

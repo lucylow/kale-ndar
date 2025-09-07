@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useWallet } from '@/contexts/WalletContext';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, LogOut, User, TrendingUp, DollarSign, ChevronDown, CheckCircle, AlertCircle } from 'lucide-react';
+import { Wallet, LogOut, User, TrendingUp, DollarSign, ChevronDown, CheckCircle, AlertCircle, Shield, Zap } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { WalletType } from '@/lib/wallet-adapters/types';
 import { useNavigate } from 'react-router-dom';
 import WalletInstallGuide from './WalletInstallGuide';
 import SimpleWalletConnector from './SimpleWalletConnector';
+import PasskeyWalletConnector from './PasskeyWalletConnector';
 
 const WalletConnector: React.FC = () => {
   const { wallet, user, userStats, availableWallets, currentWalletType, connectWallet, disconnectWallet, isLoading } = useWallet();
@@ -141,7 +142,15 @@ const WalletConnector: React.FC = () => {
 
         {/* Wallet Type Badge */}
         {currentWalletType && (
-          <Badge variant="secondary" className="hidden md:flex text-xs">
+          <Badge 
+            variant="secondary" 
+            className={`hidden md:flex text-xs ${
+              currentWalletType === 'passkey' 
+                ? 'bg-blue-500/20 text-blue-500 border-blue-500/30' 
+                : ''
+            }`}
+          >
+            {currentWalletType === 'passkey' && <Shield className="h-3 w-3 mr-1" />}
             {currentWalletType.charAt(0).toUpperCase() + currentWalletType.slice(1)}
           </Badge>
         )}
@@ -225,7 +234,15 @@ const WalletConnector: React.FC = () => {
               >
                 <span className="text-xl">{wallet.icon}</span>
                 <div className="flex flex-col flex-1">
-                  <span className="font-medium text-sm">{wallet.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">{wallet.name}</span>
+                    {wallet.name === 'Passkey' && (
+                      <Badge variant="secondary" className="bg-accent-gold/20 text-accent-gold border-accent-gold/30 text-xs">
+                        <Zap className="h-3 w-3 mr-1" />
+                        +15%
+                      </Badge>
+                    )}
+                  </div>
                   <span className="text-xs text-muted-foreground">{wallet.description}</span>
                 </div>
                 <CheckCircle className="h-4 w-4 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />

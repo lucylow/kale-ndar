@@ -95,6 +95,31 @@ export const mockWallets: WalletInfo[] = [
       },
       isConnected: async () => false
     }
+  },
+  {
+    name: 'Passkey',
+    icon: '🔐',
+    description: 'Secure biometric authentication with WebAuthn',
+    isAvailable: true,
+    adapter: {
+      name: 'Passkey',
+      icon: '🔐',
+      isAvailable: () => true,
+      connect: async () => ({
+        publicKey: 'GPASS1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+        signTransaction: async (transactionXdr: string) => {
+          console.log('Mock Passkey signing transaction:', transactionXdr);
+          return 'mock-passkey-signed-transaction-xdr';
+        }
+      }),
+      disconnect: async () => {},
+      signTransaction: async (transactionXdr: string, networkPassphrase: string) => {
+        console.log('Mock Passkey signing transaction:', transactionXdr, networkPassphrase);
+        return 'mock-passkey-signed-transaction-xdr';
+      },
+      getPublicKey: async () => 'GPASS1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+      isConnected: async () => true
+    }
   }
 ];
 
@@ -119,6 +144,19 @@ export const mockUsers = [
     last_login: '2024-09-05T17:45:00Z',
     total_bets: 42,
     total_winnings: 3200.75
+  },
+  {
+    id: 3,
+    address: 'GPASS1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+    username: 'passkey_pro',
+    email: 'pro@passkey.example.com',
+    created_at: '2024-03-10T09:20:00Z',
+    last_login: '2024-09-05T19:30:00Z',
+    total_bets: 67,
+    total_winnings: 4850.25,
+    wallet_type: 'passkey',
+    biometric_enabled: true,
+    security_level: 'high'
   }
 ];
 
@@ -195,6 +233,42 @@ export const mockUserStats = [
         status: 'completed'
       }
     ]
+  },
+  {
+    address: 'GPASS1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+    total_bets: 67,
+    total_bet_amount: 13400,
+    claimed_bets: 58,
+    pending_claims: 9,
+    wins: 45,
+    losses: 22,
+    win_rate: 67.2,
+    recent_activity: [
+      {
+        id: 7,
+        type: 'bet_won',
+        amount: 300,
+        market: 'Passkey Adoption Rate',
+        timestamp: '2024-09-05T19:30:00Z',
+        status: 'completed'
+      },
+      {
+        id: 8,
+        type: 'bet_placed',
+        amount: 150,
+        market: 'Biometric Security Trends',
+        timestamp: '2024-09-05T18:45:00Z',
+        status: 'pending'
+      },
+      {
+        id: 9,
+        type: 'bet_won',
+        amount: 225,
+        market: 'WebAuthn Integration',
+        timestamp: '2024-09-05T17:20:00Z',
+        status: 'completed'
+      }
+    ]
   }
 ];
 
@@ -207,6 +281,10 @@ export const mockKaleBalances = [
   {
     address: 'GDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
     balance: 4200.50
+  },
+  {
+    address: 'GPASS1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+    balance: 6750.25
   }
 ];
 
@@ -227,6 +305,15 @@ export const mockStakeInfo = [
     staking_duration: 60,
     rewards_earned: 78.50,
     next_harvest: '2024-10-20T14:30:00Z'
+  },
+  {
+    address: 'GPASS1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+    staked_amount: 3500,
+    staking_start: '2024-08-25T11:15:00Z',
+    staking_duration: 90,
+    rewards_earned: 125.75,
+    next_harvest: '2024-11-25T11:15:00Z',
+    security_bonus: 0.15 // Passkey users get 15% bonus rewards
   }
 ];
 
