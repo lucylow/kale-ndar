@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sprout, TrendingUp, Users, Clock, ArrowUpRight, Info, Share2, UserPlus, Loader2 } from 'lucide-react';
+import { Sprout, TrendingUp, Users, Clock, ArrowUpRight, Info, Share2, UserPlus, Loader2, Target } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,11 @@ const KalePage = () => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [isInviting, setIsInviting] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [selectedMarket, setSelectedMarket] = useState<any>(null);
+  const [isBettingModalOpen, setIsBettingModalOpen] = useState(false);
+  const [betAmount, setBetAmount] = useState('');
+  const [selectedOption, setSelectedOption] = useState<string>('');
+  const [isPlacingBet, setIsPlacingBet] = useState(false);
 
   const farmingStats = {
     totalStaked: 1234.56,
@@ -137,6 +142,90 @@ const KalePage = () => {
       });
     } finally {
       setIsHarvesting(false);
+    }
+  };
+
+  const handlePlaceBet = (market: any) => {
+    if (!wallet.isConnected || !wallet.publicKey) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to place bets",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedMarket(market);
+    setSelectedOption(market.options[0].id); // Default to first option
+    setBetAmount('');
+    setIsBettingModalOpen(true);
+  };
+
+  const handleSubmitBet = async () => {
+    if (!wallet.isConnected || !wallet.publicKey) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to place bets",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!betAmount || parseFloat(betAmount) <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid bet amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (parseFloat(betAmount) > 1234.56) { // Available balance check
+      toast({
+        title: "Insufficient Balance",
+        description: "You don't have enough KALE tokens to place this bet",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsPlacingBet(true);
+
+      // Use blockchain service to place bet
+      const result = await blockchainService.placeBet(
+        selectedMarket.id,
+        selectedOption === selectedMarket.options[0].id, // true for first option, false for second
+        parseFloat(betAmount),
+        wallet.publicKey,
+        wallet.signTransaction
+      );
+
+      if (result.status === 'success') {
+        toast({
+          title: "Bet Placed Successfully! 🎯",
+          description: `Placed ${betAmount} KALE on "${selectedMarket.options.find((o: any) => o.id === selectedOption)?.label}"`,
+          duration: 5000,
+        });
+
+        // Close modal and reset state
+        setIsBettingModalOpen(false);
+        setBetAmount('');
+        setSelectedOption('');
+        setSelectedMarket(null);
+      } else {
+        throw new Error(result.message || 'Failed to place bet');
+      }
+
+    } catch (error) {
+      console.error('Error placing bet:', error);
+      toast({
+        title: "Bet Failed",
+        description: error instanceof Error ? error.message : "Failed to place bet",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPlacingBet(false);
     }
   };
 
@@ -566,7 +655,12 @@ const KalePage = () => {
                       <div className="text-sm text-muted-foreground">
                         Total Pool: <span className="font-semibold text-foreground">{market.totalPool.toLocaleString()} KALE</span>
                       </div>
-                      <Button variant="hero" size="sm" className="group">
+                      <Button 
+                        variant="hero" 
+                        size="sm" 
+                        className="group"
+                        onClick={() => handlePlaceBet(market)}
+                      >
                         Place Bet
                       </Button>
                     </div>
@@ -583,6 +677,94 @@ const KalePage = () => {
             </Button>
           </div>
         </div>
+
+        {/* Betting Modal */}
+        <Dialog open={isBettingModalOpen} onOpenChange={setIsBettingModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                Place Bet
+              </DialogTitle>
+              <DialogDescription>
+                {selectedMarket && `Place your bet on: ${selectedMarket.title}`}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedMarket && (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="option">Select Option</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {selectedMarket.options.map((option: any) => (
+                      <Button
+                        key={option.id}
+                        variant={selectedOption === option.id ? "default" : "outline"}
+                        className="h-auto p-3 text-left"
+                        onClick={() => setSelectedOption(option.id)}
+                      >
+                        <div>
+                          <div className="font-semibold">{option.label}</div>
+                          <div className="text-sm text-muted-foreground">Odds: {option.odds}x</div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="betAmount">Bet Amount (KALE)</Label>
+                  <Input
+                    id="betAmount"
+                    type="number"
+                    placeholder="Enter bet amount"
+                    value={betAmount}
+                    onChange={(e) => setBetAmount(e.target.value)}
+                    className="mt-1"
+                  />
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Available: 1,234.56 KALE
+                  </div>
+                </div>
+
+                {betAmount && selectedOption && (
+                  <div className="bg-primary/10 rounded-lg p-3 border border-primary/20">
+                    <div className="text-sm">
+                      <div className="flex justify-between">
+                        <span>Potential Payout:</span>
+                        <span className="font-semibold text-primary">
+                          {(parseFloat(betAmount) * selectedMarket.options.find((o: any) => o.id === selectedOption)?.odds || 0).toFixed(2)} KALE
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsBettingModalOpen(false)}
+                    disabled={isPlacingBet}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleSubmitBet}
+                    disabled={isPlacingBet || !betAmount || !selectedOption}
+                  >
+                    {isPlacingBet ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Placing Bet...
+                      </>
+                    ) : (
+                      'Place Bet'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
