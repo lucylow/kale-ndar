@@ -55,41 +55,80 @@ const DeFiPage = () => {
 
   // Protocol exploration handler
   const handleExploreProtocol = async (protocolId: string) => {
+    if (!wallet.isConnected) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to explore protocols",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const result = await defiService.exploreProtocol(protocolId, wallet?.publicKey);
       if (result.success) {
         toast({
-          title: "Success",
+          title: "Protocol Connected! 🎉",
           description: result.message,
+          duration: 4000,
         });
         if (result.connectionUrl) {
+          // Open protocol website in new tab
           window.open(result.connectionUrl, '_blank');
         }
       } else {
-        throw new Error(result.message);
+        toast({
+          title: "Connection Failed",
+          description: result.message,
+          variant: "destructive",
+        });
       }
     } catch (error) {
-      throw error;
+      console.error('Error exploring protocol:', error);
+      toast({
+        title: "Connection Error",
+        description: error instanceof Error ? error.message : "Failed to connect to protocol",
+        variant: "destructive",
+      });
     }
   };
 
   // Strategy start handler
   const handleStartStrategy = async (strategyId: string, amount: number) => {
+    if (!wallet.isConnected) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to start strategies",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const result = await defiService.startStrategy(strategyId, amount, wallet?.publicKey || '');
       if (result.success) {
         toast({
-          title: "Success",
+          title: "Strategy Started! 🚀",
           description: result.message,
+          duration: 4000,
         });
         // Refresh portfolio data
         const updatedPortfolio = await defiService.getPortfolio(wallet?.publicKey);
         setPortfolio(updatedPortfolio);
       } else {
-        throw new Error(result.message);
+        toast({
+          title: "Strategy Failed",
+          description: result.message,
+          variant: "destructive",
+        });
       }
     } catch (error) {
-      throw error;
+      console.error('Error starting strategy:', error);
+      toast({
+        title: "Strategy Error",
+        description: error instanceof Error ? error.message : "Failed to start strategy",
+        variant: "destructive",
+      });
     }
   };
 
