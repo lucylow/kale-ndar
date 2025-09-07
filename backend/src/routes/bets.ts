@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import { logger } from '../utils/logger';
 import { randomUUID } from 'crypto';
+import { BlockchainTransactionService } from '../services/blockchain-transaction.service';
+import { RealtimeUpdatesService } from '../services/realtime-updates.service';
 
 const router = Router();
+
+// Initialize services
+const blockchainService = new BlockchainTransactionService();
+const realtimeService = new RealtimeUpdatesService(8080);
 
 // Mock data storage (replace with actual database)
 let bets: any[] = [];
@@ -76,12 +82,39 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Check user balance (this should be a real check against user's KALE balance)
-    // For now, we'll assume the user has sufficient balance
+    // Check user balance
+    const userBalance = await blockchainService.getUserKaleBalance(userAddress);
+    if (userBalance < amount) {
+      return res.status(400).json({
+        success: false,
+        error: 'Insufficient KALE balance',
+        details: `Required: ${amount} KALE, Available: ${userBalance} KALE`,
+      });
+    }
 
-    // Create bet
+    const betId = randomUUID();
+
+    // Create bet transaction on blockchain
+    const blockchainResult = await blockchainService.createBetTransaction({
+      betId,
+      marketId,
+      userAddress,
+      amount,
+      optionId,
+      betType,
+    });
+
+    if (!blockchainResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to place bet on blockchain',
+        details: blockchainResult.error,
+      });
+    }
+
+    // Create bet object
     const bet = {
-      id: randomUUID(),
+      id: betId,
       marketId,
       optionId,
       amount,
@@ -92,10 +125,12 @@ router.post('/', async (req, res) => {
       potentialProfit: (amount * option.odds) - amount,
       status: 'pending',
       createdAt: new Date().toISOString(),
+      transactionHash: blockchainResult.transactionHash,
       metadata: {
         marketTitle: market.title,
         optionName: option.name,
         category: market.category,
+        blockchainConfirmed: true,
       },
     };
 
@@ -130,15 +165,22 @@ router.post('/', async (req, res) => {
           const totalMarketBets = markets[marketIndex].options.reduce((sum, o) => sum + o.amount, 0);
           opt.odds = totalMarketBets > 0 ? Math.max(1.0, totalMarketBets / totalBets) : 1.0;
         });
+
+        // Send real-time update for market changes
+        realtimeService.notifyMarketUpdated(markets[marketIndex]);
       }
     }
 
-    logger.info(`Bet placed: ${bet.id} - ${amount} KALE on ${option.name} in market ${market.title}`);
+    // Send real-time update for bet placement
+    realtimeService.notifyBetPlaced(bet, marketId);
+
+    logger.info(`Bet placed: ${bet.id} - ${amount} KALE on ${option.name} in market ${market.title} - TX: ${blockchainResult.transactionHash}`);
 
     res.status(201).json({
       success: true,
       data: bet,
       message: 'Bet placed successfully',
+      transactionHash: blockchainResult.transactionHash,
     });
 
   } catch (error) {

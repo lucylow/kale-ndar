@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import { logger } from '../utils/logger';
 import { randomUUID } from 'crypto';
+import { BlockchainTransactionService } from '../services/blockchain-transaction.service';
+import { RealtimeUpdatesService } from '../services/realtime-updates.service';
 
 const router = Router();
+
+// Initialize services
+const blockchainService = new BlockchainTransactionService();
+const realtimeService = new RealtimeUpdatesService(8080);
 
 // Mock data storage (replace with actual database)
 let markets: any[] = [];
@@ -45,9 +51,32 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Create market
+    const marketId = randomUUID();
+    const creatorAddress = req.body.userAddress || 'demo-creator-address';
+
+    // Create market on blockchain
+    const blockchainResult = await blockchainService.createMarketTransaction({
+      marketId,
+      creatorAddress,
+      initialLiquidity,
+      fee,
+      title,
+      description,
+      endDate: new Date(endDate).toISOString(),
+      options,
+    });
+
+    if (!blockchainResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create market on blockchain',
+        details: blockchainResult.error,
+      });
+    }
+
+    // Create market object
     const market = {
-      id: randomUUID(),
+      id: marketId,
       title,
       description,
       category,
@@ -64,25 +93,31 @@ router.post('/', async (req, res) => {
       totalLiquidity: initialLiquidity,
       totalBets: 0,
       participants: 0,
-      creator: req.body.userAddress || 'anonymous',
+      creator: creatorAddress,
       createdAt: new Date().toISOString(),
       fee,
       oracleType,
       resolutionCriteria,
+      transactionHash: blockchainResult.transactionHash,
       metadata: {
         initialLiquidity,
         creatorFee: fee,
+        blockchainConfirmed: true,
       },
     };
 
     markets.push(market);
 
-    logger.info(`Market created: ${market.id} - ${market.title}`);
+    // Send real-time update
+    realtimeService.notifyMarketCreated(market);
+
+    logger.info(`Market created: ${market.id} - ${market.title} - TX: ${blockchainResult.transactionHash}`);
 
     res.status(201).json({
       success: true,
       data: market,
       message: 'Market created successfully',
+      transactionHash: blockchainResult.transactionHash,
     });
 
   } catch (error) {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TrendingUp, Eye, Plus, Zap, DollarSign, Activity } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Eye, Plus, Zap, DollarSign, Activity, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,11 +7,43 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import CreateCustomFeedModal from '@/components/CreateCustomFeedModal';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { useToast } from '@/hooks/use-toast';
 
 const ReflectorPage = () => {
+  const { toast } = useToast();
   const [subscriptionAmount, setSubscriptionAmount] = useState('');
   const [selectedFeed, setSelectedFeed] = useState('');
   const [customFeeds, setCustomFeeds] = useState<any[]>([]);
+  const [realTimeData, setRealTimeData] = useState<any>({});
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+
+  // WebSocket connection for real-time data
+  const { connectionState, isConnected, subscribeToMarket, unsubscribeFromMarket } = useWebSocket({
+    onMarketUpdate: (update) => {
+      setRealTimeData(prev => ({
+        ...prev,
+        [update.marketId]: update.data
+      }));
+      setLastUpdate(new Date());
+    },
+    onNotification: (notification) => {
+      toast({
+        title: "Real-time Update",
+        description: notification.message,
+        duration: 3000,
+      });
+    },
+    onError: (error) => {
+      console.error('WebSocket error:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to real-time data feed",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  });
 
   const oracleStats = {
     totalFeeds: 15,
@@ -20,12 +52,42 @@ const ReflectorPage = () => {
     xrfBalance: 567.89
   };
 
-  const priceFeeds = [
-    { symbol: 'XLM/USD', price: 0.1234, change: '+2.5%', volume: '1.2M', status: 'active' },
-    { symbol: 'BTC/USD', price: 43250.67, change: '-1.2%', volume: '45.6M', status: 'active' },
-    { symbol: 'ETH/USD', price: 2650.45, change: '+3.1%', volume: '23.4M', status: 'active' },
-    { symbol: 'USDC/USD', price: 1.0001, change: '+0.01%', volume: '12.8M', status: 'active' },
-  ];
+  const [priceFeeds, setPriceFeeds] = useState([
+    { symbol: 'XLM/USD', price: 0.1234, change: '+2.5%', volume: '1.2M', status: 'active', id: 'xlm-usd' },
+    { symbol: 'BTC/USD', price: 43250.67, change: '-1.2%', volume: '45.6M', status: 'active', id: 'btc-usd' },
+    { symbol: 'ETH/USD', price: 2650.45, change: '+3.1%', volume: '23.4M', status: 'active', id: 'eth-usd' },
+    { symbol: 'USDC/USD', price: 1.0001, change: '+0.01%', volume: '12.8M', status: 'active', id: 'usdc-usd' },
+  ]);
+
+  // Simulate real-time price updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPriceFeeds(prev => prev.map(feed => {
+        const change = (Math.random() - 0.5) * 0.1; // Random change between -5% and +5%
+        const newPrice = feed.price * (1 + change);
+        const changePercent = ((newPrice - feed.price) / feed.price * 100).toFixed(2);
+        
+        return {
+          ...feed,
+          price: newPrice,
+          change: `${changePercent > 0 ? '+' : ''}${changePercent}%`,
+          volume: (parseFloat(feed.volume.replace('M', '')) * (1 + Math.random() * 0.1)).toFixed(1) + 'M'
+        };
+      }));
+      setLastUpdate(new Date());
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Subscribe to price feed updates when connected
+  useEffect(() => {
+    if (isConnected) {
+      priceFeeds.forEach(feed => {
+        subscribeToMarket(feed.id);
+      });
+    }
+  }, [isConnected, subscribeToMarket]);
 
   const subscriptions = [
     { feed: 'XLM/USD', cost: 10, frequency: 'hourly', status: 'active' },
@@ -48,7 +110,25 @@ const ReflectorPage = () => {
       <div className="bg-gradient-card rounded-xl p-8 shadow-card border border-white/10 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-display font-bold mb-4 text-gradient">Reflector Oracle</h1>
+            <div className="flex items-center gap-3 mb-4">
+              <h1 className="text-4xl font-display font-bold text-gradient">Reflector Oracle</h1>
+              <div className="flex items-center gap-2">
+                {isConnected ? (
+                  <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">
+                    <Wifi className="w-3 h-3 mr-1" />
+                    Live
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
+                    <WifiOff className="w-3 h-3 mr-1" />
+                    Offline
+                  </Badge>
+                )}
+                <span className="text-sm text-muted-foreground">
+                  Last update: {lastUpdate.toLocaleTimeString()}
+                </span>
+              </div>
+            </div>
             <p className="text-muted-foreground text-xl">
               Access real-time price feeds and create custom subscriptions for your DeFi applications
             </p>

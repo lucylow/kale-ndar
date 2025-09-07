@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, User, Bell, Shield, Palette } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Shield, Palette, Play } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,7 @@ const Settings = () => {
     priceAlerts: true
   });
   const [theme, setTheme] = useState('light');
+  const [demoMode, setDemoMode] = useState(false);
 
   const handleSaveProfile = async () => {
     try {
@@ -48,11 +49,12 @@ const Settings = () => {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="demo">Demo</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -239,6 +241,109 @@ const Settings = () => {
                       <p className="text-sm text-gray-500">{option.description}</p>
                     </div>
                   ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="demo" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Play className="w-5 h-5" />
+                <span>Demo Mode</span>
+              </CardTitle>
+              <CardDescription>
+                Enable demo mode to showcase features with mock data
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Enable Demo Mode</p>
+                    <p className="text-sm text-gray-500">Use mock data and interactive demos</p>
+                  </div>
+                  <Switch
+                    checked={demoMode}
+                    onCheckedChange={(checked) => setDemoMode(checked)}
+                  />
+                </div>
+                
+                {demoMode && (
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Play className="w-5 h-5 text-blue-600" />
+                      <span className="font-medium text-blue-800">Demo Mode Active</span>
+                    </div>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Demo mode is enabled. You can now access interactive demos and mock data.
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="font-medium">Demo Features</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium mb-2">Team Betting Demo</h5>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Experience collaborative betting with friends
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Try Team Betting
+                    </Button>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium mb-2">NFT Receipts Demo</h5>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Trade bet tokens on Stellar DEX
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Try NFT Receipts
+                    </Button>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium mb-2">Dynamic Markets Demo</h5>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Auto-generated markets from oracle data
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Try Dynamic Markets
+                    </Button>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium mb-2">Gamification Demo</h5>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Achievements, badges, and leaderboards
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Try Gamification
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="font-medium">Demo Data</h4>
+                <div className="space-y-2">
+                  <Button variant="outline" className="w-full justify-start">
+                    Generate Mock Markets
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    Create Demo Users
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    Simulate Trading Activity
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    Reset Demo Data
+                  </Button>
                 </div>
               </div>
             </CardContent>

@@ -25,6 +25,7 @@ import Settings from "./pages/Settings";
 import WalletTest from "./pages/WalletTest";
 import PitchDeck from "./pages/PitchDeck";
 import PasskeyDemo from "./pages/PasskeyDemo";
+import Demo from "./pages/Demo";
 import ButtonFunctionalityTest from "./components/ButtonFunctionalityTest";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./components/AuthGuard";
@@ -52,6 +53,7 @@ const App = () => (
                   <Route path="/button-test" element={<ButtonFunctionalityTest />} />
                   <Route path="/pitch-deck" element={<PitchDeck />} />
                   <Route path="/passkey-demo" element={<PasskeyDemo />} />
+                  <Route path="/demo" element={<Demo />} />
                   
                   {/* App pages with sidebar layout */}
                   <Route path="/dashboard" element={

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X, Sun, Moon, Monitor, Bell, BarChart3, Target, Sparkles } from "lucide-react";
+import { Leaf, Menu, X, Sun, Moon, Monitor, Bell, BarChart3, Target, Sparkles, Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import WalletConnector from "@/components/WalletConnector";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -112,6 +112,14 @@ const Navigation = () => {
                   Community
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
                 </a>
+                <button 
+                  onClick={() => navigate('/demo')}
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group flex items-center gap-1"
+                >
+                  <Play className="h-4 w-4" />
+                  Demo
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </button>
               </>
             )}
           </div>
@@ -141,6 +149,16 @@ const Navigation = () => {
                 <Bell className="h-4 w-4" />
               </Button>
             </NotificationBadge>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hover:scale-105 transition-transform gap-2"
+              onClick={() => navigate('/demo')}
+            >
+              <Play className="h-4 w-4" />
+              Demo
+            </Button>
             
             <WalletConnector />
             {wallet.isConnected ? (
@@ -269,9 +287,32 @@ const Navigation = () => {
                 >
                   Community
                 </a>
+                <button 
+                  onClick={() => {
+                    navigate('/demo');
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-muted-foreground hover:text-accent-teal transition-all duration-200 py-3 px-4 rounded-lg hover:bg-accent/20 text-left hover:translate-x-1 flex items-center gap-3"
+                >
+                  <Play className="h-4 w-4" />
+                  Demo
+                </button>
               </>
             )}
             <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full gap-2"
+                onClick={() => {
+                  navigate('/demo');
+                  setIsMenuOpen(false);
+                }}
+              >
+                <Play className="h-4 w-4" />
+                Try Demo
+              </Button>
+              
               <WalletConnector />
               {wallet.isConnected ? (
                 <Button 
