@@ -1,4 +1,4 @@
-import { logger } from '@/lib/utils';
+// import { logger } from '@/lib/utils';
 
 export interface Market {
   id: string;
@@ -95,7 +95,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error creating market:', error);
+      console.error('Error creating market:', error);
       throw error;
     }
   }
@@ -129,7 +129,7 @@ class MarketService {
       const result = await response.json();
       return result;
     } catch (error) {
-      logger.error('Error fetching markets:', error);
+      console.error('Error fetching markets:', error);
       throw error;
     }
   }
@@ -149,7 +149,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error fetching market:', error);
+      console.error('Error fetching market:', error);
       throw error;
     }
   }
@@ -175,7 +175,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error updating market:', error);
+      console.error('Error updating market:', error);
       throw error;
     }
   }
@@ -204,7 +204,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error resolving market:', error);
+      console.error('Error resolving market:', error);
       throw error;
     }
   }
@@ -224,7 +224,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error fetching market stats:', error);
+      console.error('Error fetching market stats:', error);
       throw error;
     }
   }
@@ -250,7 +250,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error placing bet:', error);
+      console.error('Error placing bet:', error);
       throw error;
     }
   }
@@ -284,7 +284,7 @@ class MarketService {
       const result = await response.json();
       return result;
     } catch (error) {
-      logger.error('Error fetching user bets:', error);
+      console.error('Error fetching user bets:', error);
       throw error;
     }
   }
@@ -304,7 +304,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error fetching bet:', error);
+      console.error('Error fetching bet:', error);
       throw error;
     }
   }
@@ -330,7 +330,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error cancelling bet:', error);
+      console.error('Error cancelling bet:', error);
       throw error;
     }
   }
@@ -350,7 +350,7 @@ class MarketService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      logger.error('Error fetching betting stats:', error);
+      console.error('Error fetching betting stats:', error);
       throw error;
     }
   }

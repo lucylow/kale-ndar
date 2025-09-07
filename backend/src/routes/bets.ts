@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { logger } from '../utils/logger';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 const router = Router();
 
@@ -81,7 +81,7 @@ router.post('/', async (req, res) => {
 
     // Create bet
     const bet = {
-      id: uuidv4(),
+      id: randomUUID(),
       marketId,
       optionId,
       amount,

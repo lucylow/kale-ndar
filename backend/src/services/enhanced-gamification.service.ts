@@ -1,6 +1,5 @@
 import { logger } from '../utils/logger';
-import Big from 'big.js';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 // Enhanced interfaces for advanced gamification
 export interface AdvancedBadge extends Badge {

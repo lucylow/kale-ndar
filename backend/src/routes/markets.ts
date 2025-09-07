@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { logger } from '../utils/logger';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 const router = Router();
 
@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
 
     // Create market
     const market = {
-      id: uuidv4(),
+      id: randomUUID(),
       title,
       description,
       category,
