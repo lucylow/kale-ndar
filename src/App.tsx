@@ -8,8 +8,9 @@ import { WalletProvider } from "@/contexts/WalletContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import DevModeIndicator from "@/components/DevModeIndicator";
 import Header from "@/components/common/Header";
-import Sidebar from "@/components/common/Sidebar";
+import AppSidebar from "@/components/AppSidebar";
 import Footer from "@/components/common/Footer";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import KalePage from "./pages/KalePage";
@@ -42,109 +43,123 @@ const App = () => (
                   <Route path="/wallet-test" element={<WalletTest />} />
                   <Route path="/pitch-deck" element={<PitchDeck />} />
                   
-                  {/* App pages with layout */}
+                  {/* App pages with sidebar layout */}
                   <Route path="/dashboard" element={
                     <AuthGuard>
-                      <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <div className="flex flex-1">
-                          <Sidebar />
-                          <main className="flex-1 ml-64 p-6 pt-24">
-                            <Dashboard />
-                          </main>
+                      <SidebarProvider>
+                        <div className="flex min-h-screen w-full">
+                          <AppSidebar />
+                          <div className="flex flex-col flex-1">
+                            <Header />
+                            <main className="flex-1 p-6 pt-24">
+                              <Dashboard />
+                            </main>
+                            <Footer />
+                          </div>
                         </div>
-                        <Footer />
-                      </div>
+                      </SidebarProvider>
                     </AuthGuard>
                   } />
                   
                   <Route path="/kale" element={
                     <AuthGuard>
-                      <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <div className="flex flex-1">
-                          <Sidebar />
-                          <main className="flex-1 ml-64 p-6 pt-24">
-                            <KalePage />
-                          </main>
+                      <SidebarProvider>
+                        <div className="flex min-h-screen w-full">
+                          <AppSidebar />
+                          <div className="flex flex-col flex-1">
+                            <Header />
+                            <main className="flex-1 p-6 pt-24">
+                              <KalePage />
+                            </main>
+                            <Footer />
+                          </div>
                         </div>
-                        <Footer />
-                      </div>
+                      </SidebarProvider>
                     </AuthGuard>
                   } />
                   
                   <Route path="/reflector" element={
                     <AuthGuard>
-                      <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <div className="flex flex-1">
-                          <Sidebar />
-                          <main className="flex-1 ml-64 p-6 pt-24">
-                            <ReflectorPage />
-                          </main>
+                      <SidebarProvider>
+                        <div className="flex min-h-screen w-full">
+                          <AppSidebar />
+                          <div className="flex flex-col flex-1">
+                            <Header />
+                            <main className="flex-1 p-6 pt-24">
+                              <ReflectorPage />
+                            </main>
+                            <Footer />
+                          </div>
                         </div>
-                        <Footer />
-                      </div>
+                      </SidebarProvider>
                     </AuthGuard>
                   } />
                   
                   <Route path="/defi" element={
                     <AuthGuard>
-                      <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <div className="flex flex-1">
-                          <Sidebar />
-                          <main className="flex-1 ml-64 p-6 pt-24">
-                            <DeFiPage />
-                          </main>
+                      <SidebarProvider>
+                        <div className="flex min-h-screen w-full">
+                          <AppSidebar />
+                          <div className="flex flex-col flex-1">
+                            <Header />
+                            <main className="flex-1 p-6 pt-24">
+                              <DeFiPage />
+                            </main>
+                            <Footer />
+                          </div>
                         </div>
-                        <Footer />
-                      </div>
+                      </SidebarProvider>
                     </AuthGuard>
                   } />
                   
                   <Route path="/portfolio" element={
                     <AuthGuard>
-                      <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <div className="flex flex-1">
-                          <Sidebar />
-                          <main className="flex-1 ml-64 p-6 pt-24">
-                            <Portfolio />
-                          </main>
+                      <SidebarProvider>
+                        <div className="flex min-h-screen w-full">
+                          <AppSidebar />
+                          <div className="flex flex-col flex-1">
+                            <Header />
+                            <main className="flex-1 p-6 pt-24">
+                              <Portfolio />
+                            </main>
+                            <Footer />
+                          </div>
                         </div>
-                        <Footer />
-                      </div>
+                      </SidebarProvider>
                     </AuthGuard>
                   } />
                   
                   <Route path="/markets" element={
                     <AuthGuard>
-                      <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <div className="flex flex-1">
-                          <Sidebar />
-                          <main className="flex-1 ml-64 p-6 pt-24">
-                            <PredictionMarkets />
-                          </main>
+                      <SidebarProvider>
+                        <div className="flex min-h-screen w-full">
+                          <AppSidebar />
+                          <div className="flex flex-col flex-1">
+                            <Header />
+                            <main className="flex-1 p-6 pt-24">
+                              <PredictionMarkets />
+                            </main>
+                            <Footer />
+                          </div>
                         </div>
-                        <Footer />
-                      </div>
+                      </SidebarProvider>
                     </AuthGuard>
                   } />
                   
                   <Route path="/settings" element={
                     <AuthGuard>
-                      <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <div className="flex flex-1">
-                          <Sidebar />
-                          <main className="flex-1 ml-64 p-6 pt-24">
-                            <Settings />
-                          </main>
+                      <SidebarProvider>
+                        <div className="flex min-h-screen w-full">
+                          <AppSidebar />
+                          <div className="flex flex-col flex-1">
+                            <Header />
+                            <main className="flex-1 p-6 pt-24">
+                              <Settings />
+                            </main>
+                            <Footer />
+                          </div>
                         </div>
-                        <Footer />
-                      </div>
+                      </SidebarProvider>
                     </AuthGuard>
                   } />
                   
