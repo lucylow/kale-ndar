@@ -34,6 +34,72 @@ const KalePage = () => {
     }, 2000);
   };
 
+  // Mock prediction markets data
+  const mockPredictionMarkets = [
+    {
+      id: '1',
+      title: 'Bitcoin to reach $100,000 by end of 2024?',
+      description: 'Predict if Bitcoin will reach $100,000 USD by December 31, 2024',
+      category: 'Crypto',
+      totalPool: 25000,
+      endDate: '2024-12-31',
+      status: 'open' as const,
+      options: [
+        { id: '1a', label: 'Yes', odds: 2.1, totalBets: 150, totalAmount: 15000, result: null },
+        { id: '1b', label: 'No', odds: 1.8, totalBets: 120, totalAmount: 10000, result: null }
+      ],
+      creator: 'GAKM7XQPUF6DKLP4QKJ2L3GQ4C7W3NQDRN6XKHGA'
+    },
+    {
+      id: '2',
+      title: 'Next US Presidential Election Winner 2028',
+      description: 'Who will win the 2028 US Presidential Election?',
+      category: 'Politics',
+      totalPool: 45000,
+      endDate: '2028-11-07',
+      status: 'open' as const,
+      options: [
+        { id: '2a', label: 'Democratic Candidate', odds: 1.9, totalBets: 200, totalAmount: 25000, result: null },
+        { id: '2b', label: 'Republican Candidate', odds: 2.0, totalBets: 180, totalAmount: 20000, result: null }
+      ],
+      creator: 'GBKJ8MNRQP7DKLP4QKJ2L3GQ4C7W3NQDRN6XKHGB'
+    },
+    {
+      id: '3',
+      title: 'Tesla Stock Above $300 by Q2 2024?',
+      description: 'Will Tesla (TSLA) stock price be above $300 by June 30, 2024?',
+      category: 'Stocks',
+      totalPool: 18500,
+      endDate: '2024-06-30',
+      status: 'open' as const,
+      options: [
+        { id: '3a', label: 'Yes', odds: 1.7, totalBets: 95, totalAmount: 11000, result: null },
+        { id: '3b', label: 'No', odds: 2.3, totalBets: 75, totalAmount: 7500, result: null }
+      ],
+      creator: 'GCLM9XQPUF6DKLP4QKJ2L3GQ4C7W3NQDRN6XKHGC'
+    }
+  ];
+
+  const formatTimeUntilEnd = (endDate: string): string => {
+    const now = new Date();
+    const end = new Date(endDate);
+    const diff = end.getTime() - now.getTime();
+    
+    if (diff <= 0) return 'Ended';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 30) return `${Math.floor(days / 30)}mo ${days % 30}d`;
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h`;
+    return 'Soon';
+  };
+
+  const formatAddress = (address: string): string => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -238,6 +304,76 @@ const KalePage = () => {
               </Button>
             </CardContent>
           </Card>
+        </div>
+      </div>
+
+      {/* Live Prediction Markets Section */}
+      <div className="space-y-6 animate-fade-in">
+        <div className="bg-gradient-card rounded-xl p-6 shadow-card border border-white/10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-display font-bold text-gradient">Live Prediction Markets</h2>
+              <p className="text-muted-foreground">Stake KALE tokens on real-world events</p>
+            </div>
+            <div className="w-12 h-12 bg-accent-teal/20 rounded-full flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-accent-teal" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mockPredictionMarkets.map((market) => (
+              <Card key={market.id} className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift group">
+                <CardHeader>
+                  <div className="flex items-start justify-between mb-2">
+                    <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+                      {market.category}
+                    </Badge>
+                    <div className="flex items-center space-x-1 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" />
+                      <span>{formatTimeUntilEnd(market.endDate)}</span>
+                    </div>
+                  </div>
+                  <CardTitle className="text-lg leading-tight text-foreground group-hover:text-primary transition-colors">{market.title}</CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground">{market.description}</CardDescription>
+                  <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-2">
+                    <Users className="w-4 h-4" />
+                    <span>by {formatAddress(market.creator)}</span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      {market.options.map((option) => (
+                        <div key={option.id} className="text-center p-3 bg-secondary/20 rounded-lg border border-white/10 hover:bg-secondary/30 transition-colors cursor-pointer">
+                          <div className="text-lg font-bold text-foreground">{option.label}</div>
+                          <div className="text-sm text-muted-foreground">Odds: {option.odds}x</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {option.totalBets} bets • {option.totalAmount.toLocaleString()} KALE
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                      <div className="text-sm text-muted-foreground">
+                        Total Pool: <span className="font-semibold text-foreground">{market.totalPool.toLocaleString()} KALE</span>
+                      </div>
+                      <Button variant="hero" size="sm" className="group">
+                        Place Bet
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex justify-center mt-8">
+            <Button variant="outline" className="border-white/20 hover:bg-accent/20">
+              View All Markets
+              <ArrowUpRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
