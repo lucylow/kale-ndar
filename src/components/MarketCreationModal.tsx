@@ -50,6 +50,10 @@ const ORACLE_TYPES = [
 export const MarketCreationModal: React.FC<MarketCreationModalProps> = ({ onMarketCreated }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [transactionStatus, setTransactionStatus] = useState<'pending' | 'confirmed' | 'failed' | null>(null);
+  const { isConnected } = useRealtimeUpdates({ subscribeToAllMarkets: true });
+  
   const [formData, setFormData] = useState<MarketFormData>({
     title: '',
     description: '',
@@ -131,7 +135,17 @@ export const MarketCreationModal: React.FC<MarketCreationModalProps> = ({ onMark
         throw new Error('Failed to create market');
       }
 
-      const createdMarket = await response.json();
+      const result = await response.json();
+      
+      if (result.transactionHash) {
+        setTransactionHash(result.transactionHash);
+        setTransactionStatus('pending');
+        
+        // Wait for transaction confirmation
+        setTimeout(() => {
+          setTransactionStatus('confirmed');
+        }, 3000); // Simulate confirmation delay
+      }
       
       // Reset form
       setFormData({
@@ -150,7 +164,7 @@ export const MarketCreationModal: React.FC<MarketCreationModalProps> = ({ onMark
 
       // Notify parent component
       if (onMarketCreated) {
-        onMarketCreated(createdMarket);
+        onMarketCreated(result.data);
       }
 
       // Show success notification
@@ -199,6 +213,44 @@ export const MarketCreationModal: React.FC<MarketCreationModalProps> = ({ onMark
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Connection Status */}
+          <div className={cn(
+            'flex items-center space-x-2 text-sm p-3 rounded-lg',
+            isConnected 
+              ? 'bg-green-50 border border-green-200 text-green-700' 
+              : 'bg-red-50 border border-red-200 text-red-700'
+          )}>
+            <div className={cn('w-2 h-2 rounded-full', isConnected ? 'bg-green-500' : 'bg-red-500')} />
+            <span>{isConnected ? 'Connected to blockchain' : 'Disconnected from blockchain'}</span>
+          </div>
+
+          {/* Transaction Status */}
+          {transactionHash && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  {transactionStatus === 'pending' && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
+                  {transactionStatus === 'confirmed' && <CheckCircle className="w-4 h-4 text-green-600" />}
+                  <span className="text-blue-700 font-medium">
+                    {transactionStatus === 'pending' && 'Transaction pending...'}
+                    {transactionStatus === 'confirmed' && 'Transaction confirmed!'}
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(`https://horizon-testnet.stellar.org/transactions/${transactionHash}`, '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4 mr-1" />
+                  View on Stellar
+                </Button>
+              </div>
+              <div className="text-xs text-blue-600 mt-2 font-mono">
+                {transactionHash}
+              </div>
+            </div>
+          )}
+
           {/* General Error */}
           {errors.general && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">

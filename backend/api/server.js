@@ -17,6 +17,8 @@ const userRoutes = require('../routes/users');
 const blockchainRoutes = require('../routes/blockchain');
 const healthRoutes = require('../routes/health');
 const pitchdeckRoutes = require('../routes/pitchdeck');
+const customFeedsRoutes = require('../routes/custom-feeds');
+const teamsRoutes = require('../routes/teams');
 
 const app = express();
 const server = createServer(app);
@@ -78,6 +80,8 @@ app.use('/api/markets', marketRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/blockchain', blockchainRoutes);
 app.use('/api/pitchdeck', pitchdeckRoutes);
+app.use('/api/oracle/custom-feeds', customFeedsRoutes);
+app.use('/api/teams', teamsRoutes);
 
 // WebSocket endpoint
 app.get('/ws', (req, res) => {

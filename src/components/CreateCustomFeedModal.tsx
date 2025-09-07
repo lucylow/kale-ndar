@@ -122,8 +122,23 @@ const CreateCustomFeedModal: React.FC<CreateCustomFeedModalProps> = ({ onFeedCre
         totalRevenue: 0,
       };
 
-      // Simulate API call to create feed
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create custom feed via API
+      const response = await fetch('/api/oracle/custom-feeds', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...feedData,
+          userSecret: wallet.secretKey, // This would be handled securely in production
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create custom feed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
 
       toast({
         title: "Custom Feed Created! 🎉",

@@ -11,9 +11,12 @@ import {
   Clock, 
   Target,
   Calendar,
-  BarChart3
+  BarChart3,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { BettingModal } from './BettingModal';
+import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
 import { cn } from '@/lib/utils';
 
 interface Market {
@@ -74,6 +77,7 @@ export const EnhancedMarketCard: React.FC<EnhancedMarketCardProps> = ({
   showDetails = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(showDetails);
+  const { isConnected, lastUpdate } = useRealtimeUpdates({ marketId: market.id });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -131,6 +135,15 @@ export const EnhancedMarketCard: React.FC<EnhancedMarketCardProps> = ({
               <Badge className={getStatusColor(market.status)}>
                 {getStatusIcon(market.status)} {market.status}
               </Badge>
+              <div className={cn(
+                'flex items-center space-x-1 text-xs px-2 py-1 rounded-full',
+                isConnected 
+                  ? 'bg-green-100 text-green-700' 
+                  : 'bg-red-100 text-red-700'
+              )}>
+                {isConnected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+                <span>{isConnected ? 'Live' : 'Offline'}</span>
+              </div>
             </div>
             <CardTitle className="text-lg leading-tight">{market.title}</CardTitle>
           </div>

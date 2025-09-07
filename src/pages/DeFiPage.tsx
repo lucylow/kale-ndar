@@ -1,73 +1,136 @@
-import React, { useState } from 'react';
-import { Shield, TrendingUp, Coins, ArrowUpRight, Zap, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, Coins, ArrowUpRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useWallet } from '@/contexts/WalletContext';
+import defiService, { Protocol, YieldStrategy, PortfolioPosition, DeFiStats } from '@/services/defiService';
+import ProtocolCard from '@/components/defi/ProtocolCard';
+import StrategyCard from '@/components/defi/StrategyCard';
+import PortfolioCard from '@/components/defi/PortfolioCard';
+import DeFiStats from '@/components/defi/DeFiStats';
 
 const DeFiPage = () => {
+  const { toast } = useToast();
+  const { wallet } = useWallet();
+  
+  // State management
+  const [protocols, setProtocols] = useState<Protocol[]>([]);
+  const [yieldStrategies, setYieldStrategies] = useState<YieldStrategy[]>([]);
+  const [portfolio, setPortfolio] = useState<PortfolioPosition[]>([]);
+  const [defiStats, setDefiStats] = useState<DeFiStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedProtocol, setSelectedProtocol] = useState('');
 
-  const defiStats = {
-    totalValueLocked: 2400000,
-    activeProtocols: 8,
-    totalYield: 12.5,
-    users: 1200
+  // Load data on component mount
+  useEffect(() => {
+    loadDeFiData();
+  }, []);
+
+  const loadDeFiData = async () => {
+    try {
+      setIsLoading(true);
+      const [protocolsData, strategiesData, portfolioData, statsData] = await Promise.all([
+        defiService.getProtocols(),
+        defiService.getYieldStrategies(),
+        defiService.getPortfolio(wallet?.publicKey),
+        defiService.getStats()
+      ]);
+
+      setProtocols(protocolsData);
+      setYieldStrategies(strategiesData);
+      setPortfolio(portfolioData);
+      setDefiStats(statsData);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load DeFi data",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const protocols = [
-    {
-      name: 'StellarSwap',
-      type: 'DEX',
-      tvl: 1200000,
-      apy: 8.5,
-      description: 'Decentralized exchange for Stellar assets',
-      features: ['Swap', 'Liquidity', 'Farming'],
-      status: 'active'
-    },
-    {
-      name: 'LendFi',
-      type: 'Lending',
-      tvl: 800000,
-      apy: 12.3,
-      description: 'Lending and borrowing protocol',
-      features: ['Lend', 'Borrow', 'Collateral'],
-      status: 'active'
-    },
-    {
-      name: 'YieldFarm',
-      type: 'Yield',
-      tvl: 400000,
-      apy: 15.7,
-      description: 'Automated yield farming strategies',
-      features: ['Auto-compound', 'Multi-asset', 'Risk-adjusted'],
-      status: 'active'
+  // Protocol exploration handler
+  const handleExploreProtocol = async (protocolId: string) => {
+    try {
+      const result = await defiService.exploreProtocol(protocolId, wallet?.publicKey);
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+        if (result.connectionUrl) {
+          window.open(result.connectionUrl, '_blank');
+        }
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      throw error;
     }
-  ];
+  };
 
-  const yieldStrategies = [
-    {
-      name: 'Conservative',
-      apy: 8.2,
-      risk: 'Low',
-      assets: ['XLM', 'USDC'],
-      description: 'Low-risk strategy with stable returns'
-    },
-    {
-      name: 'Balanced',
-      apy: 12.5,
-      risk: 'Medium',
-      assets: ['XLM', 'BTC', 'USDC'],
-      description: 'Balanced risk-reward strategy'
-    },
-    {
-      name: 'Aggressive',
-      apy: 18.9,
-      risk: 'High',
-      assets: ['XLM', 'BTC', 'ETH', 'Altcoins'],
-      description: 'High-risk, high-reward strategy'
+  // Strategy start handler
+  const handleStartStrategy = async (strategyId: string, amount: number) => {
+    try {
+      const result = await defiService.startStrategy(strategyId, amount, wallet?.publicKey || '');
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+        // Refresh portfolio data
+        const updatedPortfolio = await defiService.getPortfolio(wallet?.publicKey);
+        setPortfolio(updatedPortfolio);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      throw error;
     }
-  ];
+  };
+
+  // Portfolio withdrawal handler
+  const handleWithdrawPosition = async (positionId: string) => {
+    try {
+      const result = await defiService.withdrawPosition(positionId);
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+        // Refresh portfolio data
+        const updatedPortfolio = await defiService.getPortfolio(wallet?.publicKey);
+        setPortfolio(updatedPortfolio);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // View protocol analytics
+  const handleViewAnalytics = async (protocolId: string) => {
+    try {
+      const analytics = await defiService.getProtocolAnalytics(protocolId);
+      toast({
+        title: "Analytics Loaded",
+        description: `Analytics data for ${protocols.find(p => p.id === protocolId)?.name} loaded successfully`,
+      });
+      // Here you could open a modal or navigate to analytics page
+      console.log('Analytics data:', analytics);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load analytics data",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -87,63 +150,7 @@ const DeFiPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Value Locked</p>
-                <p className="text-2xl font-bold text-gray-900">${(defiStats.totalValueLocked / 1000000).toFixed(1)}M</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Active Protocols</p>
-                <p className="text-2xl font-bold text-gray-900">{defiStats.activeProtocols}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Average Yield</p>
-                <p className="text-2xl font-bold text-gray-900">{defiStats.totalYield}%</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Zap className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Active Users</p>
-                <p className="text-2xl font-bold text-gray-900">{defiStats.users.toLocaleString()}</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {defiStats && <DeFiStats stats={defiStats} isLoading={isLoading} />}
 
       <Tabs defaultValue="protocols" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
@@ -153,86 +160,63 @@ const DeFiPage = () => {
         </TabsList>
 
         <TabsContent value="protocols" className="space-y-6">
+          {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {protocols.map((protocol, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{protocol.name}</CardTitle>
-                    <Badge variant="default">{protocol.type}</Badge>
-                  </div>
-                  <CardDescription>{protocol.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">TVL</span>
-                      <span className="font-medium">${(protocol.tvl / 1000).toFixed(0)}K</span>
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index}>
+                  <CardContent className="p-6">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3 mb-4"></div>
+                      <div className="h-8 bg-gray-200 rounded w-full"></div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">APY</span>
-                      <span className="font-medium text-green-600">{protocol.apy}%</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {protocol.features.map((feature, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  <Button className="w-full" variant="outline">
-                    <ArrowUpRight className="w-4 h-4 mr-2" />
-                    Explore Protocol
-                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {protocols.map((protocol) => (
+                <ProtocolCard
+                  key={protocol.id}
+                  protocol={protocol}
+                  onExplore={handleExploreProtocol}
+                  onViewAnalytics={handleViewAnalytics}
+                />
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="strategies" className="space-y-6">
+          {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {yieldStrategies.map((strategy, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{strategy.name}</CardTitle>
-                    <Badge 
-                      variant={strategy.risk === 'Low' ? 'default' : strategy.risk === 'Medium' ? 'secondary' : 'destructive'}
-                    >
-                      {strategy.risk} Risk
-                    </Badge>
-                  </div>
-                  <CardDescription>{strategy.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-green-600">{strategy.apy}%</p>
-                    <p className="text-sm text-muted-foreground">Expected APY</p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm font-medium text-foreground mb-2">Supported Assets</p>
-                    <div className="flex flex-wrap gap-2">
-                      {strategy.assets.map((asset, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {asset}
-                        </Badge>
-                      ))}
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index}>
+                  <CardContent className="p-6">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                      <div className="h-8 bg-gray-200 rounded w-full mb-4"></div>
+                      <div className="h-8 bg-gray-200 rounded w-full"></div>
                     </div>
-                  </div>
-                  
-                  <Button className="w-full">
-                    <Zap className="w-4 h-4 mr-2" />
-                    Start Strategy
-                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {yieldStrategies.map((strategy) => (
+                <StrategyCard
+                  key={strategy.id}
+                  strategy={strategy}
+                  onStartStrategy={handleStartStrategy}
+                  userBalance={1000} // Mock balance - in real app, get from wallet
+                />
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="portfolio" className="space-y-6">
@@ -244,19 +228,39 @@ const DeFiPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {isLoading ? (
               <div className="space-y-4">
+                  {Array.from({ length: 2 }).map((_, index) => (
+                    <div key={index} className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
+                      <div className="h-8 bg-gray-200 rounded w-full"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : portfolio.length === 0 ? (
                 <div className="text-center py-8">
                   <Coins className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Positions</h3>
                   <p className="text-gray-600 mb-4">
                     Start by exploring protocols or yield strategies above
                   </p>
-                  <Button>
+                  <Button onClick={() => window.location.href = '#protocols'}>
                     <ArrowUpRight className="w-4 h-4 mr-2" />
                     Explore Protocols
                   </Button>
                 </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {portfolio.map((position) => (
+                    <PortfolioCard
+                      key={position.id}
+                      position={position}
+                      onWithdraw={handleWithdrawPosition}
+                    />
+                  ))}
               </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

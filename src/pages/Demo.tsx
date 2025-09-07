@@ -28,6 +28,7 @@ import { mockUserProfiles } from '@/data/mockUserProfiles';
 import { useToast } from '@/hooks/use-toast';
 import TeamBettingDemo from '@/components/demo/TeamBettingDemo';
 import NFTReceiptsDemo from '@/components/demo/NFTReceiptsDemo';
+import DemoDataManager from '@/components/demo/DemoDataManager';
 
 const Demo = () => {
   const { toast } = useToast();
@@ -290,6 +291,15 @@ const Demo = () => {
               <Trophy className="h-4 w-4" />
               Leaderboard
             </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => setActiveDemo('data-manager')}
+              className="flex items-center gap-2"
+            >
+              <Database className="h-4 w-4" />
+              Data Manager
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -348,6 +358,11 @@ const Demo = () => {
       
       {selectedFeature === 'nft-receipts' && (
         <NFTReceiptsDemo />
+      )}
+
+      {/* Data Manager */}
+      {activeDemo === 'data-manager' && (
+        <DemoDataManager />
       )}
 
       {/* Live Markets Demo */}

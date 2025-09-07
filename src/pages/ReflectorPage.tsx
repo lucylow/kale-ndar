@@ -66,11 +66,12 @@ const ReflectorPage = () => {
         const change = (Math.random() - 0.5) * 0.1; // Random change between -5% and +5%
         const newPrice = feed.price * (1 + change);
         const changePercent = ((newPrice - feed.price) / feed.price * 100).toFixed(2);
+        const changeValue = parseFloat(changePercent);
         
         return {
           ...feed,
           price: newPrice,
-          change: `${changePercent > 0 ? '+' : ''}${changePercent}%`,
+          change: `${changeValue > 0 ? '+' : ''}${changePercent}%`,
           volume: (parseFloat(feed.volume.replace('M', '')) * (1 + Math.random() * 0.1)).toFixed(1) + 'M'
         };
       }));
@@ -252,11 +253,12 @@ const ReflectorPage = () => {
                           const change = (Math.random() - 0.5) * 0.1;
                           const newPrice = feed.price * (1 + change);
                           const changePercent = ((newPrice - feed.price) / feed.price * 100).toFixed(2);
+                          const changeValue = parseFloat(changePercent);
                           
                           return {
                             ...feed,
                             price: newPrice,
-                            change: `${changePercent > 0 ? '+' : ''}${changePercent}%`,
+                            change: `${changeValue > 0 ? '+' : ''}${changePercent}%`,
                             volume: (parseFloat(feed.volume.replace('M', '')) * (1 + Math.random() * 0.1)).toFixed(1) + 'M'
                           };
                         }));
