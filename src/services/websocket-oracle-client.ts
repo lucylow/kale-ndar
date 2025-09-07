@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from '@/lib/event-emitter';
 
 export interface WebSocketMessage {
   type: 'priceUpdate' | 'metricsUpdate' | 'nodeStatus' | 'error' | 'ping' | 'pong' | 'subscribe' | 'unsubscribe' | 'getLatestPrices' | 'getMetrics' | 'getNodeStatus';
