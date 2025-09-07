@@ -24,6 +24,7 @@ import { useWallet } from '@/contexts/WalletContext';
 const Dashboard = () => {
   const { wallet, user } = useWallet();
   const [portfolioData, setPortfolioData] = useState([]);
+  const [timeRange, setTimeRange] = useState('30D');
   const [kaleStats, setKaleStats] = useState({
     balance: 1234.56,
     staked: 890.12,
@@ -38,18 +39,50 @@ const Dashboard = () => {
     activePriceFeeds: 8
   });
 
-  // Mock data for the chart
+  // Mock data for the chart - updates based on time range
   useEffect(() => {
-    const mockData = [
-      { name: 'Jan', value: 4000, kale: 2400, xrf: 1600 },
-      { name: 'Feb', value: 3000, kale: 1398, xrf: 1602 },
-      { name: 'Mar', value: 5000, kale: 3800, xrf: 1200 },
-      { name: 'Apr', value: 4500, kale: 3908, xrf: 592 },
-      { name: 'May', value: 6000, kale: 4800, xrf: 1200 },
-      { name: 'Jun', value: 7000, kale: 5800, xrf: 1200 }
-    ];
-    setPortfolioData(mockData);
-  }, []);
+    const generateMockData = (range: string) => {
+      switch (range) {
+        case '7D':
+          return [
+            { name: 'Mon', value: 6500, kale: 4800, xrf: 1700 },
+            { name: 'Tue', value: 6200, kale: 4600, xrf: 1600 },
+            { name: 'Wed', value: 6800, kale: 5000, xrf: 1800 },
+            { name: 'Thu', value: 7200, kale: 5400, xrf: 1800 },
+            { name: 'Fri', value: 7000, kale: 5200, xrf: 1800 },
+            { name: 'Sat', value: 7400, kale: 5600, xrf: 1800 },
+            { name: 'Sun', value: 7600, kale: 5800, xrf: 1800 }
+          ];
+        case '90D':
+          return [
+            { name: 'Dec', value: 2000, kale: 1200, xrf: 800 },
+            { name: 'Jan', value: 4000, kale: 2400, xrf: 1600 },
+            { name: 'Feb', value: 3000, kale: 1398, xrf: 1602 },
+            { name: 'Mar', value: 5000, kale: 3800, xrf: 1200 },
+            { name: 'Apr', value: 4500, kale: 3908, xrf: 592 },
+            { name: 'May', value: 6000, kale: 4800, xrf: 1200 },
+            { name: 'Jun', value: 7000, kale: 5800, xrf: 1200 },
+            { name: 'Jul', value: 7500, kale: 6000, xrf: 1500 },
+            { name: 'Aug', value: 8000, kale: 6200, xrf: 1800 }
+          ];
+        default: // 30D
+          return [
+            { name: 'Jan', value: 4000, kale: 2400, xrf: 1600 },
+            { name: 'Feb', value: 3000, kale: 1398, xrf: 1602 },
+            { name: 'Mar', value: 5000, kale: 3800, xrf: 1200 },
+            { name: 'Apr', value: 4500, kale: 3908, xrf: 592 },
+            { name: 'May', value: 6000, kale: 4800, xrf: 1200 },
+            { name: 'Jun', value: 7000, kale: 5800, xrf: 1200 }
+          ];
+      }
+    };
+    
+    setPortfolioData(generateMockData(timeRange));
+  }, [timeRange]);
+
+  const handleTimeRangeChange = (range: string) => {
+    setTimeRange(range);
+  };
 
   const quickActions = [
     { title: 'Start Farming', description: 'Begin KALE farming', link: '/kale', icon: Sprout },
@@ -155,9 +188,17 @@ const Dashboard = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-foreground">Portfolio Performance</CardTitle>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" className="border-white/20 hover:bg-accent/20">7D</Button>
-              <Button variant="hero" size="sm">30D</Button>
-              <Button variant="outline" size="sm" className="border-white/20 hover:bg-accent/20">90D</Button>
+              {['7D', '30D', '90D'].map((range) => (
+                <Button 
+                  key={range}
+                  variant={timeRange === range ? "hero" : "outline"} 
+                  size="sm" 
+                  className={timeRange !== range ? "border-white/20 hover:bg-accent/20" : ""}
+                  onClick={() => handleTimeRangeChange(range)}
+                >
+                  {range}
+                </Button>
+              ))}
             </div>
           </div>
         </CardHeader>
