@@ -13,12 +13,29 @@ export class FreighterAdapter implements WalletAdapter {
   icon = '🦋';
 
   isAvailable(): boolean {
-    const available = !!(window.freighterApi || window.freighter);
-    console.log('Freighter detection:', {
-      freighterApi: !!window.freighterApi,
-      freighter: !!window.freighter,
-      available
+    // Add more comprehensive detection for Freighter
+    console.log('🔍 Checking Freighter availability...');
+    
+    // Check multiple possible API locations
+    const hasFreighterApi = !!(window as any).freighterApi;
+    const hasFreighter = !!(window as any).freighter;
+    const hasIsAllowed = typeof (window as any).freighterApi?.isAllowed === 'function';
+    
+    // Check if Freighter extension script is present
+    const hasFreighterScript = document.querySelector('script[src*="freighter"]') !== null;
+    
+    const available = hasFreighterApi || hasFreighter;
+    
+    console.log('🦋 Freighter detection results:', {
+      freighterApi: hasFreighterApi,
+      freighter: hasFreighter,
+      isAllowed: hasIsAllowed,
+      script: hasFreighterScript,
+      available,
+      userAgent: navigator.userAgent.includes('Chrome') || navigator.userAgent.includes('Firefox'),
+      windowKeys: Object.keys(window).filter(key => key.toLowerCase().includes('freighter'))
     });
+    
     return available;
   }
 

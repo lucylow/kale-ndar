@@ -40,20 +40,35 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     const initializeWallets = async () => {
       setIsLoading(true);
-      console.log('Initializing wallet manager...');
+      console.log('🔍 Initializing wallet manager...');
       
       try {
         // Force real wallets if configured
         const useRealWallets = config.wallet.forceRealWallets !== false;
         
         if (useRealWallets) {
+          // Add delay to ensure browser extensions are loaded
+          console.log('⏳ Waiting for browser extensions to load...');
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+          
+          // Debug: Check what's available on window
+          console.log('🪟 Window objects check:', {
+            freighterApi: !!(window as any).freighterApi,
+            freighter: !!(window as any).freighter,
+            isAllowed: typeof (window as any).freighterApi?.isAllowed,
+            getAllExtensions: Object.keys(window).filter(key => key.toLowerCase().includes('freighter') || key.toLowerCase().includes('stellar'))
+          });
+          
           // Check for available real wallets
           const realWallets = walletManager.getAvailableWallets();
-          console.log(`Found ${realWallets.length} real Stellar wallets available`);
+          console.log(`📍 Found ${realWallets.length} real Stellar wallets available:`, realWallets.map(w => w.name));
           
           if (realWallets.length === 0) {
-            console.log('No real wallets detected, will require wallet installation');
-            setAvailableWallets(walletManager.getAllWallets()); // Show all wallets for installation guide
+            console.log('❌ No real wallets detected, will show installation guide');
+            // Also check for all wallets to show installation options
+            const allWallets = walletManager.getAllWallets();
+            console.log('📋 All possible wallets:', allWallets.map(w => ({ name: w.name, available: w.isAvailable })));
+            setAvailableWallets(allWallets);
           } else {
             setAvailableWallets(realWallets);
             
@@ -72,6 +87,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                   signTransaction: connection.signTransaction
                 });
                 
+                console.log('✅ Auto-connected to wallet:', walletType);
+                
                 // Load user data
                 await loadUserData(connection.publicKey);
               }
@@ -79,7 +96,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }
         } else {
           // Fallback to mock wallets for development
-          console.log('Using mock wallet manager for development');
+          console.log('🎭 Using mock wallet manager for development');
           const wallets = mockWalletManager.getAllWallets();
           setAvailableWallets(wallets);
           
@@ -104,16 +121,17 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }
         }
       } catch (error) {
-        console.error('Error initializing wallets:', error);
+        console.error('💥 Error initializing wallets:', error);
       } finally {
         setIsLoading(false);
-        console.log('Wallet initialization completed');
+        console.log('✨ Wallet initialization completed');
       }
     };
 
     // Wait for the page to load before initializing
     if (typeof window !== 'undefined') {
-      setTimeout(initializeWallets, 100);
+      // Use a longer delay to ensure all extensions are loaded
+      setTimeout(initializeWallets, 500);
     }
   }, []);
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useWallet } from '@/contexts/WalletContext';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, LogOut, User, TrendingUp, DollarSign, ChevronDown, CheckCircle, AlertCircle, Shield, Zap, Download } from 'lucide-react';
+import { Wallet, LogOut, User, TrendingUp, DollarSign, ChevronDown, CheckCircle, AlertCircle, Shield, Zap, Download, Bug } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { WalletType } from '@/lib/wallet-adapters/types';
 import { useNavigate } from 'react-router-dom';
 import WalletInstallGuide from './WalletInstallGuide';
 import WalletSetupGuide from './WalletSetupGuide';
+import FreighterDebugger from './FreighterDebugger';
 import SimpleWalletConnector from './SimpleWalletConnector';
 import PasskeyWalletConnector from './PasskeyWalletConnector';
 
@@ -268,25 +269,47 @@ const WalletConnector: React.FC = () => {
     );
   }
 
-  // If no wallets are available, show install guide
+  // If no wallets are available, show install guide with debug option
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button 
-          className="gap-2 hover:scale-105 transition-transform"
-          variant="hero"
-        >
-          <Download className="h-4 w-4" />
-          Install Wallet
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-white/10">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-display">Connect to Real Stellar Network</DialogTitle>
-        </DialogHeader>
-        <WalletSetupGuide />
-      </DialogContent>
-    </Dialog>
+    <div className="flex items-center gap-2">
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button 
+            className="gap-2 hover:scale-105 transition-transform"
+            variant="hero"
+          >
+            <Download className="h-4 w-4" />
+            Install Wallet
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display">Connect to Real Stellar Network</DialogTitle>
+          </DialogHeader>
+          <WalletSetupGuide />
+        </DialogContent>
+      </Dialog>
+      
+      {/* Debug button for troubleshooting */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="gap-2"
+          >
+            <Bug className="h-4 w-4" />
+            Debug
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Freighter Debug Tool</DialogTitle>
+          </DialogHeader>
+          <FreighterDebugger />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 
