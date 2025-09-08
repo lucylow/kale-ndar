@@ -47,9 +47,9 @@ const WalletConnector: React.FC = () => {
         duration: 2000,
       });
       
-      // Navigate to external dashboard
+      // Navigate to internal dashboard
       setTimeout(() => {
-        window.location.href = 'https://kale-ndar.lovable.app/dashboard';
+        navigate('/dashboard');
       }, 1000);
       
     } catch (error) {
