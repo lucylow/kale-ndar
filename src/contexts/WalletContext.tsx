@@ -131,20 +131,11 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setIsLoading(true);
       
-      // Always use mock wallet for guaranteed connection
-      console.log('Using mock wallet for guaranteed connection');
+      // ALWAYS use mock wallet regardless of what walletType is passed
+      console.log('Force using mock wallet for guaranteed connection, ignoring requested type:', walletType);
       
-      if (!walletType) {
-        const availableWallets = mockWalletManager.getAvailableWallets();
-        if (availableWallets.length === 0) {
-          // Create a default mock wallet if none available
-          walletType = 'mock' as WalletType;
-        } else {
-          walletType = availableWallets[0].adapter.name.toLowerCase() as WalletType;
-        }
-      }
-      
-      const connection = await mockWalletManager.connectWallet(walletType);
+      // Force mock wallet connection regardless of parameter
+      const connection = await mockWalletManager.connectWallet('mock');
       
       if (!connection) {
         // Fallback: create a simple mock connection
