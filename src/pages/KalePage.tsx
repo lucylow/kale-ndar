@@ -617,88 +617,27 @@ const KalePage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* KALE-Reflector Ecosystem Diagram */}
-            <div className="md:col-span-2 lg:col-span-3 mb-6">
-              <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="text-center mb-4">
-                    <h3 className="text-xl font-display font-bold text-foreground mb-2">
-                      KALE-Reflector Ecosystem
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      Comprehensive integration between prediction markets and oracle infrastructure
-                    </p>
-                  </div>
-                  <div className="flex justify-center">
-                    <img 
-                      src="/lovable-uploads/7dad9ff9-244a-4702-9864-d8034c250efa.png" 
-                      alt="KALE-Reflector Ecosystem Diagram" 
-                      className="max-w-full h-auto rounded-lg"
-                      style={{ maxHeight: '400px' }}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {mockPredictionMarkets.map((market) => (
-              <Card key={market.id} className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift group">
-                <CardHeader>
-                  <div className="flex items-start justify-between mb-2">
-                    <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
-                      {market.category}
-                    </Badge>
-                    <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span>{formatTimeUntilEnd(market.endDate)}</span>
-                    </div>
-                  </div>
-                  <CardTitle className="text-lg leading-tight text-foreground group-hover:text-primary transition-colors">{market.title}</CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">{market.description}</CardDescription>
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-2">
-                    <Users className="w-4 h-4" />
-                    <span>by {formatAddress(market.creator)}</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      {market.options.map((option) => (
-                        <div key={option.id} className="text-center p-3 bg-secondary/20 rounded-lg border border-white/10 hover:bg-secondary/30 transition-colors cursor-pointer">
-                          <div className="text-lg font-bold text-foreground">{option.label}</div>
-                          <div className="text-sm text-muted-foreground">Odds: {option.odds}x</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {option.totalBets} bets • {option.totalAmount.toLocaleString()} KALE
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                      <div className="text-sm text-muted-foreground">
-                        Total Pool: <span className="font-semibold text-foreground">{market.totalPool.toLocaleString()} KALE</span>
-                      </div>
-                      <Button 
-                        variant="hero" 
-                        size="sm" 
-                        className="group"
-                        onClick={() => handlePlaceBet(market)}
-                      >
-                        Place Bet
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="flex justify-center mt-8">
-            <Button variant="outline" className="border-white/20 hover:bg-accent/20">
-              View All Markets
-              <ArrowUpRight className="w-4 h-4 ml-2" />
-            </Button>
+          <div className="flex justify-center">
+            <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 max-w-4xl w-full">
+              <CardContent className="p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-display font-bold text-foreground mb-2">
+                    KALE-Reflector Ecosystem
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Comprehensive integration between prediction markets and oracle infrastructure
+                  </p>
+                </div>
+                <div className="flex justify-center">
+                  <img 
+                    src="/lovable-uploads/d4ff5cb1-baad-4c86-8870-05b4a22b7756.png" 
+                    alt="KALE-Reflector Ecosystem Diagram" 
+                    className="max-w-full h-auto rounded-lg"
+                    style={{ maxHeight: '500px' }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
