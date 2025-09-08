@@ -7,7 +7,7 @@ import { getMockUserByAddress as getMockUserByAddressNew, getMockUserStatsByAddr
 import { walletManager, WalletManager } from '@/lib/wallet-adapters/wallet-manager';
 import { mockWalletManager } from '@/lib/wallet-adapters/mock-wallet-manager';
 import { WalletType } from '@/lib/wallet-adapters/types';
-import { useNavigate } from 'react-router-dom';
+
 
 interface WalletContextType {
   wallet: Wallet;
@@ -36,7 +36,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isLoading, setIsLoading] = useState(false);
   const [availableWallets, setAvailableWallets] = useState<any[]>([]);
   const [currentWalletType, setCurrentWalletType] = useState<WalletType | null>(null);
-  const navigate = useNavigate();
 
   // Initialize available wallets but don't auto-connect
   useEffect(() => {
@@ -154,9 +153,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Load user data after connecting
       await loadUserData(mockConnection.publicKey);
       
-      // Force navigation to external dashboard after successful connection
-      console.log('Navigating to external dashboard...');
-      window.location.href = 'https://kale-ndar.lovable.app/dashboard';
+      console.log('Mock wallet connected successfully');
     } catch (error) {
       console.error('Error connecting wallet:', error);
       
