@@ -618,6 +618,30 @@ const KalePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* KALE-Reflector Ecosystem Diagram */}
+            <div className="md:col-span-2 lg:col-span-3 mb-6">
+              <Card className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-xl font-display font-bold text-foreground mb-2">
+                      KALE-Reflector Ecosystem
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      Comprehensive integration between prediction markets and oracle infrastructure
+                    </p>
+                  </div>
+                  <div className="flex justify-center">
+                    <img 
+                      src="/lovable-uploads/7dad9ff9-244a-4702-9864-d8034c250efa.png" 
+                      alt="KALE-Reflector Ecosystem Diagram" 
+                      className="max-w-full h-auto rounded-lg"
+                      style={{ maxHeight: '400px' }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             {mockPredictionMarkets.map((market) => (
               <Card key={market.id} className="bg-gradient-card border-white/10 shadow-card hover:shadow-card-hover transition-all duration-300 hover-lift group">
                 <CardHeader>
