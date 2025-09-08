@@ -34,16 +34,24 @@ const WalletConnector: React.FC = () => {
       // Show connecting toast
       toast({
         title: "Connecting...",
-        description: "Please approve the connection in your wallet",
+        description: "Setting up your mock wallet",
         duration: 3000,
       });
       
-      await connectWallet(walletType);
-      const walletName = walletType ? availableWallets.find(w => w.adapter.name.toLowerCase() === walletType)?.name || 'wallet' : 'wallet';
+      // Force mock wallet connection by temporarily overriding the config
+      const originalForceRealWallets = (window as any).__KALE_FORCE_REAL_WALLETS;
+      (window as any).__KALE_FORCE_REAL_WALLETS = false;
+      
+      try {
+        await connectWallet();
+      } finally {
+        // Restore original setting
+        (window as any).__KALE_FORCE_REAL_WALLETS = originalForceRealWallets;
+      }
       
       toast({
-        title: "Wallet Connected! 🎉",
-        description: `Your ${walletName} has been connected successfully. Redirecting to dashboard...`,
+        title: "Mock Wallet Connected! 🎉",
+        description: "Your demo wallet has been connected successfully. Redirecting to dashboard...",
         duration: 2000,
       });
       
@@ -53,12 +61,28 @@ const WalletConnector: React.FC = () => {
       }, 1000);
       
     } catch (error) {
-      toast({
-        title: "Connection Failed",
-        description: error instanceof Error ? error.message : 'Failed to connect wallet. Please try again.',
-        variant: "destructive",
-        duration: 5000,
-      });
+      // If mock wallet fails, try regular connection flow
+      try {
+        await connectWallet(walletType);
+        const walletName = walletType ? availableWallets.find(w => w.adapter.name.toLowerCase() === walletType)?.name || 'wallet' : 'wallet';
+        
+        toast({
+          title: "Wallet Connected! 🎉",
+          description: `Your ${walletName} has been connected successfully. Redirecting to dashboard...`,
+          duration: 2000,
+        });
+        
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      } catch (secondError) {
+        toast({
+          title: "Connection Failed",
+          description: secondError instanceof Error ? secondError.message : 'Failed to connect wallet. Please try again.',
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
     } finally {
       setIsConnecting(false);
     }
@@ -194,108 +218,25 @@ const WalletConnector: React.FC = () => {
     );
   }
 
-  // If only one wallet is available or multiple wallets, show dropdown
+  // Auto-connect to mock wallet when button is clicked
   if (availableWallets.length >= 1) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            disabled={isConnecting || isLoading}
-            className="gap-2 hover:scale-105 transition-transform bg-gradient-to-r from-primary to-accent-teal text-white border-0 shadow-lg hover:shadow-primary/25"
-            size="default"
-          >
-            <Wallet className="h-4 w-4" />
-            {isConnecting ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-background border-t-transparent" />
-                Connecting...
-              </>
-            ) : (
-              'Connect Wallet'
-            )}
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="end" 
-          className="w-72 bg-background/95 backdrop-blur-xl border-white/10 shadow-2xl z-50"
-        >
-          <div className="p-3">
-            <div className="text-xs text-muted-foreground mb-3 px-2 font-medium">
-              Choose your wallet
-            </div>
-            <div className="space-y-1">
-              {availableWallets.map((wallet) => (
-                <DropdownMenuItem
-                  key={wallet.name}
-                  onClick={() => handleConnect(wallet.adapter.name.toLowerCase() as WalletType)}
-                  className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-primary/10 hover:border hover:border-primary/20 transition-all duration-200 group"
-                >
-                  <div className="text-2xl group-hover:scale-110 transition-transform">
-                    {wallet.icon}
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm group-hover:text-primary transition-colors">
-                        {wallet.name}
-                      </span>
-                      {wallet.name === 'Passkey' && (
-                        <Badge variant="secondary" className="bg-accent-gold/20 text-accent-gold border-accent-gold/30 text-xs">
-                          <Zap className="h-3 w-3 mr-1" />
-                          +15%
-                        </Badge>
-                      )}
-                      {wallet.name === 'Freighter' && (
-                        <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 text-xs">
-                          Recommended
-                        </Badge>
-                      )}
-                    </div>
-                    <span className="text-xs text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">
-                      {wallet.description}
-                    </span>
-                  </div>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ChevronDown className="h-4 w-4 text-primary rotate-270" />
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </div>
-            
-            {/* Passkey Option */}
-            <div className="border-t border-white/10 mt-3 pt-3">
-              <div className="text-xs text-muted-foreground mb-2 px-2 font-medium">
-                Web3 Authentication
-              </div>
-              <DropdownMenuItem
-                onClick={() => navigate('/passkey-demo')}
-                className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-blue-500/10 hover:border hover:border-blue-500/20 transition-all duration-200 group"
-              >
-                <div className="text-2xl group-hover:scale-110 transition-transform">
-                  🔐
-                </div>
-                <div className="flex flex-col flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm group-hover:text-blue-500 transition-colors">
-                      Passkey Wallet
-                    </span>
-                    <Badge variant="secondary" className="bg-blue-500/20 text-blue-500 border-blue-500/30 text-xs">
-                      <Shield className="h-3 w-3 mr-1" />
-                      Secure
-                    </Badge>
-                  </div>
-                  <span className="text-xs text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">
-                    Biometric authentication for enhanced security
-                  </span>
-                </div>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ChevronDown className="h-4 w-4 text-blue-500 rotate-270" />
-                </div>
-              </DropdownMenuItem>
-            </div>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button 
+        disabled={isConnecting || isLoading}
+        className="gap-2 hover:scale-105 transition-transform bg-gradient-to-r from-primary to-accent-teal text-white border-0 shadow-lg hover:shadow-primary/25"
+        size="default"
+        onClick={() => handleConnect()}
+      >
+        <Wallet className="h-4 w-4" />
+        {isConnecting ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-background border-t-transparent" />
+            Connecting...
+          </>
+        ) : (
+          'Connect Wallet'
+        )}
+      </Button>
     );
   }
 
