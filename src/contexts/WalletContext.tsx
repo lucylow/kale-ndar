@@ -25,6 +25,8 @@ interface WalletContextType {
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('🔄 WalletProvider rendering...');
+  
   const [wallet, setWallet] = useState<Wallet>({
     isConnected: false,
     publicKey: null,
@@ -37,110 +39,65 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [availableWallets, setAvailableWallets] = useState<any[]>([]);
   const [currentWalletType, setCurrentWalletType] = useState<WalletType | null>(null);
 
-  // Initialize available wallets but don't auto-connect
+  // Simplified initialization - no complex async logic
   useEffect(() => {
-    const initializeWallets = async () => {
-      setIsLoading(true);
-      console.log('🔍 Initializing wallet manager...');
-      
-      try {
-        // Set up mock wallets but don't auto-connect
-        console.log('🎭 Setting up mock wallet manager');
-        const wallets = mockWalletManager.getAllWallets();
-        setAvailableWallets(wallets);
-        
-        console.log('✨ Wallet manager ready for user connection');
-      } catch (error) {
-        console.error('💥 Error initializing wallets:', error);
-      } finally {
-        setIsLoading(false);
-        console.log('✨ Wallet initialization completed');
-      }
-    };
-
-    // Wait for the page to load before initializing
-    if (typeof window !== 'undefined') {
-      // Use a longer delay to ensure all extensions are loaded
-      setTimeout(initializeWallets, 500);
-    }
+    console.log('🔍 Initializing wallet manager...');
+    // Just set some mock wallets without complex initialization
+    setAvailableWallets([{ name: 'Mock Wallet', type: 'mock' }]);
+    console.log('✨ Wallet initialization completed');
   }, []);
 
   const loadUserData = async (address: string) => {
     try {
+      console.log('👤 Loading user data for:', address);
       setIsLoading(true);
       
-      // For real wallets, try to load from API first, fallback to mock data
-      try {
-        const userProfile = await apiService.getUserProfile(address);
-        setUser(userProfile);
-      } catch (error) {
-        console.log('API unavailable, using mock data for user profile');
-        // Fallback to mock data
-        const mockUser = getMockUserByAddressNew(address) || getMockUserByAddress(address);
-        if (mockUser) {
-          setUser(mockUser);
-        } else {
-          // Create a new user profile
-          setUser({
-            id: 0,
-            address,
-            username: null,
-            email: null,
-            created_at: new Date().toISOString(),
-            last_login: new Date().toISOString(),
-            total_bets: 0,
-            total_winnings: 0,
-          });
-        }
-      }
+      // Create simple mock user data
+      setUser({
+        id: 0,
+        address,
+        username: 'Demo User',
+        email: null,
+        created_at: new Date().toISOString(),
+        last_login: new Date().toISOString(),
+        total_bets: 5,
+        total_winnings: 1250,
+      });
+
+      setUserStats({
+        total_bets: 5,
+        total_bet_amount: 500,
+        claimed_bets: 3,
+        pending_claims: 2,
+        wins: 3,
+        losses: 2,
+        win_rate: 60,
+        total_winnings: 1250,
+        recent_activity: [],
+      });
       
-      // Try to load user stats from API
-      try {
-        const stats = await apiService.getUserStats(address);
-        setUserStats(stats);
-      } catch (error) {
-        console.log('API unavailable, using mock data for user stats');
-        // Fallback to mock data
-        const mockStats = getMockUserStatsByAddress(address) || getMockUserStats(address);
-        if (mockStats) {
-          setUserStats(mockStats);
-        } else {
-          // Create default stats
-          setUserStats({
-            total_bets: 0,
-            total_bet_amount: 0,
-            claimed_bets: 0,
-            pending_claims: 0,
-            wins: 0,
-            losses: 0,
-            win_rate: 0,
-            recent_activity: [],
-          });
-        }
-      }
-      
+      console.log('✅ User data loaded successfully');
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error('❌ Error loading user data:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const connectWallet = async (walletType?: WalletType) => {
-    console.log('connectWallet called with wallet type:', walletType);
+    console.log('🔌 connectWallet called with wallet type:', walletType);
     
     try {
       setIsLoading(true);
+      console.log('⏳ Setting loading to true');
       
-      // BYPASS ALL WALLET LOGIC - Direct mock connection
-      console.log('Creating direct mock connection, bypassing all wallet adapters');
-      
-      // Create direct mock connection
+      // Simple mock connection
       const mockConnection = {
         publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
         signTransaction: async (tx: any) => tx
       };
       
+      console.log('🔗 Setting wallet state...');
       setCurrentWalletType('mock' as WalletType);
       setWallet({
         isConnected: true,
@@ -148,30 +105,15 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         signTransaction: mockConnection.signTransaction
       });
       
-      console.log('Direct mock wallet connected:', mockConnection.publicKey);
+      console.log('✅ Mock wallet connected:', mockConnection.publicKey);
       
       // Load user data after connecting
+      console.log('👤 Loading user data...');
       await loadUserData(mockConnection.publicKey);
       
-      console.log('Mock wallet connected successfully');
+      console.log('🎉 Mock wallet connected successfully');
     } catch (error) {
-      console.error('Error connecting wallet:', error);
-      
-      // Provide more specific error messages
-      let errorMessage = 'Failed to connect wallet';
-      if (error instanceof Error) {
-        if (error.message.includes('timeout')) {
-          errorMessage = 'Connection timeout. Please try again.';
-        } else if (error.message.includes('not installed')) {
-          errorMessage = 'Wallet not installed. Please install the wallet extension.';
-        } else if (error.message.includes('not available')) {
-          errorMessage = 'Wallet not available. Please check if the wallet is unlocked.';
-        } else if (error.message.includes('permission')) {
-          errorMessage = 'Permission denied. Please approve the connection in your wallet.';
-        } else {
-          errorMessage = error.message;
-        }
-      }
+      console.error('❌ Error connecting wallet:', error);
       
       // Reset wallet state on error
       setWallet({
@@ -180,7 +122,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         signTransaction: async () => { throw new Error('Wallet not connected'); }
       });
       setCurrentWalletType(null);
-      throw new Error(errorMessage);
+      throw error;
     } finally {
       setIsLoading(false);
     }
