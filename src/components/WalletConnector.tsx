@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '@/contexts/WalletContext';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +21,19 @@ const WalletConnector: React.FC = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const navigate = useNavigate();
 
+  // Navigate to dashboard when wallet gets connected
+  useEffect(() => {
+    if (wallet.isConnected && isConnecting) {
+      toast({
+        title: "Wallet Connected! 🎉",
+        description: "Your demo wallet has been connected successfully.",
+        duration: 2000,
+      });
+      navigate('/dashboard');
+      setIsConnecting(false);
+    }
+  }, [wallet.isConnected, isConnecting, navigate, toast]);
+
   // Fallback to simple wallet connector if there are issues
   const hasError = availableWallets.length === 0 && !isLoading;
   if (hasError) {
@@ -31,28 +44,20 @@ const WalletConnector: React.FC = () => {
     try {
       setIsConnecting(true);
       
-      // Force mock wallet connection
+      // Force mock wallet usage
       (window as any).__KALE_FORCE_REAL_WALLETS = false;
       
+      // Connect to mock wallet
       await connectWallet();
       
-      toast({
-        title: "Wallet Connected! 🎉",
-        description: "Your demo wallet has been connected successfully.",
-        duration: 2000,
-      });
-      
-      // Navigate to dashboard immediately
-      navigate('/dashboard');
-      
     } catch (error) {
+      console.error('Connection failed:', error);
       toast({
         title: "Connection Failed",
         description: "Failed to connect wallet. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
-    } finally {
       setIsConnecting(false);
     }
   };
