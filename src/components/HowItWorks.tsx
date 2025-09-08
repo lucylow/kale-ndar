@@ -29,13 +29,22 @@ const HowItWorks = () => {
     <section id="how-it-works" className="py-24 bg-background">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 text-foreground">
             How It Works
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
             Start earning KALE tokens in just three simple steps
           </p>
+          
+          {/* Feature Image */}
+          <div className="max-w-4xl mx-auto mb-16">
+            <img 
+              src="/lovable-uploads/cb6a8c2a-2f44-42e4-8547-26c5cd8dd241.png" 
+              alt="KALE-ndar Dashboard Preview" 
+              className="w-full h-auto rounded-xl shadow-2xl border border-white/10"
+            />
+          </div>
         </div>
 
         {/* Steps */}
