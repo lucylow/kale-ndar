@@ -34,20 +34,20 @@ const WalletConnector: React.FC = () => {
       // Show connecting toast
       toast({
         title: "Connecting...",
-        description: "Please approve the connection in your wallet",
-        duration: 3000,
-      });
-      
-      await connectWallet(walletType);
-      const walletName = walletType ? availableWallets.find(w => w.adapter.name.toLowerCase() === walletType)?.name || 'wallet' : 'wallet';
-      
-      toast({
-        title: "Wallet Connected! 🎉",
-        description: `Your ${walletName} has been connected successfully. Redirecting to dashboard...`,
+        description: "Connecting to demo wallet...",
         duration: 2000,
       });
       
-      // Small delay for better UX
+      // Always connect to mock wallet directly
+      await connectWallet('mock' as WalletType);
+      
+      toast({
+        title: "Wallet Connected! 🎉",
+        description: "Demo wallet connected successfully. Redirecting to dashboard...",
+        duration: 2000,
+      });
+      
+      // Navigate to dashboard
       setTimeout(() => {
         navigate('/dashboard');
       }, 1000);

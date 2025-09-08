@@ -36,57 +36,21 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [availableWallets, setAvailableWallets] = useState<any[]>([]);
   const [currentWalletType, setCurrentWalletType] = useState<WalletType | null>(null);
 
-  // Initialize available wallets and check for existing connections
+  // Initialize available wallets but don't auto-connect
   useEffect(() => {
     const initializeWallets = async () => {
       setIsLoading(true);
       console.log('🔍 Initializing wallet manager...');
       
       try {
-        // Always use mock wallets for guaranteed connection
-        console.log('🎭 Using mock wallet manager for guaranteed connection');
+        // Set up mock wallets but don't auto-connect
+        console.log('🎭 Setting up mock wallet manager');
         const wallets = mockWalletManager.getAllWallets();
         setAvailableWallets(wallets);
         
-        // Try to auto-connect to mock wallet
-        const connected = await mockWalletManager.autoConnect();
-        
-        if (connected) {
-          const connection = mockWalletManager.getCurrentConnection();
-          const walletType = mockWalletManager.getCurrentWallet();
-          
-          if (connection && walletType) {
-            setCurrentWalletType(walletType as WalletType);
-            setWallet({
-              isConnected: true,
-              publicKey: connection.publicKey,
-              signTransaction: connection.signTransaction
-            });
-            
-            // Load user data
-            await loadUserData(connection.publicKey);
-          }
-        }
+        console.log('✨ Wallet manager ready for user connection');
       } catch (error) {
         console.error('💥 Error initializing wallets:', error);
-        // Even on error, set up a basic mock wallet
-        try {
-          const mockConnection = {
-            publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
-            signTransaction: async (tx: any) => tx
-          };
-          
-          setCurrentWalletType('mock' as WalletType);
-          setWallet({
-            isConnected: true,
-            publicKey: mockConnection.publicKey,
-            signTransaction: mockConnection.signTransaction
-          });
-          
-          await loadUserData(mockConnection.publicKey);
-        } catch (fallbackError) {
-          console.error('Failed to set up fallback mock wallet:', fallbackError);
-        }
       } finally {
         setIsLoading(false);
         console.log('✨ Wallet initialization completed');
