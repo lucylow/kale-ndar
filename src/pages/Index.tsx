@@ -193,6 +193,29 @@ const IndexContent = () => {
         <Hero />
         <YieldOptimizer />
         <Features />
+        
+        {/* Create Your Own Markets Section */}
+        <section className="py-20 bg-gradient-to-b from-background to-muted/10">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 text-foreground">
+                Create Your Own Markets
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Design custom prediction markets with flexible market types and automated oracle resolution
+              </p>
+            </div>
+            
+            <div className="max-w-6xl mx-auto">
+              <img 
+                src="/lovable-uploads/a476074c-fac7-4d9a-b3e4-8b93b83a3790.png" 
+                alt="Create Your Own Markets Interface" 
+                className="w-full h-auto rounded-xl shadow-2xl border border-white/10"
+              />
+            </div>
+          </div>
+        </section>
+        
         <HowItWorks />
         <CTA />
         
