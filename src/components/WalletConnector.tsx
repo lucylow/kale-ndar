@@ -27,62 +27,31 @@ const WalletConnector: React.FC = () => {
     return <SimpleWalletConnector />;
   }
 
-  const handleConnect = async (walletType?: WalletType) => {
+  const handleConnect = async () => {
     try {
       setIsConnecting(true);
       
-      // Show connecting toast
-      toast({
-        title: "Connecting...",
-        description: "Setting up your mock wallet",
-        duration: 3000,
-      });
-      
-      // Force mock wallet connection by temporarily overriding the config
-      const originalForceRealWallets = (window as any).__KALE_FORCE_REAL_WALLETS;
+      // Force mock wallet connection
       (window as any).__KALE_FORCE_REAL_WALLETS = false;
       
-      try {
-        await connectWallet();
-      } finally {
-        // Restore original setting
-        (window as any).__KALE_FORCE_REAL_WALLETS = originalForceRealWallets;
-      }
+      await connectWallet();
       
       toast({
-        title: "Mock Wallet Connected! 🎉",
-        description: "Your demo wallet has been connected successfully. Redirecting to dashboard...",
+        title: "Wallet Connected! 🎉",
+        description: "Your demo wallet has been connected successfully.",
         duration: 2000,
       });
       
-      // Small delay for better UX
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
+      // Navigate to dashboard immediately
+      navigate('/dashboard');
       
     } catch (error) {
-      // If mock wallet fails, try regular connection flow
-      try {
-        await connectWallet(walletType);
-        const walletName = walletType ? availableWallets.find(w => w.adapter.name.toLowerCase() === walletType)?.name || 'wallet' : 'wallet';
-        
-        toast({
-          title: "Wallet Connected! 🎉",
-          description: `Your ${walletName} has been connected successfully. Redirecting to dashboard...`,
-          duration: 2000,
-        });
-        
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1000);
-      } catch (secondError) {
-        toast({
-          title: "Connection Failed",
-          description: secondError instanceof Error ? secondError.message : 'Failed to connect wallet. Please try again.',
-          variant: "destructive",
-          duration: 5000,
-        });
-      }
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect wallet. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
     } finally {
       setIsConnecting(false);
     }
