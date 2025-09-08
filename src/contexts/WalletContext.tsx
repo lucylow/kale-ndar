@@ -131,44 +131,26 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setIsLoading(true);
       
-      // ALWAYS use mock wallet regardless of what walletType is passed
-      console.log('Force using mock wallet for guaranteed connection, ignoring requested type:', walletType);
+      // BYPASS ALL WALLET LOGIC - Direct mock connection
+      console.log('Creating direct mock connection, bypassing all wallet adapters');
       
-      // Force mock wallet connection regardless of parameter
-      const connection = await mockWalletManager.connectWallet('mock');
+      // Create direct mock connection
+      const mockConnection = {
+        publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+        signTransaction: async (tx: any) => tx
+      };
       
-      if (!connection) {
-        // Fallback: create a simple mock connection
-        const mockConnection = {
-          publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890',
-          signTransaction: async (tx: any) => tx
-        };
-        
-        setCurrentWalletType('mock' as WalletType);
-        setWallet({
-          isConnected: true,
-          publicKey: mockConnection.publicKey,
-          signTransaction: mockConnection.signTransaction
-        });
-        
-        console.log('Fallback mock wallet connected:', mockConnection.publicKey);
-        
-        // Load user data after connecting
-        await loadUserData(mockConnection.publicKey);
-        return;
-      }
-      
-      setCurrentWalletType(walletType);
+      setCurrentWalletType('mock' as WalletType);
       setWallet({
         isConnected: true,
-        publicKey: connection.publicKey,
-        signTransaction: connection.signTransaction
+        publicKey: mockConnection.publicKey,
+        signTransaction: mockConnection.signTransaction
       });
       
-      console.log('Mock wallet connected:', connection.publicKey);
+      console.log('Direct mock wallet connected:', mockConnection.publicKey);
       
       // Load user data after connecting
-      await loadUserData(connection.publicKey);
+      await loadUserData(mockConnection.publicKey);
     } catch (error) {
       console.error('Error connecting wallet:', error);
       
