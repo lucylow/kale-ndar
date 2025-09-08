@@ -1,4 +1,4 @@
-# Kale-ndar Backend
+# Kale-ndar 
 
 A comprehensive prediction market platform built on Stellar blockchain with Soroban smart contracts, featuring KALE token integration and Reflector oracle services.
 
