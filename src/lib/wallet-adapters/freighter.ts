@@ -14,30 +14,19 @@ export class FreighterAdapter implements WalletAdapter {
 
   isAvailable(): boolean {
     try {
-      // Add more comprehensive detection for Freighter
-      console.log('🔍 Checking Freighter availability...');
+      // Check for Freighter API with better detection
+      const api = (window as any).freighterApi || (window as any).freighter;
       
-      // Check multiple possible API locations
-      const hasFreighterApi = !!(window as any).freighterApi;
-      const hasFreighter = !!(window as any).freighter;
-      const hasIsAllowed = typeof (window as any).freighterApi?.isAllowed === 'function';
-      
-      // Check if Freighter extension script is present
-      const hasFreighterScript = document.querySelector('script[src*="freighter"]') !== null;
-      
-      const available = hasFreighterApi || hasFreighter;
-      
-      console.log('🦋 Freighter detection results:', {
-        freighterApi: hasFreighterApi,
-        freighter: hasFreighter,
-        isAllowed: hasIsAllowed,
-        script: hasFreighterScript,
-        available,
-        userAgent: navigator.userAgent.includes('Chrome') || navigator.userAgent.includes('Firefox'),
-        windowKeys: Object.keys(window).filter(key => key.toLowerCase().includes('freighter'))
+      console.log('🦋 Freighter detection check:', {
+        freighterApi: !!(window as any).freighterApi,
+        freighter: !!(window as any).freighter,
+        api: !!api,
+        getAddress: typeof api?.getAddress === 'function',
+        signTransaction: typeof api?.signTransaction === 'function'
       });
       
-      return available;
+      // More reliable check - ensure the API has the required methods
+      return !!api && typeof api.getAddress === 'function' && typeof api.signTransaction === 'function';
     } catch (error) {
       console.error('Error checking Freighter availability:', error);
       return false;
@@ -45,52 +34,50 @@ export class FreighterAdapter implements WalletAdapter {
   }
 
   async connect(): Promise<WalletConnection> {
-    if (!this.isAvailable()) {
-      throw new Error('Freighter wallet is not installed. Please install Freighter from freighter.app and refresh the page.');
+    const api = (window as any).freighterApi || (window as any).freighter;
+    
+    if (!api || typeof api.getAddress !== 'function') {
+      throw new Error('Freighter wallet is not installed or not properly loaded. Please install Freighter from freighter.app and refresh the page.');
     }
 
-    const api = window.freighterApi || window.freighter;
-    
     try {
-      console.log('Attempting Freighter connection...');
+      console.log('🦋 Attempting Freighter connection...');
       
-      // Check if Freighter is available and request permission
+      // Try to check and request permission (optional, some versions may not have this)
       try {
-        const isAllowed = await api.isAllowed();
-        console.log('Freighter permission check:', isAllowed);
-        
-        if (!isAllowed) {
-          console.log('Requesting Freighter permission...');
-          await api.setAllowed();
+        if (typeof api.isAllowed === 'function') {
+          const isAllowed = await api.isAllowed();
+          console.log('Freighter permission check:', isAllowed);
+          
+          if (!isAllowed && typeof api.setAllowed === 'function') {
+            console.log('Requesting Freighter permission...');
+            await api.setAllowed();
+          }
+        } else {
+          console.log('Freighter isAllowed method not available, proceeding with direct connection');
         }
       } catch (permError) {
-        console.log('Permission check failed, trying direct connection...', permError);
+        console.log('Permission check failed, continuing with connection...', permError);
       }
-
-      // Get network passphrase from config
-      const networkPassphrase = this.getNetworkPassphrase();
-      console.log('Using network:', networkPassphrase);
 
       // Get the public key/address
       console.log('Getting Freighter address...');
       const addressResponse = await api.getAddress();
       console.log('Freighter address response:', addressResponse);
       
-      const publicKey = typeof addressResponse === 'string' ? addressResponse : addressResponse.address;
+      const publicKey = typeof addressResponse === 'string' ? addressResponse : addressResponse?.address;
       
       if (!publicKey) {
-        throw new Error('No public key returned from Freighter');
+        throw new Error('No public key returned from Freighter. Please make sure Freighter is unlocked and has an account selected.');
       }
 
-      console.log('Freighter connected successfully:', publicKey);
-      console.log(`✅ Freighter connected successfully!`);
-      console.log(`📍 Address: ${publicKey}`);
-      console.log(`🌐 Network: ${networkPassphrase.includes('Test') ? 'Testnet' : 'Mainnet'}`);
+      console.log(`✅ Freighter connected successfully! Address: ${publicKey}`);
 
       return {
         publicKey,
         signTransaction: async (transactionXdr: string) => {
-          console.log('Signing transaction with Freighter...');
+          console.log('🔏 Signing transaction with Freighter...');
+          const networkPassphrase = this.getNetworkPassphrase();
           const result = await api.signTransaction(transactionXdr, {
             networkPassphrase,
           });
@@ -99,7 +86,14 @@ export class FreighterAdapter implements WalletAdapter {
         }
       };
     } catch (error) {
-      console.error('Freighter connection error:', error);
+      console.error('❌ Freighter connection error:', error);
+      if (error instanceof Error) {
+        if (error.message.includes('User declined')) {
+          throw new Error('Connection cancelled. Please approve the connection request in Freighter.');
+        } else if (error.message.includes('locked')) {
+          throw new Error('Freighter wallet is locked. Please unlock your wallet and try again.');
+        }
+      }
       throw new Error(`Failed to connect to Freighter: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
