@@ -2,15 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Clock, Users, DollarSign, Target, Calendar, Wifi, WifiOff, AlertTriangle, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Users, DollarSign, Target, Calendar, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
 import { Market } from '@/types/market';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useLoadingState } from '@/hooks/useLoadingState';
-import { LineChart, Line, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import btcChart from '@/assets/market-chart-btc.jpg';
-import ethChart from '@/assets/market-chart-eth.jpg';
-import kaleChart from '@/assets/market-chart-kale.jpg';
 
 interface MarketCardProps {
   market: Market;
@@ -36,25 +32,6 @@ const MarketCard = React.memo<MarketCardProps>(({
   const [isConnected, setIsConnected] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [priceChange, setPriceChange] = useState<number | null>(null);
-  
-  // Generate mock chart data
-  const generateChartData = () => {
-    return Array.from({ length: 20 }, (_, i) => ({
-      time: i,
-      value: (market.currentPrice || 100) + Math.sin(i * 0.5) * 10 + (Math.random() - 0.5) * 5,
-    }));
-  };
-  
-  const [chartData] = useState(() => generateChartData());
-  
-  // Get chart image based on asset
-  const getChartImage = () => {
-    const code = market.oracleAsset.code.toLowerCase();
-    if (code.includes('btc')) return btcChart;
-    if (code.includes('eth')) return ethChart;
-    if (code.includes('kale')) return kaleChart;
-    return btcChart; // default
-  };
 
   // Simulate real-time updates
   useEffect(() => {
@@ -130,46 +107,6 @@ const MarketCard = React.memo<MarketCardProps>(({
       </CardHeader>
       
       <CardContent className="relative z-10">
-        {/* Market Chart Visualization */}
-        <div className="mb-6 relative overflow-hidden rounded-xl bg-gradient-to-br from-background/50 to-background/20 border border-white/10">
-          {/* Chart Image Background */}
-          <div className="absolute inset-0 opacity-30">
-            <img 
-              src={getChartImage()} 
-              alt={`${market.oracleAsset.code} chart`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          {/* Mini Chart Overlay */}
-          <div className="relative z-10 h-32 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">
-                  Price Trend
-                </span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                24h
-              </div>
-            </div>
-            
-            <ResponsiveContainer width="100%" height={80}>
-              <AreaChart data={chartData}>
-                <Area 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="hsl(var(--primary))" 
-                  fill="hsl(var(--primary))" 
-                  fillOpacity={0.2}
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        
         {/* Enhanced Market Stats */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="text-center p-4 bg-primary/10 rounded-xl border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 group/stat">

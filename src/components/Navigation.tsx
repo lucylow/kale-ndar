@@ -106,43 +106,51 @@ const Navigation = () => {
                   How It Works
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
                 </a>
+                <a 
+                  href="#community" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group"
+                >
+                  Community
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <button 
+                  onClick={() => navigate('/demo')}
+                  className="text-muted-foreground hover:text-accent-teal transition-colors relative group flex items-center gap-1"
+                >
+                  <Play className="h-4 w-4" />
+                  Demo
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-teal transition-all duration-300 group-hover:w-full"></span>
+                </button>
               </>
             )}
           </div>
 
           {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* Status Indicators */}
-            <div className="flex items-center gap-2">
-              <ConnectionStatus variant="icon" />
-              <NetworkIndicator />
-            </div>
+          <div className="hidden md:flex items-center gap-4">
+            <ConnectionStatus variant="icon" className="mr-2" />
             
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="hover:bg-accent/50 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {getThemeIcon()}
+            </Button>
+            
+            {/* Notification Button */}
+            <NotificationBadge count={notificationCount} variant="default">
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={toggleTheme}
-                className="hover:bg-accent/50 transition-colors"
-                aria-label="Toggle theme"
+                className="hover:bg-accent/50 transition-colors relative"
+                aria-label="Notifications"
               >
-                {getThemeIcon()}
+                <Bell className="h-4 w-4" />
               </Button>
-              
-              <NotificationBadge count={notificationCount} variant="default">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-accent/50 transition-colors"
-                  aria-label="Notifications"
-                >
-                  <Bell className="h-4 w-4" />
-                </Button>
-              </NotificationBadge>
-            </div>
+            </NotificationBadge>
             
-            {/* Demo Button */}
             <Button 
               variant="outline" 
               size="sm" 
@@ -153,21 +161,21 @@ const Navigation = () => {
               Demo
             </Button>
             
-            {/* Wallet & Dashboard */}
-            <div className="flex items-center gap-2">
-              <WalletConnector />
-              {wallet.isConnected && (
-                <Button 
-                  variant="hero" 
-                  size="sm" 
-                  className="hover:scale-105 transition-transform gap-2"
-                  onClick={() => navigate('/dashboard')}
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  Dashboard
-                </Button>
-              )}
-            </div>
+            {/* Network Indicator */}
+            <NetworkIndicator />
+            
+            <WalletConnector />
+            {wallet.isConnected && (
+              <Button 
+                variant="hero" 
+                size="sm" 
+                className="hover:scale-105 transition-transform gap-2"
+                onClick={() => navigate('/dashboard')}
+              >
+                <BarChart3 className="h-4 w-4" />
+                Dashboard
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -267,6 +275,23 @@ const Navigation = () => {
                 >
                   How It Works
                 </a>
+                <a 
+                  href="#community" 
+                  className="text-muted-foreground hover:text-accent-teal transition-colors py-2 px-4 rounded-lg hover:bg-accent/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Community
+                </a>
+                <button 
+                  onClick={() => {
+                    navigate('/demo');
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-muted-foreground hover:text-accent-teal transition-all duration-200 py-3 px-4 rounded-lg hover:bg-accent/20 text-left hover:translate-x-1 flex items-center gap-3"
+                >
+                  <Play className="h-4 w-4" />
+                  Demo
+                </button>
               </>
             )}
             <div className="flex flex-col gap-3 pt-4 border-t border-white/10">

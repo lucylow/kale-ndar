@@ -43,8 +43,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       console.log('🔍 Initializing wallet manager...');
       
       try {
-        // Force real wallets if configured, but allow temporary override
-        const useRealWallets = config.wallet.forceRealWallets !== false && (window as any).__KALE_FORCE_REAL_WALLETS !== false;
+        // Force real wallets if configured
+        const useRealWallets = config.wallet.forceRealWallets !== false;
         
         if (useRealWallets) {
           // Add delay to ensure browser extensions are loaded
@@ -203,7 +203,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsLoading(true);
       
       // Always try to use real wallets first when forceRealWallets is enabled
-      const useRealWallets = config.wallet.forceRealWallets !== false && (window as any).__KALE_FORCE_REAL_WALLETS !== false;
+      const useRealWallets = config.wallet.forceRealWallets !== false;
       
       if (useRealWallets) {
         const availableRealWallets = walletManager.getAvailableWallets();

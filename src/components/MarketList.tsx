@@ -212,12 +212,11 @@ const MarketList: React.FC = () => {
                   <Skeleton className="h-4 w-1/2" />
                 </CardHeader>
                 <CardContent>
-                  <Skeleton className="h-32 w-full mb-4 rounded-xl" />
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <Skeleton className="h-16 w-full rounded-xl" />
-                    <Skeleton className="h-16 w-full rounded-xl" />
+                  <Skeleton className="h-20 w-full mb-4" />
+                  <div className="flex gap-2 mb-4">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-16" />
                   </div>
-                  <Skeleton className="h-10 w-full mb-2" />
                   <Skeleton className="h-10 w-full" />
                 </CardContent>
               </Card>
