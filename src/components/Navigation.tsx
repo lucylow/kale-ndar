@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X, Sun, Moon, Monitor, Bell, BarChart3, Target, Sparkles, Play } from "lucide-react";
+import { Menu, X, Sun, Moon, Monitor, Bell, BarChart3, Target, Sparkles, Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import WalletConnector from "@/components/WalletConnector";
 import NetworkIndicator from "@/components/NetworkIndicator";
@@ -49,8 +49,12 @@ const Navigation = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer" onClick={() => navigate('/')}>
-            <div className="p-1.5 sm:p-2 rounded-xl bg-gradient-primary transition-all duration-300 group-hover:scale-110 group-hover:shadow-primary">
-              <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-background" />
+            <div className="transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-lg">
+              <img 
+                src="/lovable-uploads/edeb72bc-c588-4cdf-a715-4cafa7e36e71.png" 
+                alt="KALE-ndar Logo" 
+                className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg"
+              />
             </div>
             <span className="text-xl sm:text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors">
               KALE-ndar
