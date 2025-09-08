@@ -13,44 +13,28 @@ export class FreighterAdapter implements WalletAdapter {
   icon = '🦋';
 
   isAvailable(): boolean {
-<<<<<<< Updated upstream
-    // Add more comprehensive detection for Freighter
-    console.log('🔍 Checking Freighter availability...');
-    
-    // Check multiple possible API locations
-    const hasFreighterApi = !!(window as any).freighterApi;
-    const hasFreighter = !!(window as any).freighter;
-    const hasIsAllowed = typeof (window as any).freighterApi?.isAllowed === 'function';
-    
-    // Check if Freighter extension script is present
-    const hasFreighterScript = document.querySelector('script[src*="freighter"]') !== null;
-    
-    const available = hasFreighterApi || hasFreighter;
-    
-    console.log('🦋 Freighter detection results:', {
-      freighterApi: hasFreighterApi,
-      freighter: hasFreighter,
-      isAllowed: hasIsAllowed,
-      script: hasFreighterScript,
-      available,
-      userAgent: navigator.userAgent.includes('Chrome') || navigator.userAgent.includes('Firefox'),
-      windowKeys: Object.keys(window).filter(key => key.toLowerCase().includes('freighter'))
-    });
-    
-    return available;
-=======
     try {
-      // Check multiple possible Freighter API locations
-      const freighterApi = window.freighterApi;
-      const freighter = window.freighter;
+      // Add more comprehensive detection for Freighter
+      console.log('🔍 Checking Freighter availability...');
       
-      const available = !!(freighterApi || freighter);
+      // Check multiple possible API locations
+      const hasFreighterApi = !!(window as any).freighterApi;
+      const hasFreighter = !!(window as any).freighter;
+      const hasIsAllowed = typeof (window as any).freighterApi?.isAllowed === 'function';
       
-      console.log('Freighter detection:', {
-        freighterApi: !!freighterApi,
-        freighter: !!freighter,
+      // Check if Freighter extension script is present
+      const hasFreighterScript = document.querySelector('script[src*="freighter"]') !== null;
+      
+      const available = hasFreighterApi || hasFreighter;
+      
+      console.log('🦋 Freighter detection results:', {
+        freighterApi: hasFreighterApi,
+        freighter: hasFreighter,
+        isAllowed: hasIsAllowed,
+        script: hasFreighterScript,
         available,
-        userAgent: navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Other'
+        userAgent: navigator.userAgent.includes('Chrome') || navigator.userAgent.includes('Firefox'),
+        windowKeys: Object.keys(window).filter(key => key.toLowerCase().includes('freighter'))
       });
       
       return available;
@@ -58,7 +42,6 @@ export class FreighterAdapter implements WalletAdapter {
       console.error('Error checking Freighter availability:', error);
       return false;
     }
->>>>>>> Stashed changes
   }
 
   async connect(): Promise<WalletConnection> {
@@ -84,15 +67,12 @@ export class FreighterAdapter implements WalletAdapter {
         console.log('Permission check failed, trying direct connection...', permError);
       }
 
-<<<<<<< Updated upstream
       // Get network passphrase from config
       const networkPassphrase = this.getNetworkPassphrase();
       console.log('Using network:', networkPassphrase);
 
-=======
       // Get the public key/address
       console.log('Getting Freighter address...');
->>>>>>> Stashed changes
       const addressResponse = await api.getAddress();
       console.log('Freighter address response:', addressResponse);
       
@@ -103,7 +83,6 @@ export class FreighterAdapter implements WalletAdapter {
       }
 
       console.log('Freighter connected successfully:', publicKey);
-
       console.log(`✅ Freighter connected successfully!`);
       console.log(`📍 Address: ${publicKey}`);
       console.log(`🌐 Network: ${networkPassphrase.includes('Test') ? 'Testnet' : 'Mainnet'}`);
