@@ -154,9 +154,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Load user data after connecting
       await loadUserData(mockConnection.publicKey);
       
-      // Force navigation to dashboard after successful connection
-      console.log('Navigating to dashboard...');
-      navigate('/dashboard');
+      // Force navigation to external dashboard after successful connection
+      console.log('Navigating to external dashboard...');
+      window.location.href = 'https://kale-ndar.lovable.app/dashboard';
     } catch (error) {
       console.error('Error connecting wallet:', error);
       
