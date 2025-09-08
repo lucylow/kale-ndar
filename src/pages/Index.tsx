@@ -191,7 +191,6 @@ const IndexContent = () => {
       <Navigation />
       <main>
         <Hero />
-        <MarketList />
         <YieldOptimizer />
         <Features />
         <HowItWorks />
